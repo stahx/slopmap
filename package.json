@@ -1,0 +1,26 @@
+{
+  "name": "slopmap",
+  "version": "0.1.0",
+  "description": "3D architecture map of any repo or PR — changed files and their blast radius",
+  "type": "module",
+  "bin": {
+    "slopmap": "bin/slopmap.js"
+  },
+  "files": [
+    "bin",
+    "src"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "3d-force-graph": "^1.73.0"
+  },
+  "devDependencies": {
+    "vitest": "^3.2.4"
+  },
+  "license": "MIT"
+}
