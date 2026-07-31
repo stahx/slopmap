@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>__SLOPMAP_TITLE__</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #1a1a19;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+
+    #graph {
+      position: fixed;
+      inset: 0;
+    }
+
+    #panel {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      z-index: 2;
+      width: calc(100vw - 32px);
+      max-width: 340px;
+      padding: 14px 16px;
+      color: #ffffff;
+      background: rgba(26,26,25,0.92);
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 10px;
+      backdrop-filter: blur(6px);
+    }
+
+    #panel-title {
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.35;
+    }
+
+    #meta {
+      margin-top: 4px;
+      color: #c3c2b7;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    #legend {
+      display: grid;
+      gap: 6px;
+      margin-top: 12px;
+    }
+
+    .legend-row {
+      display: grid;
+      grid-template-columns: 10px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 8px;
+      color: #c3c2b7;
+      font-size: 12px;
+      line-height: 1.3;
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .legend-count {
+      color: #898781;
+    }
+
+    #search {
+      width: 100%;
+      margin-top: 12px;
+      padding: 7px 9px;
+      color: #ffffff;
+      background: #262624;
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 6px;
+      outline: none;
+      font: inherit;
+      font-size: 12px;
+    }
+
+    #search::placeholder {
+      color: #898781;
+    }
+
+    #search:focus {
+      border-color: rgba(255,255,255,0.24);
+    }
+
+    #filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 14px;
+      margin-top: 10px;
+    }
+
+    .checkbox-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: #c3c2b7;
+      font-size: 12px;
+      line-height: 1.3;
+      cursor: pointer;
+    }
+
+    .checkbox-label input {
+      margin: 0;
+      accent-color: #ec835a;
+    }
+
+    #hint {
+      margin-top: 10px;
+      color: #898781;
+      font-size: 11px;
+      line-height: 1.35;
+    }
+  </style>
+</head>
+<body>
+  <div id="graph"></div>
+  <section id="panel">
+    <div id="panel-title">__SLOPMAP_TITLE__</div>
+    <div id="meta"></div>
+    <div id="legend"></div>
+    <input id="search" type="search" placeholder="filter files…" aria-label="Filter files">
+    <div id="filters">
+      <label id="impact-option" class="checkbox-label">
+        <input id="impact-only" type="checkbox" checked>
+        <span>impact only</span>
+      </label>
+      <label class="checkbox-label">
+        <input id="hide-isolated" type="checkbox">
+        <span>hide isolated</span>
+      </label>
+    </div>
+    <div id="hint">drag rotate · scroll zoom · click node = focus</div>
+  </section>
+  <script>__SLOPMAP_LIB__</script>
+  <script>
+    const payload = __SLOPMAP_DATA__;
+    const diffMode = payload.graph.stats.changedCount > 0;
+    const STATUS_COLORS = { changed: '#d03b3b', dependent: '#ec835a', dependency: '#fab219' };
+    const GROUP_COLORS = ['#3987e5', '#d95926', '#199e70', '#c98500', '#d55181', '#008300', '#9085e9', '#e66767'];
+    const MUTED_COLOR = '#898781';
+    const filterState = { searchTerm: '' };
+    const groupColors = new Map(
+      payload.graph.groups
+        .slice(0, GROUP_COLORS.length)
+        .map((group, slotIndex) => [group.name, GROUP_COLORS[slotIndex]])
+    );
+    const metaElement = document.getElementById('meta');
+    const legendElement = document.getElementById('legend');
+    const searchInput = document.getElementById('search');
+    const impactOption = document.getElementById('impact-option');
+    const impactOnlyInput = document.getElementById('impact-only');
+    const hideIsolatedInput = document.getElementById('hide-isolated');
+
+    const appendLegendRow = (color, label, count) => {
+      const rowElement = document.createElement('div');
+      const dotElement = document.createElement('span');
+      const labelElement = document.createElement('span');
+      const countElement = document.createElement('span');
+      rowElement.className = 'legend-row';
+      dotElement.className = 'legend-dot';
+      dotElement.style.background = color;
+      labelElement.textContent = label;
+      countElement.className = 'legend-count';
+      countElement.textContent = String(count);
+      rowElement.append(dotElement, labelElement, countElement);
+      legendElement.append(rowElement);
+    };
+
+    const renderLegend = () => {
+      if (diffMode) {
+        const untouchedCount = payload.graph.nodes.filter((node) => node.status === 'normal').length;
+        appendLegendRow(STATUS_COLORS.changed, 'Changed', payload.graph.stats.changedCount);
+        appendLegendRow(STATUS_COLORS.dependent, 'Blast radius (depends on change)', payload.graph.stats.dependentCount);
+        appendLegendRow(STATUS_COLORS.dependency, 'Change depends on', payload.graph.stats.dependencyCount);
+        appendLegendRow(MUTED_COLOR, 'Untouched', untouchedCount);
+        return;
+      }
+
+      for (const [slotIndex, group] of payload.graph.groups.slice(0, GROUP_COLORS.length).entries()) {
+        appendLegendRow(GROUP_COLORS[slotIndex], group.name, group.count);
+      }
+      if (payload.graph.groups.length > GROUP_COLORS.length) {
+        const otherCount = payload.graph.groups
+          .slice(GROUP_COLORS.length)
+          .reduce((totalCount, group) => totalCount + group.count, 0);
+        appendLegendRow(MUTED_COLOR, 'other', `(${otherCount})`);
+      }
+    };
+
+    metaElement.textContent = `${payload.graph.stats.fileCount} files · ${payload.graph.stats.linkCount} imports` +
+      (diffMode
+        ? ` · ${payload.graph.stats.changedCount} changed · ${payload.graph.stats.dependentCount} blast`
+        : '');
+    impactOption.hidden = !diffMode;
+    renderLegend();
+
+    const colorFor = (node) => {
+      if (filterState.searchTerm && node.id.toLowerCase().includes(filterState.searchTerm)) return '#ffffff';
+      if (node.status !== 'normal') return STATUS_COLORS[node.status];
+      if (diffMode) return 'rgba(137,135,129,0.35)';
+      return groupColors.get(node.group) || MUTED_COLOR;
+    };
+
+    const idOf = (endpoint) => typeof endpoint === 'object' ? endpoint.id : endpoint;
+
+    const graphInstance = ForceGraph3D()(document.getElementById('graph'))
+      .backgroundColor('#1a1a19')
+      .nodeLabel((node) => `${node.id} · ${node.loc} loc` + (node.status !== 'normal' ? ` · ${node.status}` : ''))
+      .nodeVal((node) => Math.max(1, Math.min(14, node.loc / 60)))
+      .nodeColor(colorFor)
+      .linkColor((link) => link.hot ? '#ec835a' : '#4a4a47')
+      .linkOpacity(0.35)
+      .linkDirectionalParticles((link) => link.hot ? 2 : 0)
+      .linkDirectionalParticleWidth(1.4)
+      .onNodeClick((node) => {
+        const distance = 140;
+        const length = Math.hypot(node.x, node.y, node.z) || 1;
+        const ratio = 1 + distance / length;
+        graphInstance.cameraPosition(
+          { x: node.x * ratio, y: node.y * ratio, z: node.z * ratio },
+          node,
+          800
+        );
+      });
+
+    const applyFilters = () => {
+      let nodes = payload.graph.nodes;
+      if (diffMode && impactOnlyInput.checked) {
+        nodes = nodes.filter((node) => node.status !== 'normal');
+      }
+      let keptNodeIds = new Set(nodes.map((node) => node.id));
+      let links = payload.graph.links.filter(
+        (link) => keptNodeIds.has(idOf(link.source)) && keptNodeIds.has(idOf(link.target))
+      );
+      if (hideIsolatedInput.checked) {
+        const linkedNodeIds = new Set();
+        for (const link of links) {
+          linkedNodeIds.add(idOf(link.source));
+          linkedNodeIds.add(idOf(link.target));
+        }
+        nodes = nodes.filter((node) => linkedNodeIds.has(node.id));
+        keptNodeIds = new Set(nodes.map((node) => node.id));
+        links = links.filter(
+          (link) => keptNodeIds.has(idOf(link.source)) && keptNodeIds.has(idOf(link.target))
+        );
+      }
+      graphInstance.graphData({ nodes, links });
+    };
+
+    searchInput.addEventListener('input', () => {
+      filterState.searchTerm = searchInput.value.toLowerCase();
+      graphInstance.nodeColor(colorFor);
+    });
+    impactOnlyInput.addEventListener('change', applyFilters);
+    hideIsolatedInput.addEventListener('change', applyFilters);
+    applyFilters();
+  </script>
+</body>
+</html>
