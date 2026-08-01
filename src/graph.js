@@ -19,6 +19,74 @@ const sectionFor = (filePath) => {
   return segments.length >= 3 ? `${segments[0]}/${segments[1]}` : segments[0];
 };
 
+const rootOf = (filePath) => filePath.includes('/') ? filePath.split('/')[0] : '(root)';
+
+const createSectionRecord = (sectionId, groupName) => ({
+  id: sectionId,
+  group: groupName,
+  fileCount: 0,
+  loc: 0,
+  changedCount: 0,
+  dependentCount: 0,
+  dependencyCount: 0,
+  changedFiles: [],
+  status: 'normal',
+});
+
+const buildAggregate = (nodesById, links, sectionOf) => {
+  const sectionRecordsById = new Map();
+  for (const node of nodesById.values()) {
+    const sectionId = sectionOf(node.id);
+    if (!sectionRecordsById.has(sectionId)) {
+      sectionRecordsById.set(sectionId, createSectionRecord(sectionId, sectionId));
+    }
+    const section = sectionRecordsById.get(sectionId);
+    section.fileCount += 1;
+    section.loc += node.loc;
+    if (node.status === 'changed') {
+      section.changedCount += 1;
+      if (section.changedFiles.length < 100) section.changedFiles.push(node.id);
+    } else if (node.status === 'dependent') {
+      section.dependentCount += 1;
+    } else if (node.status === 'dependency') {
+      section.dependencyCount += 1;
+    }
+  }
+
+  const sections = [...sectionRecordsById.values()];
+  for (const section of sections) {
+    section.status = section.changedCount > 0
+      ? 'changed'
+      : section.dependentCount > 0
+        ? 'dependent'
+        : section.dependencyCount > 0
+          ? 'dependency'
+          : 'normal';
+  }
+
+  const importLinksByKey = new Map();
+  for (const link of links) {
+    const sourceSection = sectionOf(link.source);
+    const targetSection = sectionOf(link.target);
+    if (sourceSection === targetSection) continue;
+    const importKey = `${sourceSection}\0${targetSection}`;
+    if (!importLinksByKey.has(importKey)) {
+      importLinksByKey.set(importKey, {
+        source: sourceSection,
+        target: targetSection,
+        kind: 'imports',
+        weight: 0,
+        hot: 0,
+      });
+    }
+    const importLink = importLinksByKey.get(importKey);
+    importLink.weight += 1;
+    if (link.hot) importLink.hot = 1;
+  }
+
+  return { sections, links: [...importLinksByKey.values()] };
+};
+
 const breadthFirst = (startIds, adjacency) => {
   const visited = new Set();
   let frontier = [...startIds];
@@ -92,6 +160,7 @@ export const buildGraph = ({ sources, resolver, changedFiles }) => {
 
   for (const node of nodesById.values()) {
     node.section = sectionFor(node.id);
+    node.rootGroup = rootOf(node.id);
   }
 
   const sectionCountsByGroup = new Map();
@@ -125,78 +194,27 @@ export const buildGraph = ({ sources, resolver, changedFiles }) => {
     link.hot = sourceStatus !== 'normal' && targetStatus !== 'normal' ? 1 : 0;
   }
 
-  const sectionRecordsById = new Map();
+  const dirs = buildAggregate(nodesById, links, (filePath) => nodesById.get(filePath).section);
+  const dirSectionsById = new Map(dirs.sections.map((section) => [section.id, section]));
   const groupsWithSubsections = new Set();
-  const createSectionRecord = (sectionId, groupName) => ({
-    id: sectionId,
-    group: groupName,
-    fileCount: 0,
-    loc: 0,
-    changedCount: 0,
-    dependentCount: 0,
-    dependencyCount: 0,
-    changedFiles: [],
-    status: 'normal',
-  });
-
   for (const node of nodesById.values()) {
-    if (!sectionRecordsById.has(node.section)) {
-      sectionRecordsById.set(node.section, createSectionRecord(node.section, node.group));
-    }
+    dirSectionsById.get(node.section).group = node.group;
     if (node.section !== node.group) groupsWithSubsections.add(node.group);
-    const section = sectionRecordsById.get(node.section);
-    section.fileCount += 1;
-    section.loc += node.loc;
-    if (node.status === 'changed') {
-      section.changedCount += 1;
-      if (section.changedFiles.length < 100) section.changedFiles.push(node.id);
-    } else if (node.status === 'dependent') {
-      section.dependentCount += 1;
-    } else if (node.status === 'dependency') {
-      section.dependencyCount += 1;
-    }
   }
 
   for (const groupName of groupsWithSubsections) {
-    if (!sectionRecordsById.has(groupName)) {
-      sectionRecordsById.set(groupName, createSectionRecord(groupName, groupName));
+    if (!dirSectionsById.has(groupName)) {
+      const hubSection = createSectionRecord(groupName, groupName);
+      dirSectionsById.set(groupName, hubSection);
+      dirs.sections.push(hubSection);
     }
   }
 
-  const sections = [...sectionRecordsById.values()];
-  for (const section of sections) {
-    section.status = section.changedCount > 0
-      ? 'changed'
-      : section.dependentCount > 0
-        ? 'dependent'
-        : section.dependencyCount > 0
-          ? 'dependency'
-          : 'normal';
-  }
-
-  const sectionLinks = sections
+  const orbitLinks = dirs.sections
     .filter((section) => section.id !== section.group)
     .map((section) => ({ source: section.group, target: section.id, kind: 'orbit' }));
-  const importLinksByKey = new Map();
-  for (const link of links) {
-    const sourceSection = nodesById.get(link.source).section;
-    const targetSection = nodesById.get(link.target).section;
-    if (sourceSection === targetSection) continue;
-    const importKey = `${sourceSection}\0${targetSection}`;
-    if (!importLinksByKey.has(importKey)) {
-      importLinksByKey.set(importKey, {
-        source: sourceSection,
-        target: targetSection,
-        kind: 'imports',
-        weight: 0,
-        hot: 0,
-      });
-    }
-    const importLink = importLinksByKey.get(importKey);
-    importLink.weight += 1;
-    if (link.hot) importLink.hot = 1;
-  }
-  sectionLinks.push(...importLinksByKey.values());
+  dirs.links = [...orbitLinks, ...dirs.links];
+  const roots = buildAggregate(nodesById, links, rootOf);
 
   const groupCounts = new Map();
   for (const node of nodesById.values()) {
@@ -210,7 +228,7 @@ export const buildGraph = ({ sources, resolver, changedFiles }) => {
     nodes: [...nodesById.values()],
     links,
     groups,
-    cosmos: { sections, links: sectionLinks },
+    levels: { roots, dirs },
     stats: {
       fileCount: nodesById.size,
       linkCount: links.length,
