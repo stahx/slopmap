@@ -171,6 +171,25 @@
       margin-top: 10px;
     }
 
+    #theme-setting {
+      margin-top: 10px;
+    }
+
+    #theme-label {
+      margin-bottom: 4px;
+      color: #898781;
+      font-size: 11px;
+    }
+
+    #theme-toggle {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+      padding: 2px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 7px;
+    }
+
     .checkbox-label {
       display: inline-flex;
       align-items: center;
@@ -339,6 +358,13 @@
         </label>
       </div>
     </div>
+    <div id="theme-setting">
+      <div id="theme-label">background</div>
+      <div id="theme-toggle" aria-label="Background theme">
+        <button class="view-button" type="button" data-theme="plain">Plain</button>
+        <button class="view-button" type="button" data-theme="galaxy">Galaxy</button>
+      </div>
+    </div>
     <div id="section-filter" hidden>
       <span id="section-filter-label"></span>
       <button id="clear-section-filter" type="button" aria-label="Clear section filter">×</button>
@@ -365,6 +391,8 @@
     let currentView = 'cosmos';
     let sectionFilter = null;
     let selectedSection = null;
+    let selectedNode = null;
+    let simulationNodes = [];
     let labelFrameId = null;
     let initialEngineStopPending = true;
     const groupColors = new Map(
@@ -390,7 +418,8 @@
     const detailBodyElement = document.getElementById('detail-body');
     const detailCloseButton = document.getElementById('detail-close');
     const openAdvancedButton = document.getElementById('open-advanced');
-    const viewButtons = [...document.querySelectorAll('.view-button')];
+    const viewButtons = [...document.querySelectorAll('#view-toggle .view-button')];
+    const themeButtons = [...document.querySelectorAll('#theme-toggle .view-button')];
     const sectionLabelElements = new Map();
 
     const appendLegendRow = (color, label, count) => {
@@ -432,17 +461,35 @@
     const isSectionNode = (node) => node.fileCount !== undefined;
     const idOf = (endpoint) => typeof endpoint === 'object' ? endpoint.id : endpoint;
 
+    const blendTowardWhite = (hexColor, blendRatio) => {
+      const blendChannel = (channelOffset) => {
+        const channelValue = parseInt(hexColor.slice(channelOffset, channelOffset + 2), 16);
+        return Math.round(channelValue + (255 - channelValue) * blendRatio)
+          .toString(16)
+          .padStart(2, '0');
+      };
+      return `#${blendChannel(1)}${blendChannel(3)}${blendChannel(5)}`;
+    };
+
     const nodeColorFor = (node) => {
+      let baseColor;
       if (isSectionNode(node)) {
-        if (diffMode) {
-          return node.status === 'normal' ? 'rgba(137,135,129,0.5)' : STATUS_COLORS[node.status];
-        }
-        return groupColors.get(node.group) || MUTED_COLOR;
+        baseColor = diffMode
+          ? (node.status === 'normal' ? 'rgba(137,135,129,0.5)' : STATUS_COLORS[node.status])
+          : (groupColors.get(node.group) || MUTED_COLOR);
+      } else if (filterState.searchTerm && node.id.toLowerCase().includes(filterState.searchTerm)) {
+        baseColor = '#ffffff';
+      } else if (node.status !== 'normal') {
+        baseColor = STATUS_COLORS[node.status];
+      } else if (diffMode) {
+        baseColor = 'rgba(137,135,129,0.35)';
+      } else {
+        baseColor = groupColors.get(node.group) || MUTED_COLOR;
       }
-      if (filterState.searchTerm && node.id.toLowerCase().includes(filterState.searchTerm)) return '#ffffff';
-      if (node.status !== 'normal') return STATUS_COLORS[node.status];
-      if (diffMode) return 'rgba(137,135,129,0.35)';
-      return groupColors.get(node.group) || MUTED_COLOR;
+      if (node !== selectedNode) return baseColor;
+      return baseColor.startsWith('#')
+        ? blendTowardWhite(baseColor, 0.4)
+        : blendTowardWhite('#898781', 0.4);
     };
 
     const nodeLabelFor = (node) => {
@@ -606,6 +653,14 @@
       }
     };
 
+    const readStoredTheme = () => {
+      try {
+        return localStorage.getItem('slopmap-theme');
+      } catch (storageError) {
+        return null;
+      }
+    };
+    let backgroundTheme = readStoredTheme() === 'plain' ? 'plain' : 'galaxy';
     const starsCanvas = document.getElementById('stars');
     const starsContext = starsCanvas.getContext('2d');
     const baseCanvas = document.createElement('canvas');
@@ -752,7 +807,7 @@
     };
 
     const renderStars = (timestamp) => {
-      if (currentView !== 'cosmos') {
+      if (backgroundTheme !== 'galaxy') {
         starsFrameId = null;
         return;
       }
@@ -818,21 +873,33 @@
     };
 
     const updateStarsLoop = () => {
-      if (currentView === 'cosmos' && starsFrameId === null) {
+      if (backgroundTheme === 'galaxy' && starsFrameId === null) {
         starsFrameId = requestAnimationFrame(renderStars);
-      } else if (currentView !== 'cosmos' && starsFrameId !== null) {
+      } else if (backgroundTheme !== 'galaxy' && starsFrameId !== null) {
         cancelAnimationFrame(starsFrameId);
         starsFrameId = null;
       }
     };
 
+    const setBackgroundTheme = (theme) => {
+      backgroundTheme = theme === 'plain' ? 'plain' : 'galaxy';
+      try {
+        localStorage.setItem('slopmap-theme', backgroundTheme);
+      } catch (storageError) {}
+      starsCanvas.style.display = backgroundTheme === 'galaxy' ? 'block' : 'none';
+      updateStarsLoop();
+      for (const themeButton of themeButtons) {
+        themeButton.classList.toggle('active', themeButton.dataset.theme === backgroundTheme);
+      }
+    };
+
     const showView = (view) => {
       currentView = view;
+      selectedNode = null;
       for (const viewButton of viewButtons) {
         viewButton.classList.toggle('active', viewButton.dataset.view === view);
       }
       labelsElement.hidden = view !== 'cosmos';
-      starsCanvas.style.display = view === 'cosmos' ? 'block' : 'none';
       advancedControlsElement.hidden = view !== 'advanced';
       hintElement.textContent = view === 'cosmos'
         ? 'drag rotate · scroll zoom · click section = details'
@@ -842,28 +909,64 @@
           nodes: payload.graph.cosmos.sections,
           links: payload.graph.cosmos.links,
         });
+        graphInstance.d3Force('charge').strength(-160);
+        graphInstance.d3Force('link').distance((link) => link.kind === 'orbit' ? 70 : 110);
       } else {
         closeDetailPanel();
         graphInstance.graphData(applyFilters());
+        graphInstance.d3Force('charge').strength(-45);
+        graphInstance.d3Force('link').distance(35);
       }
+      graphInstance.d3ReheatSimulation();
       updateSectionLabelLoop();
-      updateStarsLoop();
       graphInstance.zoomToFit(600);
     };
 
-    const handleNodeClick = (node) => {
-      if (isSectionNode(node)) {
-        openSectionDetail(node);
-        return;
+    const clickRepelForce = (alpha) => {
+      if (selectedNode === null) return;
+      const repelRadius = currentView === 'cosmos' ? 180 : 90;
+      for (const simulationNode of simulationNodes) {
+        if (simulationNode === selectedNode) continue;
+        const deltaX = simulationNode.x - selectedNode.x;
+        const deltaY = simulationNode.y - selectedNode.y;
+        const deltaZ = (simulationNode.z ?? 0) - (selectedNode.z ?? 0);
+        const distance = Math.max(Math.hypot(deltaX, deltaY, deltaZ), 1);
+        if (distance < repelRadius) {
+          const pushFactor = ((repelRadius - distance) / distance) * alpha * 0.6;
+          simulationNode.vx += deltaX * pushFactor;
+          simulationNode.vy += deltaY * pushFactor;
+          simulationNode.vz += deltaZ * pushFactor;
+        }
       }
-      const distance = 140;
-      const length = Math.hypot(node.x, node.y, node.z) || 1;
-      const ratio = 1 + distance / length;
-      graphInstance.cameraPosition(
-        { x: node.x * ratio, y: node.y * ratio, z: node.z * ratio },
-        node,
-        800
-      );
+    };
+    clickRepelForce.initialize = (nodes) => { simulationNodes = nodes; };
+
+    const handleNodeClick = (node) => {
+      const isDeselecting = selectedNode === node;
+      selectedNode = isDeselecting ? null : node;
+      if (!isDeselecting) {
+        if (isSectionNode(node)) {
+          openSectionDetail(node);
+        } else {
+          const distance = 140;
+          const length = Math.hypot(node.x, node.y, node.z) || 1;
+          const ratio = 1 + distance / length;
+          graphInstance.cameraPosition(
+            { x: node.x * ratio, y: node.y * ratio, z: node.z * ratio },
+            node,
+            800
+          );
+        }
+      }
+      graphInstance.d3ReheatSimulation();
+      graphInstance.nodeColor(nodeColorFor);
+    };
+
+    const handleBackgroundClick = () => {
+      if (selectedNode === null) return;
+      selectedNode = null;
+      graphInstance.d3ReheatSimulation();
+      graphInstance.nodeColor(nodeColorFor);
     };
 
     metaElement.textContent = `${payload.graph.stats.fileCount} files · ${payload.graph.stats.linkCount} imports` +
@@ -896,14 +999,20 @@
       .linkDirectionalParticles(particleCountFor)
       .linkDirectionalParticleWidth(1.4)
       .onNodeClick(handleNodeClick)
+      .onBackgroundClick(handleBackgroundClick)
       .onEngineStop(() => {
         if (!initialEngineStopPending) return;
         initialEngineStopPending = false;
         graphInstance.zoomToFit(600);
       });
 
+    graphInstance.d3Force('clickRepel', clickRepelForce);
+
     for (const viewButton of viewButtons) {
       viewButton.addEventListener('click', () => showView(viewButton.dataset.view));
+    }
+    for (const themeButton of themeButtons) {
+      themeButton.addEventListener('click', () => setBackgroundTheme(themeButton.dataset.theme));
     }
     searchInput.addEventListener('input', () => {
       filterState.searchTerm = searchInput.value.toLowerCase();
@@ -929,6 +1038,7 @@
     window.addEventListener('resize', resizeStarsCanvas);
 
     renderSectionFilter();
+    setBackgroundTheme(backgroundTheme);
     showView(currentView);
   </script>
 </body>
