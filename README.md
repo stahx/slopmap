@@ -1,6 +1,6 @@
 # slopmap
 
-slopmap turns any JavaScript or TypeScript repository into a 3D architecture map: blocks are files, lines are imports, and diff views show a pull request's blast radius. The name is a joke, and unfortunately an accurate one.
+slopmap turns any JavaScript or TypeScript repository into a 3D architecture map. Its default cosmic view rolls files up into sections shown as planets, while diff views reveal a pull request's blast radius. The name is a joke, and unfortunately an accurate one.
 
 ## Install
 
@@ -28,6 +28,8 @@ slopmap --pr 123
 - `slopmap` renders the full map of the repository in the current directory.
 - `slopmap --base <ref>` renders changes against a Git ref and their blast radius.
 - `slopmap --pr <number>` renders the files changed by a GitHub pull request and their blast radius.
+
+Every map opens in the cosmic view, where planets represent repository sections and import lines show how those sections connect. Click a section to see its changed files, then choose `open in advanced` to inspect that section at file level. The advanced view contains the full file graph, search highlighting, and the impact-only and isolated-file toggles.
 
 | Option | Description |
 | --- | --- |
