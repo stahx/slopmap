@@ -948,7 +948,7 @@
     let aggregateFilter = null;
     let selectedSection = null;
     let selectedNode = null;
-    let simulationNodes = [];
+    let displacedOriginals = new Map();
     let labelFrameId = null;
     let initialEngineStopPending = true;
     const groupColors = new Map(
@@ -1693,6 +1693,7 @@
     const showView = (view) => {
       currentView = view;
       selectedNode = null;
+      clearSelectionDisplacement();
       closeDetailPanel();
       for (const viewButton of viewButtons) {
         viewButton.classList.toggle('active', viewButton.dataset.view === view);
@@ -1728,29 +1729,61 @@
       activeGraph().zoomToFit(600);
     };
 
-    const clickRepelForce = (alpha) => {
-      if (selectedNode === null) return;
-      const repelRadius = isAggregatedView() ? 180 : 90;
-      for (const simulationNode of simulationNodes) {
-        if (simulationNode === selectedNode) continue;
-        const deltaX = simulationNode.x - selectedNode.x;
-        const deltaY = simulationNode.y - selectedNode.y;
-        const deltaZ = (simulationNode.z ?? 0) - (selectedNode.z ?? 0);
-        const distance = Math.max(Math.hypot(deltaX, deltaY, deltaZ), 1);
-        if (distance < repelRadius) {
-          const pushFactor = ((repelRadius - distance) / distance) * alpha * 0.6;
-          simulationNode.vx += deltaX * pushFactor;
-          simulationNode.vy += deltaY * pushFactor;
-          simulationNode.vz += deltaZ * pushFactor;
+    const clearSelectionDisplacement = () => {
+      if (displacedOriginals.size === 0) return;
+      for (const [displacedNode, original] of displacedOriginals) {
+        displacedNode.x = original.x;
+        displacedNode.y = original.y;
+        displacedNode.fx = original.fx;
+        displacedNode.fy = original.fy;
+        if (original.z !== undefined) {
+          displacedNode.z = original.z;
+          displacedNode.fz = original.fz;
         }
       }
+      displacedOriginals.clear();
+      activeGraph().graphData(activeGraph().graphData());
     };
-    clickRepelForce.initialize = (nodes) => { simulationNodes = nodes; };
+
+    const applySelectionDisplacement = (originNode) => {
+      clearSelectionDisplacement();
+      const pushRadius = isAggregatedView() ? 180 : 90;
+      const maxPush = 26;
+      for (const graphNode of activeGraph().graphData().nodes) {
+        if (graphNode === originNode) continue;
+        const deltaX = graphNode.x - originNode.x;
+        const deltaY = graphNode.y - originNode.y;
+        const deltaZ = (graphNode.z ?? 0) - (originNode.z ?? 0);
+        const distance = Math.max(Math.hypot(deltaX, deltaY, deltaZ), 1);
+        if (distance >= pushRadius) continue;
+        displacedOriginals.set(graphNode, {
+          x: graphNode.x,
+          y: graphNode.y,
+          z: graphNode.z,
+          fx: graphNode.fx,
+          fy: graphNode.fy,
+          fz: graphNode.fz,
+        });
+        const pushDistance = ((pushRadius - distance) / pushRadius) * maxPush;
+        graphNode.x += deltaX / distance * pushDistance;
+        graphNode.fx = graphNode.x;
+        graphNode.y += deltaY / distance * pushDistance;
+        graphNode.fy = graphNode.y;
+        if (graphNode.z !== undefined) {
+          graphNode.z += deltaZ / distance * pushDistance;
+          graphNode.fz = graphNode.z;
+        }
+      }
+      activeGraph().graphData(activeGraph().graphData());
+    };
 
     const handleNodeClick = (node) => {
       const isDeselecting = selectedNode === node;
       selectedNode = isDeselecting ? null : node;
-      if (!isDeselecting) {
+      if (isDeselecting) {
+        clearSelectionDisplacement();
+      } else {
+        applySelectionDisplacement(node);
         if (isAggregatedView()) {
           openSectionDetail(node);
         } else if (viewDimension === '2d') {
@@ -1767,14 +1800,13 @@
           );
         }
       }
-      activeGraph().d3ReheatSimulation();
       activeGraph().nodeColor(nodeColorFor);
     };
 
     const handleBackgroundClick = () => {
       if (selectedNode === null) return;
       selectedNode = null;
-      activeGraph().d3ReheatSimulation();
+      clearSelectionDisplacement();
       activeGraph().nodeColor(nodeColorFor);
     };
 
@@ -1797,6 +1829,11 @@
       .onNodeClick(handleNodeClick)
       .onBackgroundClick(handleBackgroundClick)
       .onEngineStop(() => {
+        for (const graphNode of graphInstance.graphData().nodes) {
+          graphNode.fx = graphNode.x;
+          graphNode.fy = graphNode.y;
+          graphNode.fz = graphNode.z;
+        }
         if (!initialEngineStopPending) return;
         initialEngineStopPending = false;
         activeGraph().zoomToFit(600);
@@ -1829,6 +1866,12 @@
       })
       .onNodeClick(handleNodeClick)
       .onBackgroundClick(handleBackgroundClick)
+      .onEngineStop(() => {
+        for (const graphNode of graph2dInstance.graphData().nodes) {
+          graphNode.fx = graphNode.x;
+          graphNode.fy = graphNode.y;
+        }
+      })
       .onZoom(({ x: transformX, y: transformY }) => {
         pan2dX = transformX;
         pan2dY = transformY;
@@ -1837,6 +1880,7 @@
     const activeGraph = () => viewDimension === '2d' ? graph2dInstance : graphInstance;
 
     const setViewDimension = (dimension) => {
+      clearSelectionDisplacement();
       viewDimension = dimension === '2d' ? '2d' : '3d';
       try {
         localStorage.setItem('slopmap-dimension', viewDimension);
@@ -1852,9 +1896,6 @@
       showView(currentView);
       updateSectionLabelLoop();
     };
-
-    graphInstance.d3Force('clickRepel', clickRepelForce);
-    graph2dInstance.d3Force('clickRepel', clickRepelForce);
 
     for (const viewButton of viewButtons) {
       viewButton.addEventListener('click', () => showView(viewButton.dataset.view));
