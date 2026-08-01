@@ -25,8 +25,29 @@ const locateLibrary = () => {
   throw new Error('slopmap: cannot locate 3d-force-graph UMD bundle');
 };
 
+const locate2dLibrary = () => {
+  const directPath = path.join(toolRoot, 'node_modules', 'force-graph', 'dist', 'force-graph.min.js');
+  if (fs.existsSync(directPath)) return directPath;
+
+  let resolvedEntry = null;
+  try {
+    const packageRequire = createRequire(import.meta.url);
+    resolvedEntry = packageRequire.resolve('force-graph');
+  } catch {
+    resolvedEntry = null;
+  }
+
+  if (resolvedEntry !== null) {
+    const fallbackPath = path.join(path.dirname(resolvedEntry), 'force-graph.min.js');
+    if (fs.existsSync(fallbackPath)) return fallbackPath;
+  }
+
+  throw new Error('slopmap: cannot locate force-graph UMD bundle');
+};
+
 export const renderHtml = ({ graph, repoName, modeLabel, context }) => {
   const librarySource = fs.readFileSync(locateLibrary(), 'utf8');
+  const library2dSource = fs.readFileSync(locate2dLibrary(), 'utf8');
   const template = fs.readFileSync(path.join(toolRoot, 'src', 'template.html'), 'utf8');
   const { changes, ...graphPayload } = graph;
   const serializedData = JSON.stringify({
@@ -41,6 +62,7 @@ export const renderHtml = ({ graph, repoName, modeLabel, context }) => {
   return template
     .replaceAll('__SLOPMAP_TITLE__', () => title)
     .replaceAll('__SLOPMAP_LIB__', () => librarySource)
+    .replaceAll('__SLOPMAP_LIB_2D__', () => library2dSource)
     .replaceAll('__SLOPMAP_DATA__', () => serializedData);
 };
 

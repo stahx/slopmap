@@ -35,10 +35,19 @@
       display: block;
     }
 
-    #graph {
+    #graph,
+    #graph2d {
       position: fixed;
       inset: 0;
       z-index: 1;
+    }
+
+    #graph[hidden] {
+      display: none;
+    }
+
+    #graph2d[hidden] {
+      display: none;
     }
 
     #labels {
@@ -379,17 +388,20 @@
       font-size: 10px;
     }
 
-    #theme-setting {
+    #theme-setting,
+    #dimension-setting {
       margin: 0;
     }
 
-    #theme-label {
+    #theme-label,
+    #dimension-label {
       margin: 0 0 5px;
       color: rgba(232,230,223,.45);
       font-size: 11px;
     }
 
     #theme-toggle,
+    #dimension-toggle,
     #view-toggle {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -799,6 +811,7 @@
 <body>
   <canvas id="stars"></canvas>
   <div id="graph"></div>
+  <div id="graph2d" hidden></div>
   <div id="labels"></div>
   <section id="panel">
     <div id="panel-header">
@@ -852,6 +865,13 @@
         <button class="view-button" type="button" data-theme="galaxy">Galaxy</button>
       </div>
     </div>
+    <div id="dimension-setting">
+      <div id="dimension-label">dimension</div>
+      <div id="dimension-toggle" aria-label="Graph dimension">
+        <button class="view-button" type="button" data-dimension="3d">3D</button>
+        <button class="view-button" type="button" data-dimension="2d">2D</button>
+      </div>
+    </div>
     <div id="files-controls" hidden>
       <input id="search" type="search" placeholder="filter files…" aria-label="Filter files">
       <div id="filters">
@@ -898,6 +918,7 @@
     </div>
   </section>
   <script>__SLOPMAP_LIB__</script>
+  <script>__SLOPMAP_LIB_2D__</script>
   <script>
     const payload = __SLOPMAP_DATA__;
     const diffMode = (payload.changes?.totals ?? null) !== null;
@@ -906,6 +927,15 @@
     const MUTED_COLOR = '#8b8fa3';
     const filterState = { searchTerm: '' };
     let currentView = 'compact';
+    const readStoredViewDimension = () => {
+      try {
+        const storedDimension = localStorage.getItem('slopmap-dimension');
+        return ['3d', '2d'].includes(storedDimension) ? storedDimension : '3d';
+      } catch (storageError) {
+        return '3d';
+      }
+    };
+    let viewDimension = readStoredViewDimension();
     const readStoredCompactness = () => {
       try {
         const storedLevel = Number(localStorage.getItem('slopmap-compactness'));
@@ -945,6 +975,8 @@
     const metaElement = document.getElementById('meta');
     const legendElement = document.getElementById('legend');
     const labelsElement = document.getElementById('labels');
+    const graphElement = document.getElementById('graph');
+    const graph2dElement = document.getElementById('graph2d');
     const compactnessSettingElement = document.getElementById('compactness-setting');
     const compactnessLevelElement = document.getElementById('compactness-level');
     const compactnessInput = document.getElementById('compactness');
@@ -971,6 +1003,7 @@
     const openFilesButton = document.getElementById('open-files');
     const viewButtons = [...document.querySelectorAll('#view-toggle .view-button')];
     const themeButtons = [...document.querySelectorAll('#theme-toggle .view-button')];
+    const dimensionButtons = [...document.querySelectorAll('#dimension-toggle .view-button')];
     const sectionLabelElements = new Map();
     const isAggregatedView = () => currentView === 'compact';
     const activeAggregate = () => payload.graph.levels[
@@ -1173,7 +1206,7 @@
     };
 
     const refreshFilesView = () => {
-      if (currentView === 'files') graphInstance.graphData(applyFilters());
+      if (currentView === 'files') activeGraph().graphData(applyFilters());
     };
 
     const renderAggregateFilter = () => {
@@ -1355,7 +1388,7 @@
     };
 
     const renderSectionLabels = () => {
-      if (!isAggregatedView()) {
+      if (!isAggregatedView() || viewDimension !== '3d') {
         labelFrameId = null;
         return;
       }
@@ -1379,9 +1412,9 @@
     };
 
     const updateSectionLabelLoop = () => {
-      if (isAggregatedView() && labelFrameId === null) {
+      if (isAggregatedView() && viewDimension === '3d' && labelFrameId === null) {
         labelFrameId = requestAnimationFrame(renderSectionLabels);
-      } else if (!isAggregatedView() && labelFrameId !== null) {
+      } else if ((!isAggregatedView() || viewDimension !== '3d') && labelFrameId !== null) {
         cancelAnimationFrame(labelFrameId);
         labelFrameId = null;
       }
@@ -1408,6 +1441,8 @@
     let starFieldHeight = window.innerHeight;
     let accumulatedPanX = 0;
     let previousAzimuth = null;
+    let pan2dX = 0;
+    let pan2dY = 0;
     const STAR_DEPTH_BUCKETS = [0.4, 0.7, 1.0];
     const pickDepthFactor = () =>
       STAR_DEPTH_BUCKETS[Math.floor(Math.random() * STAR_DEPTH_BUCKETS.length)];
@@ -1567,8 +1602,12 @@
         starsFrameId = null;
         return;
       }
-      let panY = 0;
-      if (typeof graphInstance !== 'undefined' && graphInstance.camera()) {
+      let parallaxPanX = accumulatedPanX;
+      let parallaxPanY = 0;
+      if (viewDimension === '2d' && typeof graph2dInstance !== 'undefined') {
+        parallaxPanX = pan2dX * 0.6;
+        parallaxPanY = pan2dY * 0.6;
+      } else if (typeof graphInstance !== 'undefined' && graphInstance.camera()) {
         const cameraPosition = graphInstance.camera().position;
         const azimuth = Math.atan2(cameraPosition.x, cameraPosition.z);
         const elevation = Math.atan2(
@@ -1584,15 +1623,16 @@
           accumulatedPanX += (azimuthDelta / (2 * Math.PI)) * starFieldWidth * 2;
           previousAzimuth = azimuth;
         }
-        panY = (elevation / (Math.PI / 2)) * starFieldHeight * 0.5;
+        parallaxPanY = (elevation / (Math.PI / 2)) * starFieldHeight * 0.5;
+        parallaxPanX = accumulatedPanX;
       }
       starsContext.clearRect(0, 0, starFieldWidth, starFieldHeight);
       starsContext.drawImage(baseCanvas, 0, 0, starFieldWidth, starFieldHeight);
       const deepHeight = starFieldHeight * 1.6;
       const deepOffsetX = Math.round(
-        (((accumulatedPanX * 0.25) % starFieldWidth) + starFieldWidth) % starFieldWidth
+        (((parallaxPanX * 0.25) % starFieldWidth) + starFieldWidth) % starFieldWidth
       );
-      const deepOffsetY = Math.round(-0.3 * starFieldHeight + panY * 0.25);
+      const deepOffsetY = Math.round(-0.3 * starFieldHeight + parallaxPanY * 0.25);
       starsContext.drawImage(deepCanvas, deepOffsetX, deepOffsetY, starFieldWidth, deepHeight);
       starsContext.drawImage(
         deepCanvas, deepOffsetX - starFieldWidth, deepOffsetY, starFieldWidth, deepHeight
@@ -1605,10 +1645,10 @@
         if (star.yPosition < 0) star.yPosition += starFieldHeight;
         if (star.yPosition > starFieldHeight) star.yPosition -= starFieldHeight;
         const screenX =
-          (((star.xPosition + accumulatedPanX * star.depthFactor) % starFieldWidth) +
+          (((star.xPosition + parallaxPanX * star.depthFactor) % starFieldWidth) +
             starFieldWidth) % starFieldWidth;
         const screenY =
-          (((star.yPosition + panY * star.depthFactor) % starFieldHeight) +
+          (((star.yPosition + parallaxPanY * star.depthFactor) % starFieldHeight) +
             starFieldHeight) % starFieldHeight;
         starsContext.globalAlpha =
           0.25 + 0.55 * Math.abs(Math.sin(star.twinklePhase + timestamp * 0.001 * star.twinkleSpeed));
@@ -1657,7 +1697,7 @@
       for (const viewButton of viewButtons) {
         viewButton.classList.toggle('active', viewButton.dataset.view === view);
       }
-      labelsElement.hidden = !isAggregatedView();
+      labelsElement.hidden = !isAggregatedView() || viewDimension !== '3d';
       compactnessSettingElement.hidden = !isAggregatedView();
       filesControlsElement.hidden = isAggregatedView();
       hintElement.textContent = isAggregatedView()
@@ -1667,12 +1707,12 @@
       if (isAggregatedView()) {
         const aggregate = activeAggregate();
         rebuildSectionLabels();
-        graphInstance.graphData({
+        activeGraph().graphData({
           nodes: aggregate.sections,
           links: aggregate.links,
         });
-        graphInstance.d3Force('charge').strength(-160);
-        graphInstance.d3Force('link').distance(
+        activeGraph().d3Force('charge').strength(-160);
+        activeGraph().d3Force('link').distance(
           compactnessLevel === 1
             ? 120
             : compactnessLevel === 2
@@ -1680,12 +1720,12 @@
               : (link) => link.kind === 'orbit' ? 70 : 110
         );
       } else {
-        graphInstance.graphData(applyFilters());
-        graphInstance.d3Force('charge').strength(-45);
-        graphInstance.d3Force('link').distance(35);
+        activeGraph().graphData(applyFilters());
+        activeGraph().d3Force('charge').strength(-45);
+        activeGraph().d3Force('link').distance(35);
       }
       updateSectionLabelLoop();
-      graphInstance.zoomToFit(600);
+      activeGraph().zoomToFit(600);
     };
 
     const clickRepelForce = (alpha) => {
@@ -1713,6 +1753,9 @@
       if (!isDeselecting) {
         if (isAggregatedView()) {
           openSectionDetail(node);
+        } else if (viewDimension === '2d') {
+          graph2dInstance.centerAt(node.x, node.y, 800);
+          graph2dInstance.zoom(Math.max(graph2dInstance.zoom(), 4), 800);
         } else {
           const distance = 140;
           const length = Math.hypot(node.x, node.y, node.z) || 1;
@@ -1724,15 +1767,15 @@
           );
         }
       }
-      graphInstance.d3ReheatSimulation();
-      graphInstance.nodeColor(nodeColorFor);
+      activeGraph().d3ReheatSimulation();
+      activeGraph().nodeColor(nodeColorFor);
     };
 
     const handleBackgroundClick = () => {
       if (selectedNode === null) return;
       selectedNode = null;
-      graphInstance.d3ReheatSimulation();
-      graphInstance.nodeColor(nodeColorFor);
+      activeGraph().d3ReheatSimulation();
+      activeGraph().nodeColor(nodeColorFor);
     };
 
     repoNameElement.textContent = payload.repoName;
@@ -1742,7 +1785,7 @@
     renderLegend();
 
     const graphInstance = ForceGraph3D()(document.getElementById('graph'))
-      .backgroundColor('rgba(0,0,0,0)')
+      .backgroundColor('rgba(18,20,42,0)')
       .nodeLabel(nodeLabelFor)
       .nodeVal(nodeValueFor)
       .nodeColor(nodeColorFor)
@@ -1756,10 +1799,62 @@
       .onEngineStop(() => {
         if (!initialEngineStopPending) return;
         initialEngineStopPending = false;
-        graphInstance.zoomToFit(600);
+        activeGraph().zoomToFit(600);
       });
 
+    const graph2dInstance = ForceGraph()(graph2dElement)
+      .backgroundColor('rgba(18,20,42,0)')
+      .nodeVal(nodeValueFor)
+      .nodeColor(nodeColorFor)
+      .nodeLabel(nodeLabelFor)
+      .linkColor(linkColorFor)
+      .linkWidth(linkWidthFor)
+      .linkDirectionalParticles(particleCountFor)
+      .linkDirectionalParticleWidth(1.4)
+      .nodeCanvasObjectMode(() => 'after')
+      .nodeCanvasObject((node, canvasContext, globalScale) => {
+        if (node.fileCount === undefined) return;
+        const isHub = compactnessLevel !== 3 || node.id === node.group;
+        const labelText = isHub ? node.id : node.id.split('/').at(-1);
+        const fontSize = 12 / globalScale;
+        const verticalOffset = Math.sqrt(nodeValueFor(node)) * 4 / globalScale + 12 / globalScale;
+        canvasContext.font = `${isHub ? 600 : 500} ${fontSize}px "Inter Tight", system-ui, sans-serif`;
+        canvasContext.fillStyle = isHub ? '#ffffff' : 'rgba(255,255,255,.72)';
+        canvasContext.textAlign = 'center';
+        canvasContext.shadowColor = 'rgba(0,0,0,.9)';
+        canvasContext.shadowBlur = 3;
+        canvasContext.fillText(labelText, node.x, node.y + verticalOffset);
+        canvasContext.shadowColor = 'transparent';
+        canvasContext.shadowBlur = 0;
+      })
+      .onNodeClick(handleNodeClick)
+      .onBackgroundClick(handleBackgroundClick)
+      .onZoom(({ x: transformX, y: transformY }) => {
+        pan2dX = transformX;
+        pan2dY = transformY;
+      });
+
+    const activeGraph = () => viewDimension === '2d' ? graph2dInstance : graphInstance;
+
+    const setViewDimension = (dimension) => {
+      viewDimension = dimension === '2d' ? '2d' : '3d';
+      try {
+        localStorage.setItem('slopmap-dimension', viewDimension);
+      } catch (storageError) {}
+      graphElement.hidden = viewDimension !== '3d';
+      graph2dElement.hidden = viewDimension !== '2d';
+      for (const dimensionButton of dimensionButtons) {
+        dimensionButton.classList.toggle(
+          'active',
+          dimensionButton.dataset.dimension === viewDimension
+        );
+      }
+      showView(currentView);
+      updateSectionLabelLoop();
+    };
+
     graphInstance.d3Force('clickRepel', clickRepelForce);
+    graph2dInstance.d3Force('clickRepel', clickRepelForce);
 
     for (const viewButton of viewButtons) {
       viewButton.addEventListener('click', () => showView(viewButton.dataset.view));
@@ -1775,9 +1870,15 @@
     for (const themeButton of themeButtons) {
       themeButton.addEventListener('click', () => setBackgroundTheme(themeButton.dataset.theme));
     }
+    for (const dimensionButton of dimensionButtons) {
+      dimensionButton.addEventListener(
+        'click',
+        () => setViewDimension(dimensionButton.dataset.dimension)
+      );
+    }
     searchInput.addEventListener('input', () => {
       filterState.searchTerm = searchInput.value.toLowerCase();
-      graphInstance.nodeColor(nodeColorFor);
+      activeGraph().nodeColor(nodeColorFor);
     });
     impactOnlyInput.addEventListener('change', refreshFilesView);
     hideIsolatedInput.addEventListener('change', refreshFilesView);
@@ -1804,7 +1905,7 @@
 
     renderAggregateFilter();
     setBackgroundTheme(backgroundTheme);
-    showView(currentView);
+    setViewDimension(viewDimension);
   </script>
 </body>
 </html>

@@ -33,6 +33,8 @@ When GitHub PR metadata is available, the context card shows its state and chang
 
 Every map has two views: Compact rolls files up with a compactness slider (`roots` → `groups` → `dirs`), and Advanced shows the full file graph. Import lines show how items at the active Compact level connect. Click a Compact ball to open the right drawer, where diff maps list file statuses, additions, deletions, and downstream sections. `Isolate blast` jumps to the matching filtered Advanced graph with impact-only enabled. Advanced also provides search highlighting and the impact-only and isolated-file toggles.
 
+Use the dimension switch for a 3D orbit or flat 2D canvas; the choice is remembered between visits.
+
 | Option | Description |
 | --- | --- |
 | `--base <ref>` | Git ref to diff against, such as `master` or `origin/main` |
