@@ -15,24 +15,86 @@
       font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
     }
 
+    button,
+    input {
+      font: inherit;
+    }
+
     #graph {
       position: fixed;
       inset: 0;
     }
 
-    #panel {
+    #labels {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .section-label {
+      position: absolute;
+      top: 0;
+      left: 0;
+      white-space: nowrap;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.9);
+      will-change: transform;
+    }
+
+    .section-label-hub {
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .section-label-subsection {
+      color: #c3c2b7;
+      font-size: 11px;
+    }
+
+    #panel,
+    #detail-panel {
       position: fixed;
-      top: 16px;
-      left: 16px;
       z-index: 2;
       width: calc(100vw - 32px);
-      max-width: 340px;
       padding: 14px 16px;
       color: #ffffff;
       background: rgba(26,26,25,0.92);
       border: 1px solid rgba(255,255,255,0.10);
       border-radius: 10px;
       backdrop-filter: blur(6px);
+    }
+
+    #panel {
+      top: 16px;
+      left: 16px;
+      max-width: 340px;
+    }
+
+    #view-toggle {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+      margin-bottom: 12px;
+      padding: 2px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 7px;
+    }
+
+    .view-button {
+      padding: 5px 8px;
+      color: #898781;
+      background: transparent;
+      border: 0;
+      border-radius: 5px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .view-button.active {
+      color: #ffffff;
+      background: #262624;
     }
 
     #panel-title {
@@ -83,7 +145,6 @@
       border: 1px solid rgba(255,255,255,0.10);
       border-radius: 6px;
       outline: none;
-      font: inherit;
       font-size: 12px;
     }
 
@@ -117,32 +178,172 @@
       accent-color: #ec835a;
     }
 
+    #section-filter {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      max-width: 100%;
+      margin-top: 10px;
+      padding: 4px 7px;
+      color: #c3c2b7;
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 999px;
+      font-size: 12px;
+    }
+
+    #section-filter-label {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    #clear-section-filter {
+      padding: 0;
+      color: #898781;
+      background: transparent;
+      border: 0;
+      line-height: 1;
+      cursor: pointer;
+    }
+
     #hint {
       margin-top: 10px;
       color: #898781;
       font-size: 11px;
       line-height: 1.35;
     }
+
+    #detail-panel {
+      top: 16px;
+      right: 16px;
+      max-width: 360px;
+      max-height: 70vh;
+      overflow-y: auto;
+    }
+
+    #detail-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    #detail-title {
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+    }
+
+    #detail-close {
+      flex: 0 0 auto;
+      margin-top: -3px;
+      padding: 0;
+      color: #898781;
+      background: transparent;
+      border: 0;
+      font-size: 20px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    #detail-meta {
+      margin-top: 4px;
+      color: #898781;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    #detail-body {
+      display: grid;
+      gap: 7px;
+      margin-top: 14px;
+    }
+
+    .detail-file-row {
+      display: flex;
+      align-items: center;
+      min-width: 0;
+      gap: 7px;
+      color: #c3c2b7;
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .detail-file-name {
+      min-width: 0;
+      flex: 1 1 auto;
+      overflow-wrap: anywhere;
+    }
+
+    .detail-loc {
+      flex: 0 0 auto;
+      color: #898781;
+    }
+
+    .changed-dot {
+      width: 8px;
+      height: 8px;
+      flex: 0 0 auto;
+      background: #d03b3b;
+      border-radius: 50%;
+    }
+
+    .detail-empty {
+      color: #898781;
+      font-size: 12px;
+    }
+
+    #open-advanced {
+      margin-top: 14px;
+      padding: 6px 9px;
+      color: #c3c2b7;
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
   <div id="graph"></div>
+  <div id="labels"></div>
   <section id="panel">
+    <div id="view-toggle" aria-label="Graph view">
+      <button class="view-button active" type="button" data-view="cosmos">cosmos</button>
+      <button class="view-button" type="button" data-view="advanced">advanced</button>
+    </div>
     <div id="panel-title">__SLOPMAP_TITLE__</div>
     <div id="meta"></div>
     <div id="legend"></div>
-    <input id="search" type="search" placeholder="filter files…" aria-label="Filter files">
-    <div id="filters">
-      <label id="impact-option" class="checkbox-label">
-        <input id="impact-only" type="checkbox" checked>
-        <span>impact only</span>
-      </label>
-      <label class="checkbox-label">
-        <input id="hide-isolated" type="checkbox">
-        <span>hide isolated</span>
-      </label>
+    <div id="advanced-controls" hidden>
+      <input id="search" type="search" placeholder="filter files…" aria-label="Filter files">
+      <div id="filters">
+        <label id="impact-option" class="checkbox-label">
+          <input id="impact-only" type="checkbox" checked>
+          <span>impact only</span>
+        </label>
+        <label class="checkbox-label">
+          <input id="hide-isolated" type="checkbox">
+          <span>hide isolated</span>
+        </label>
+      </div>
     </div>
-    <div id="hint">drag rotate · scroll zoom · click node = focus</div>
+    <div id="section-filter" hidden>
+      <span id="section-filter-label"></span>
+      <button id="clear-section-filter" type="button" aria-label="Clear section filter">×</button>
+    </div>
+    <div id="hint">drag rotate · scroll zoom · click section = details</div>
+  </section>
+  <section id="detail-panel" hidden>
+    <div id="detail-header">
+      <div id="detail-title"></div>
+      <button id="detail-close" type="button" aria-label="Close section details">×</button>
+    </div>
+    <div id="detail-meta"></div>
+    <div id="detail-body"></div>
+    <button id="open-advanced" type="button">open in advanced</button>
   </section>
   <script>__SLOPMAP_LIB__</script>
   <script>
@@ -152,6 +353,11 @@
     const GROUP_COLORS = ['#3987e5', '#d95926', '#199e70', '#c98500', '#d55181', '#008300', '#9085e9', '#e66767'];
     const MUTED_COLOR = '#898781';
     const filterState = { searchTerm: '' };
+    let currentView = 'cosmos';
+    let sectionFilter = null;
+    let selectedSection = null;
+    let labelFrameId = null;
+    let initialEngineStopPending = true;
     const groupColors = new Map(
       payload.graph.groups
         .slice(0, GROUP_COLORS.length)
@@ -159,10 +365,24 @@
     );
     const metaElement = document.getElementById('meta');
     const legendElement = document.getElementById('legend');
+    const labelsElement = document.getElementById('labels');
+    const advancedControlsElement = document.getElementById('advanced-controls');
     const searchInput = document.getElementById('search');
     const impactOption = document.getElementById('impact-option');
     const impactOnlyInput = document.getElementById('impact-only');
     const hideIsolatedInput = document.getElementById('hide-isolated');
+    const sectionFilterElement = document.getElementById('section-filter');
+    const sectionFilterLabelElement = document.getElementById('section-filter-label');
+    const clearSectionFilterButton = document.getElementById('clear-section-filter');
+    const hintElement = document.getElementById('hint');
+    const detailPanelElement = document.getElementById('detail-panel');
+    const detailTitleElement = document.getElementById('detail-title');
+    const detailMetaElement = document.getElementById('detail-meta');
+    const detailBodyElement = document.getElementById('detail-body');
+    const detailCloseButton = document.getElementById('detail-close');
+    const openAdvancedButton = document.getElementById('open-advanced');
+    const viewButtons = [...document.querySelectorAll('.view-button')];
+    const sectionLabelElements = new Map();
 
     const appendLegendRow = (color, label, count) => {
       const rowElement = document.createElement('div');
@@ -200,44 +420,56 @@
       }
     };
 
-    metaElement.textContent = `${payload.graph.stats.fileCount} files · ${payload.graph.stats.linkCount} imports` +
-      (diffMode
-        ? ` · ${payload.graph.stats.changedCount} changed · ${payload.graph.stats.dependentCount} blast`
-        : '');
-    impactOption.hidden = !diffMode;
-    renderLegend();
+    const isSectionNode = (node) => node.fileCount !== undefined;
+    const idOf = (endpoint) => typeof endpoint === 'object' ? endpoint.id : endpoint;
 
-    const colorFor = (node) => {
+    const nodeColorFor = (node) => {
+      if (isSectionNode(node)) {
+        if (diffMode) {
+          return node.status === 'normal' ? 'rgba(137,135,129,0.5)' : STATUS_COLORS[node.status];
+        }
+        return groupColors.get(node.group) || MUTED_COLOR;
+      }
       if (filterState.searchTerm && node.id.toLowerCase().includes(filterState.searchTerm)) return '#ffffff';
       if (node.status !== 'normal') return STATUS_COLORS[node.status];
       if (diffMode) return 'rgba(137,135,129,0.35)';
       return groupColors.get(node.group) || MUTED_COLOR;
     };
 
-    const idOf = (endpoint) => typeof endpoint === 'object' ? endpoint.id : endpoint;
+    const nodeLabelFor = (node) => {
+      if (isSectionNode(node)) {
+        return `${node.id} · ${node.fileCount} files` +
+          (node.changedCount > 0 ? ` · ${node.changedCount} changed` : '');
+      }
+      return `${node.id} · ${node.loc} loc` +
+        (node.status !== 'normal' ? ` · ${node.status}` : '');
+    };
 
-    const graphInstance = ForceGraph3D()(document.getElementById('graph'))
-      .backgroundColor('#1a1a19')
-      .nodeLabel((node) => `${node.id} · ${node.loc} loc` + (node.status !== 'normal' ? ` · ${node.status}` : ''))
-      .nodeVal((node) => Math.max(1, Math.min(14, node.loc / 60)))
-      .nodeColor(colorFor)
-      .linkColor((link) => link.hot ? '#ec835a' : '#4a4a47')
-      .linkOpacity(0.35)
-      .linkDirectionalParticles((link) => link.hot ? 2 : 0)
-      .linkDirectionalParticleWidth(1.4)
-      .onNodeClick((node) => {
-        const distance = 140;
-        const length = Math.hypot(node.x, node.y, node.z) || 1;
-        const ratio = 1 + distance / length;
-        graphInstance.cameraPosition(
-          { x: node.x * ratio, y: node.y * ratio, z: node.z * ratio },
-          node,
-          800
-        );
-      });
+    const nodeValueFor = (node) => isSectionNode(node)
+      ? Math.max(4, Math.min(40, node.fileCount))
+      : Math.max(1, Math.min(14, node.loc / 60));
+
+    const linkWidthFor = (link) => {
+      if (link.kind === undefined) return 1;
+      return link.kind === 'imports' ? Math.min(4, Math.log2(link.weight + 1)) : 0.2;
+    };
+
+    const linkColorFor = (link) => {
+      if (link.kind === 'orbit') return 'rgba(255,255,255,0.08)';
+      if (link.kind === 'imports') return link.hot ? '#ec835a' : '#4a4a47';
+      return link.hot ? '#ec835a' : '#4a4a47';
+    };
+
+    const particleCountFor = (link) => {
+      if (link.kind !== undefined) return link.kind === 'imports' && link.hot ? 2 : 0;
+      return link.hot ? 2 : 0;
+    };
 
     const applyFilters = () => {
       let nodes = payload.graph.nodes;
+      if (sectionFilter !== null) {
+        nodes = nodes.filter((node) => node.section === sectionFilter);
+      }
       if (diffMode && impactOnlyInput.checked) {
         nodes = nodes.filter((node) => node.status !== 'normal');
       }
@@ -257,16 +489,213 @@
           (link) => keptNodeIds.has(idOf(link.source)) && keptNodeIds.has(idOf(link.target))
         );
       }
-      graphInstance.graphData({ nodes, links });
+      return { nodes, links };
     };
 
+    const refreshAdvancedView = () => {
+      if (currentView === 'advanced') graphInstance.graphData(applyFilters());
+    };
+
+    const renderSectionFilter = () => {
+      sectionFilterElement.hidden = sectionFilter === null;
+      sectionFilterLabelElement.textContent = sectionFilter === null ? '' : `section: ${sectionFilter}`;
+    };
+
+    const closeDetailPanel = () => {
+      selectedSection = null;
+      detailPanelElement.hidden = true;
+    };
+
+    const appendChangedFile = (filePath) => {
+      const rowElement = document.createElement('div');
+      const dotElement = document.createElement('span');
+      const fileElement = document.createElement('span');
+      rowElement.className = 'detail-file-row';
+      dotElement.className = 'changed-dot';
+      fileElement.className = 'detail-file-name';
+      fileElement.textContent = filePath;
+      rowElement.append(dotElement, fileElement);
+      detailBodyElement.append(rowElement);
+    };
+
+    const appendSectionFile = (node) => {
+      const rowElement = document.createElement('div');
+      const fileElement = document.createElement('span');
+      const locElement = document.createElement('span');
+      rowElement.className = 'detail-file-row';
+      fileElement.className = 'detail-file-name';
+      fileElement.textContent = node.id;
+      locElement.className = 'detail-loc';
+      locElement.textContent = `${node.loc} loc`;
+      rowElement.append(fileElement, locElement);
+      detailBodyElement.append(rowElement);
+    };
+
+    const appendDetailEmptyState = (message) => {
+      const emptyElement = document.createElement('div');
+      emptyElement.className = 'detail-empty';
+      emptyElement.textContent = message;
+      detailBodyElement.append(emptyElement);
+    };
+
+    const openSectionDetail = (section) => {
+      selectedSection = section;
+      detailTitleElement.textContent = section.id;
+      detailMetaElement.textContent = `${section.fileCount} files · ${section.loc} loc` +
+        (diffMode ? ` · ${section.changedCount} changed` : '');
+      detailBodyElement.replaceChildren();
+      if (diffMode) {
+        if (section.changedFiles.length === 0) {
+          appendDetailEmptyState('no changed files here');
+        } else {
+          for (const filePath of section.changedFiles) appendChangedFile(filePath);
+        }
+      } else {
+        const sectionFiles = payload.graph.nodes
+          .filter((node) => node.section === section.id)
+          .sort((firstNode, secondNode) => secondNode.loc - firstNode.loc)
+          .slice(0, 10);
+        if (sectionFiles.length === 0) {
+          appendDetailEmptyState('no files here');
+        } else {
+          for (const node of sectionFiles) appendSectionFile(node);
+        }
+      }
+      detailPanelElement.hidden = false;
+    };
+
+    const renderSectionLabels = () => {
+      if (currentView !== 'cosmos') {
+        labelFrameId = null;
+        return;
+      }
+      for (const section of payload.graph.cosmos.sections) {
+        const labelElement = sectionLabelElements.get(section.id);
+        if (!labelElement) continue;
+        if (
+          section.x === undefined ||
+          section.y === undefined ||
+          section.z === undefined
+        ) {
+          labelElement.style.visibility = 'hidden';
+          continue;
+        }
+        const screenCoordinates = graphInstance.graph2ScreenCoords(section.x, section.y, section.z);
+        labelElement.style.visibility = 'visible';
+        labelElement.style.transform =
+          `translate(-50%, 8px) translate(${screenCoordinates.x}px, ${screenCoordinates.y}px)`;
+      }
+      labelFrameId = requestAnimationFrame(renderSectionLabels);
+    };
+
+    const updateSectionLabelLoop = () => {
+      if (currentView === 'cosmos' && labelFrameId === null) {
+        labelFrameId = requestAnimationFrame(renderSectionLabels);
+      } else if (currentView !== 'cosmos' && labelFrameId !== null) {
+        cancelAnimationFrame(labelFrameId);
+        labelFrameId = null;
+      }
+    };
+
+    const showView = (view) => {
+      currentView = view;
+      for (const viewButton of viewButtons) {
+        viewButton.classList.toggle('active', viewButton.dataset.view === view);
+      }
+      labelsElement.hidden = view !== 'cosmos';
+      advancedControlsElement.hidden = view !== 'advanced';
+      hintElement.textContent = view === 'cosmos'
+        ? 'drag rotate · scroll zoom · click section = details'
+        : 'drag rotate · scroll zoom · click node = focus';
+      if (view === 'cosmos') {
+        graphInstance.graphData({
+          nodes: payload.graph.cosmos.sections,
+          links: payload.graph.cosmos.links,
+        });
+      } else {
+        closeDetailPanel();
+        graphInstance.graphData(applyFilters());
+      }
+      updateSectionLabelLoop();
+      graphInstance.zoomToFit(600);
+    };
+
+    const handleNodeClick = (node) => {
+      if (isSectionNode(node)) {
+        openSectionDetail(node);
+        return;
+      }
+      const distance = 140;
+      const length = Math.hypot(node.x, node.y, node.z) || 1;
+      const ratio = 1 + distance / length;
+      graphInstance.cameraPosition(
+        { x: node.x * ratio, y: node.y * ratio, z: node.z * ratio },
+        node,
+        800
+      );
+    };
+
+    metaElement.textContent = `${payload.graph.stats.fileCount} files · ${payload.graph.stats.linkCount} imports` +
+      (diffMode
+        ? ` · ${payload.graph.stats.changedCount} changed · ${payload.graph.stats.dependentCount} blast`
+        : '');
+    impactOption.hidden = !diffMode;
+    renderLegend();
+
+    for (const section of payload.graph.cosmos.sections) {
+      const labelElement = document.createElement('div');
+      const isHub = section.id === section.group;
+      labelElement.className = isHub
+        ? 'section-label section-label-hub'
+        : 'section-label section-label-subsection';
+      labelElement.textContent = isHub ? section.id : section.id.split('/').at(-1);
+      labelElement.style.visibility = 'hidden';
+      sectionLabelElements.set(section.id, labelElement);
+      labelsElement.append(labelElement);
+    }
+
+    const graphInstance = ForceGraph3D()(document.getElementById('graph'))
+      .backgroundColor('#1a1a19')
+      .nodeLabel(nodeLabelFor)
+      .nodeVal(nodeValueFor)
+      .nodeColor(nodeColorFor)
+      .linkWidth(linkWidthFor)
+      .linkColor(linkColorFor)
+      .linkOpacity(0.35)
+      .linkDirectionalParticles(particleCountFor)
+      .linkDirectionalParticleWidth(1.4)
+      .onNodeClick(handleNodeClick)
+      .onEngineStop(() => {
+        if (!initialEngineStopPending) return;
+        initialEngineStopPending = false;
+        graphInstance.zoomToFit(600);
+      });
+
+    for (const viewButton of viewButtons) {
+      viewButton.addEventListener('click', () => showView(viewButton.dataset.view));
+    }
     searchInput.addEventListener('input', () => {
       filterState.searchTerm = searchInput.value.toLowerCase();
-      graphInstance.nodeColor(colorFor);
+      graphInstance.nodeColor(nodeColorFor);
     });
-    impactOnlyInput.addEventListener('change', applyFilters);
-    hideIsolatedInput.addEventListener('change', applyFilters);
-    applyFilters();
+    impactOnlyInput.addEventListener('change', refreshAdvancedView);
+    hideIsolatedInput.addEventListener('change', refreshAdvancedView);
+    clearSectionFilterButton.addEventListener('click', () => {
+      sectionFilter = null;
+      renderSectionFilter();
+      refreshAdvancedView();
+    });
+    detailCloseButton.addEventListener('click', closeDetailPanel);
+    openAdvancedButton.addEventListener('click', () => {
+      if (selectedSection === null) return;
+      sectionFilter = selectedSection.id;
+      renderSectionFilter();
+      closeDetailPanel();
+      showView('advanced');
+    });
+
+    renderSectionFilter();
+    showView(currentView);
   </script>
 </body>
 </html>
