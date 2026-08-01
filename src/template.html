@@ -950,7 +950,7 @@
     let selectedNode = null;
     let displacedOriginals = new Map();
     let labelFrameId = null;
-    let initialEngineStopPending = true;
+    let pendingFitAfterStop = false;
     const groupColors = new Map(
       payload.graph.groups
         .slice(0, GROUP_COLORS.length)
@@ -1727,6 +1727,7 @@
       }
       updateSectionLabelLoop();
       activeGraph().zoomToFit(600);
+      pendingFitAfterStop = true;
     };
 
     const clearSelectionDisplacement = () => {
@@ -1834,9 +1835,9 @@
           graphNode.fy = graphNode.y;
           graphNode.fz = graphNode.z;
         }
-        if (!initialEngineStopPending) return;
-        initialEngineStopPending = false;
-        activeGraph().zoomToFit(600);
+        if (!pendingFitAfterStop || viewDimension !== '3d') return;
+        pendingFitAfterStop = false;
+        graphInstance.zoomToFit(600);
       });
 
     const graph2dInstance = ForceGraph()(graph2dElement)
@@ -1871,6 +1872,9 @@
           graphNode.fx = graphNode.x;
           graphNode.fy = graphNode.y;
         }
+        if (!pendingFitAfterStop || viewDimension !== '2d') return;
+        pendingFitAfterStop = false;
+        graph2dInstance.zoomToFit(600);
       })
       .onZoom(({ x: transformX, y: transformY }) => {
         pan2dX = transformX;
