@@ -1,6 +1,6 @@
 # slopmap
 
-slopmap turns any JavaScript or TypeScript repository into a 3D architecture map. Its default Roots view rolls files up into top-level paths shown as planets, while diff views reveal a pull request's blast radius. The name is a joke, and unfortunately an accurate one.
+slopmap turns any JavaScript or TypeScript repository into a 3D architecture map. Its default Compact view rolls files up into groups shown as planets, while diff views reveal a pull request's blast radius. The name is a joke, and unfortunately an accurate one.
 
 ## Install
 
@@ -31,7 +31,7 @@ slopmap --pr 123
 
 When GitHub PR metadata is available, the map panel links directly to the pull request.
 
-Every map has three detail levels: Roots is the default top-level overview, Dirs expands the repository into directory sections, and Files shows the full file graph. Import lines show how items at the active level connect. Click a ball in Roots or Dirs to see its changed files or largest files, then choose `open in Files` to jump to the matching filtered file graph. Files also provides search highlighting and the impact-only and isolated-file toggles.
+Every map has two views: Compact rolls files up with a compactness slider (`roots` → `groups` → `dirs`), and Advanced shows the full file graph. Import lines show how items at the active Compact level connect. Click a Compact ball for details, then choose `open in Files` to jump to the matching filtered Advanced graph. Advanced also provides search highlighting and the impact-only and isolated-file toggles.
 
 | Option | Description |
 | --- | --- |
