@@ -608,11 +608,18 @@
 
     const starsCanvas = document.getElementById('stars');
     const starsContext = starsCanvas.getContext('2d');
-    const nebulaCanvas = document.createElement('canvas');
-    const nebulaContext = nebulaCanvas.getContext('2d');
+    const baseCanvas = document.createElement('canvas');
+    const baseContext = baseCanvas.getContext('2d');
+    const deepCanvas = document.createElement('canvas');
+    const deepContext = deepCanvas.getContext('2d');
+    const vignetteCanvas = document.createElement('canvas');
+    const vignetteContext = vignetteCanvas.getContext('2d');
     let starsFrameId = null;
     let starFieldWidth = window.innerWidth;
     let starFieldHeight = window.innerHeight;
+    const STAR_DEPTH_BUCKETS = [0.4, 0.7, 1.0];
+    const pickDepthFactor = () =>
+      STAR_DEPTH_BUCKETS[Math.floor(Math.random() * STAR_DEPTH_BUCKETS.length)];
 
     const pickStarColor = () => {
       const colorRoll = Math.random();
@@ -631,6 +638,7 @@
       driftY: (Math.random() - 0.5) * 0.04,
       color: pickStarColor(),
       isBright: false,
+      depthFactor: pickDepthFactor(),
     })).concat(Array.from({ length: 8 }, () => ({
       xPosition: Math.random() * starFieldWidth,
       yPosition: Math.random() * starFieldHeight,
@@ -641,61 +649,80 @@
       driftY: (Math.random() - 0.5) * 0.04,
       color: pickStarColor(),
       isBright: true,
+      depthFactor: 1.0,
     })));
 
-    const drawNebula = () => {
+    const drawBaseLayer = () => {
       const pixelRatio = window.devicePixelRatio || 1;
-      nebulaCanvas.width = starsCanvas.width;
-      nebulaCanvas.height = starsCanvas.height;
-      nebulaContext.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-      nebulaContext.clearRect(0, 0, starFieldWidth, starFieldHeight);
+      baseCanvas.width = starFieldWidth * pixelRatio;
+      baseCanvas.height = starFieldHeight * pixelRatio;
+      baseContext.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
       const maxDimension = Math.max(starFieldWidth, starFieldHeight);
-      const baseGradient = nebulaContext.createRadialGradient(
+      const baseGradient = baseContext.createRadialGradient(
         starFieldWidth * 0.6, starFieldHeight * 0.38, 0,
         starFieldWidth * 0.6, starFieldHeight * 0.38, maxDimension * 1.2
       );
       baseGradient.addColorStop(0, '#0d1120');
       baseGradient.addColorStop(0.55, '#070911');
       baseGradient.addColorStop(1, '#04050a');
-      nebulaContext.fillStyle = baseGradient;
-      nebulaContext.fillRect(0, 0, starFieldWidth, starFieldHeight);
-      nebulaContext.save();
-      nebulaContext.translate(starFieldWidth / 2, starFieldHeight / 2);
-      nebulaContext.rotate(-0.5);
-      const bandHeight = starFieldHeight * 0.45;
-      const bandGradient = nebulaContext.createLinearGradient(0, -bandHeight / 2, 0, bandHeight / 2);
+      baseContext.fillStyle = baseGradient;
+      baseContext.fillRect(0, 0, starFieldWidth, starFieldHeight);
+    };
+
+    const drawDeepLayer = () => {
+      const pixelRatio = window.devicePixelRatio || 1;
+      const deepHeight = starFieldHeight * 1.6;
+      deepCanvas.width = starFieldWidth * pixelRatio;
+      deepCanvas.height = deepHeight * pixelRatio;
+      deepContext.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+      deepContext.clearRect(0, 0, starFieldWidth, deepHeight);
+      const maxDimension = Math.max(starFieldWidth, deepHeight);
+      deepContext.save();
+      deepContext.translate(starFieldWidth / 2, deepHeight / 2);
+      deepContext.rotate(-0.5);
+      const bandHeight = deepHeight * 0.45;
+      const bandGradient = deepContext.createLinearGradient(0, -bandHeight / 2, 0, bandHeight / 2);
       bandGradient.addColorStop(0, 'rgba(201,215,255,0)');
       bandGradient.addColorStop(0.5, 'rgba(201,215,255,0.055)');
       bandGradient.addColorStop(1, 'rgba(201,215,255,0)');
-      nebulaContext.fillStyle = bandGradient;
-      nebulaContext.fillRect(-starFieldWidth * 1.5, -bandHeight / 2, starFieldWidth * 3, bandHeight);
-      nebulaContext.restore();
+      deepContext.fillStyle = bandGradient;
+      deepContext.fillRect(-starFieldWidth * 1.5, -bandHeight / 2, starFieldWidth * 3, bandHeight);
+      deepContext.restore();
       const nebulaBlobs = [
-        { colorChannels: '144,133,233', alpha: 0.1, centerX: starFieldWidth * 0.25, centerY: starFieldHeight * 0.3, blobRadius: maxDimension * 0.38 },
-        { colorChannels: '57,135,229', alpha: 0.08, centerX: starFieldWidth * 0.72, centerY: starFieldHeight * 0.58, blobRadius: maxDimension * 0.32 },
-        { colorChannels: '213,81,129', alpha: 0.06, centerX: starFieldWidth * 0.48, centerY: starFieldHeight * 0.85, blobRadius: maxDimension * 0.26 },
-        { colorChannels: '236,131,90', alpha: 0.035, centerX: starFieldWidth * 0.85, centerY: starFieldHeight * 0.18, blobRadius: maxDimension * 0.18 },
+        { colorChannels: '144,133,233', alpha: 0.1, centerX: starFieldWidth * 0.25, centerY: deepHeight * 0.3, blobRadius: maxDimension * 0.38 },
+        { colorChannels: '57,135,229', alpha: 0.08, centerX: starFieldWidth * 0.72, centerY: deepHeight * 0.58, blobRadius: maxDimension * 0.32 },
+        { colorChannels: '213,81,129', alpha: 0.06, centerX: starFieldWidth * 0.48, centerY: deepHeight * 0.85, blobRadius: maxDimension * 0.26 },
+        { colorChannels: '236,131,90', alpha: 0.035, centerX: starFieldWidth * 0.85, centerY: deepHeight * 0.18, blobRadius: maxDimension * 0.18 },
       ];
       for (const blob of nebulaBlobs) {
-        const gradient = nebulaContext.createRadialGradient(
+        const gradient = deepContext.createRadialGradient(
           blob.centerX, blob.centerY, 0,
           blob.centerX, blob.centerY, blob.blobRadius
         );
         gradient.addColorStop(0, `rgba(${blob.colorChannels},${blob.alpha})`);
         gradient.addColorStop(0.45, `rgba(${blob.colorChannels},${blob.alpha})`);
         gradient.addColorStop(1, `rgba(${blob.colorChannels},0)`);
-        nebulaContext.fillStyle = gradient;
-        nebulaContext.fillRect(0, 0, starFieldWidth, starFieldHeight);
+        deepContext.fillStyle = gradient;
+        deepContext.fillRect(0, 0, starFieldWidth, deepHeight);
       }
-      const vignetteGradient = nebulaContext.createRadialGradient(
+    };
+
+    const drawVignetteLayer = () => {
+      const pixelRatio = window.devicePixelRatio || 1;
+      vignetteCanvas.width = starFieldWidth * pixelRatio;
+      vignetteCanvas.height = starFieldHeight * pixelRatio;
+      vignetteContext.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+      vignetteContext.clearRect(0, 0, starFieldWidth, starFieldHeight);
+      const maxDimension = Math.max(starFieldWidth, starFieldHeight);
+      const vignetteGradient = vignetteContext.createRadialGradient(
         starFieldWidth / 2, starFieldHeight / 2, 0,
         starFieldWidth / 2, starFieldHeight / 2, maxDimension
       );
       vignetteGradient.addColorStop(0, 'rgba(0,0,0,0)');
       vignetteGradient.addColorStop(0.6, 'rgba(0,0,0,0)');
       vignetteGradient.addColorStop(1, 'rgba(0,0,0,0.35)');
-      nebulaContext.fillStyle = vignetteGradient;
-      nebulaContext.fillRect(0, 0, starFieldWidth, starFieldHeight);
+      vignetteContext.fillStyle = vignetteGradient;
+      vignetteContext.fillRect(0, 0, starFieldWidth, starFieldHeight);
     };
 
     const resizeStarsCanvas = () => {
@@ -705,7 +732,9 @@
       starsCanvas.width = starFieldWidth * pixelRatio;
       starsCanvas.height = starFieldHeight * pixelRatio;
       starsContext.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-      drawNebula();
+      drawBaseLayer();
+      drawDeepLayer();
+      drawVignetteLayer();
     };
 
     const renderStars = (timestamp) => {
@@ -713,8 +742,27 @@
         starsFrameId = null;
         return;
       }
+      let panX = 0;
+      let panY = 0;
+      if (typeof graphInstance !== 'undefined' && graphInstance.camera()) {
+        const cameraPosition = graphInstance.camera().position;
+        const azimuth = Math.atan2(cameraPosition.x, cameraPosition.z);
+        const elevation = Math.atan2(
+          cameraPosition.y,
+          Math.hypot(cameraPosition.x, cameraPosition.z)
+        );
+        panX = ((azimuth + Math.PI) / (2 * Math.PI)) * starFieldWidth * 2;
+        panY = (elevation / (Math.PI / 2)) * starFieldHeight * 0.5;
+      }
       starsContext.clearRect(0, 0, starFieldWidth, starFieldHeight);
-      starsContext.drawImage(nebulaCanvas, 0, 0, starFieldWidth, starFieldHeight);
+      starsContext.drawImage(baseCanvas, 0, 0, starFieldWidth, starFieldHeight);
+      const deepHeight = starFieldHeight * 1.6;
+      const deepOffsetX = (panX * 0.25) % starFieldWidth;
+      const deepOffsetY = -0.3 * starFieldHeight + panY * 0.25;
+      starsContext.drawImage(deepCanvas, deepOffsetX, deepOffsetY, starFieldWidth, deepHeight);
+      starsContext.drawImage(
+        deepCanvas, deepOffsetX - starFieldWidth, deepOffsetY, starFieldWidth, deepHeight
+      );
       for (const star of stars) {
         star.xPosition += star.driftX;
         star.yPosition += star.driftY;
@@ -722,6 +770,10 @@
         if (star.xPosition > starFieldWidth) star.xPosition -= starFieldWidth;
         if (star.yPosition < 0) star.yPosition += starFieldHeight;
         if (star.yPosition > starFieldHeight) star.yPosition -= starFieldHeight;
+        const screenX =
+          (star.xPosition + panX * star.depthFactor + starFieldWidth) % starFieldWidth;
+        const screenY =
+          (star.yPosition + panY * star.depthFactor + starFieldHeight) % starFieldHeight;
         starsContext.globalAlpha =
           0.25 + 0.55 * Math.abs(Math.sin(star.twinklePhase + timestamp * 0.001 * star.twinkleSpeed));
         starsContext.fillStyle = star.color;
@@ -730,13 +782,14 @@
           starsContext.shadowColor = star.color;
         }
         starsContext.beginPath();
-        starsContext.arc(star.xPosition, star.yPosition, star.radius, 0, Math.PI * 2);
+        starsContext.arc(screenX, screenY, star.radius, 0, Math.PI * 2);
         starsContext.fill();
         if (star.isBright) {
           starsContext.shadowBlur = 0;
         }
       }
       starsContext.globalAlpha = 1;
+      starsContext.drawImage(vignetteCanvas, 0, 0, starFieldWidth, starFieldHeight);
       starsFrameId = requestAnimationFrame(renderStars);
     };
 
