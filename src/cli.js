@@ -24,6 +24,37 @@ Options:
 
 const git = (cwd, args) => execFileSync('git', args, { cwd, encoding: 'utf8' }).trim();
 
+const detectBranch = (repoRoot) => {
+  try {
+    const branch = git(repoRoot, ['rev-parse', '--abbrev-ref', 'HEAD']);
+    return branch === 'HEAD' ? null : branch;
+  } catch {
+    return null;
+  }
+};
+
+const detectPullRequest = (repoRoot, prNumber) => {
+  try {
+    const prArguments = ['pr', 'view'];
+    if (prNumber !== null && prNumber !== undefined) prArguments.push(String(prNumber));
+    prArguments.push('--json', 'number,title,url');
+    const output = execFileSync('gh', prArguments, {
+      cwd: repoRoot,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+      timeout: 5000,
+    });
+    const pullRequest = JSON.parse(output);
+    return {
+      number: pullRequest.number,
+      title: pullRequest.title,
+      url: pullRequest.url,
+    };
+  } catch {
+    return null;
+  }
+};
+
 const parseArgs = (argv) => {
   const options = { base: null, pr: null, out: null, open: true, help: false };
   for (let argIndex = 0; argIndex < argv.length; argIndex += 1) {
@@ -66,10 +97,19 @@ const resolveChangedFiles = (repoRoot, options) => {
   if (options.pr) {
     const output = execFileSync(
       'gh',
-      ['pr', 'view', String(options.pr), '--json', 'files', '--jq', '.files[].path'],
-      { cwd: repoRoot, encoding: 'utf8' }
+      ['pr', 'view', String(options.pr), '--json', 'number,title,url,files'],
+      { cwd: repoRoot, encoding: 'utf8', stdio: ['ignore', 'pipe', 'inherit'] }
     );
-    return { modeLabel: `PR #${options.pr}`, files: new Set(output.split('\n').filter(Boolean)) };
+    const pullRequest = JSON.parse(output);
+    return {
+      modeLabel: `PR #${options.pr}`,
+      files: new Set(pullRequest.files.map((file) => file.path)),
+      pullRequest: {
+        number: pullRequest.number,
+        title: pullRequest.title,
+        url: pullRequest.url,
+      },
+    };
   }
   if (options.base) {
     const committed = git(repoRoot, ['diff', '--name-only', `${options.base}...HEAD`])
@@ -95,12 +135,17 @@ export const runCli = async (argv) => {
   const repoName = path.basename(repoRoot);
 
   const changed = resolveChangedFiles(repoRoot, options);
+  const branch = detectBranch(repoRoot);
+  const pullRequest = options.pr
+    ? changed.pullRequest
+    : (options.base ? detectPullRequest(repoRoot) : null);
+  const context = { branch, baseRef: options.base || null, pullRequest };
   const repoFiles = collectRepoFiles(repoRoot);
   const sources = scanSources(repoRoot, repoFiles.sourceFiles);
   const resolver = createResolver(repoRoot, repoFiles);
   const graph = buildGraph({ sources, resolver, changedFiles: changed.files });
 
-  const html = renderHtml({ graph, repoName, modeLabel: changed.modeLabel });
+  const html = renderHtml({ graph, repoName, modeLabel: changed.modeLabel, context });
   const outPath = options.out
     ? path.resolve(options.out)
     : path.join(os.tmpdir(), `slopmap-${repoName}-${Date.now()}.html`);
@@ -112,6 +157,9 @@ export const runCli = async (argv) => {
       `  files: ${stats.fileCount}   imports: ${stats.linkCount}   unresolved: ${stats.unresolvedCount}\n` +
       (stats.changedCount > 0
         ? `  changed: ${stats.changedCount}   blast radius: ${stats.dependentCount}   depends on: ${stats.dependencyCount}\n`
+        : '') +
+      (context.pullRequest
+        ? `  PR #${context.pullRequest.number}: ${context.pullRequest.url}\n`
         : '') +
       `  -> ${outPath}\n`
   );

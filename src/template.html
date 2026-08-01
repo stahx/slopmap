@@ -111,6 +111,42 @@
       line-height: 1.35;
     }
 
+    #context-row {
+      display: grid;
+      gap: 2px;
+      max-width: 100%;
+      margin-top: 4px;
+      overflow: hidden;
+      color: #c3c2b7;
+      font-size: 12px;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    #context-row[hidden] {
+      display: none;
+    }
+
+    #context-branch,
+    #context-pr {
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    #context-base {
+      color: #898781;
+    }
+
+    #context-pr {
+      color: #3987e5;
+      text-decoration: none;
+    }
+
+    #context-pr:hover {
+      text-decoration: underline;
+    }
+
     #meta {
       margin-top: 4px;
       color: #c3c2b7;
@@ -343,6 +379,10 @@
       <button class="view-button" type="button" data-view="advanced">Advanced</button>
     </div>
     <div id="panel-title">__SLOPMAP_TITLE__</div>
+    <div id="context-row" hidden>
+      <div id="context-branch" hidden></div>
+      <a id="context-pr" target="_blank" rel="noopener" hidden></a>
+    </div>
     <div id="meta"></div>
     <div id="legend"></div>
     <div id="advanced-controls" hidden>
@@ -400,6 +440,9 @@
         .slice(0, GROUP_COLORS.length)
         .map((group, slotIndex) => [group.name, GROUP_COLORS[slotIndex]])
     );
+    const contextRowElement = document.getElementById('context-row');
+    const contextBranchElement = document.getElementById('context-branch');
+    const contextPrElement = document.getElementById('context-pr');
     const metaElement = document.getElementById('meta');
     const legendElement = document.getElementById('legend');
     const labelsElement = document.getElementById('labels');
@@ -421,6 +464,33 @@
     const viewButtons = [...document.querySelectorAll('#view-toggle .view-button')];
     const themeButtons = [...document.querySelectorAll('#theme-toggle .view-button')];
     const sectionLabelElements = new Map();
+
+    const renderContext = () => {
+      const context = payload.context;
+      if (context === null || context === undefined) return;
+
+      const hasBranch = Boolean(context.branch);
+      if (hasBranch) {
+        contextBranchElement.textContent = String(context.branch);
+        if (context.baseRef) {
+          const baseElement = document.createElement('span');
+          baseElement.id = 'context-base';
+          baseElement.textContent = ` → ${context.baseRef}`;
+          contextBranchElement.append(baseElement);
+        }
+        contextBranchElement.hidden = false;
+      }
+
+      const pullRequest = context.pullRequest;
+      const hasPullRequest = pullRequest !== null && pullRequest !== undefined;
+      if (hasPullRequest) {
+        contextPrElement.textContent = `PR #${pullRequest.number} — ${pullRequest.title}`;
+        contextPrElement.setAttribute('href', String(pullRequest.url));
+        contextPrElement.hidden = false;
+      }
+
+      contextRowElement.hidden = !hasBranch && !hasPullRequest;
+    };
 
     const appendLegendRow = (color, label, count) => {
       const rowElement = document.createElement('div');
@@ -972,6 +1042,7 @@
       (diffMode
         ? ` · ${payload.graph.stats.changedCount} changed · ${payload.graph.stats.dependentCount} blast`
         : '');
+    renderContext();
     impactOption.hidden = !diffMode;
     renderLegend();
 
