@@ -43,6 +43,15 @@ const RESOLVER = {
 
 const CHANGED_FILES = new Set(['apps/web/entry.ts', 'apps/web/consumer.ts']);
 
+const CHANGES = {
+  files: [
+    { path: 'apps/web/entry.ts', status: 'M', additions: 10, deletions: 2 },
+    { path: 'apps/web/consumer.ts', status: 'R', additions: 4, deletions: 1 },
+    { path: 'apps/web/deleted.ts', status: 'D', additions: 0, deletions: 8 },
+  ],
+  totals: { additions: 14, deletions: 11 },
+};
+
 const COSMOS_SOURCES = [
   {
     filePath: 'apps/cosmos/section-01/changed.ts',
@@ -89,9 +98,22 @@ const COSMOS_RESOLVER = {
 
 const COSMOS_CHANGED_FILES = new Set(['apps/cosmos/section-01/changed.ts']);
 
+const COSMOS_CHANGES = {
+  files: [
+    { path: 'apps/cosmos/section-01/changed.ts', status: 'M', additions: 7, deletions: 3 },
+    { path: 'apps/cosmos/section-12/deleted.ts', status: 'D', additions: 0, deletions: 4 },
+  ],
+  totals: { additions: 7, deletions: 7 },
+};
+
 describe('src/graph', () => {
   test('buildGraph', () => {
-    const graph = buildGraph({ sources: SOURCES, resolver: RESOLVER, changedFiles: CHANGED_FILES });
+    const graph = buildGraph({
+      sources: SOURCES,
+      resolver: RESOLVER,
+      changedFiles: CHANGED_FILES,
+      changes: CHANGES,
+    });
     const nodesById = new Map(graph.nodes.map((node) => [node.id, node]));
 
     expect(nodesById.get('apps/web/entry.ts').status).toBe('changed');
@@ -122,6 +144,38 @@ describe('src/graph', () => {
       dependentCount: 1,
       dependencyCount: 2,
     });
+    expect(graph.changes).toEqual({
+      files: [
+        {
+          path: 'apps/web/entry.ts',
+          status: 'M',
+          additions: 10,
+          deletions: 2,
+          section: 'apps/web',
+          group: 'apps/web',
+          rootGroup: 'apps',
+        },
+        {
+          path: 'apps/web/consumer.ts',
+          status: 'R',
+          additions: 4,
+          deletions: 1,
+          section: 'apps/web',
+          group: 'apps/web',
+          rootGroup: 'apps',
+        },
+        {
+          path: 'apps/web/deleted.ts',
+          status: 'D',
+          additions: 0,
+          deletions: 8,
+          section: 'apps/web',
+          group: 'apps/web',
+          rootGroup: 'apps',
+        },
+      ],
+      totals: { additions: 14, deletions: 11 },
+    });
   });
 
   test('buildGraph dirs', () => {
@@ -129,6 +183,7 @@ describe('src/graph', () => {
       sources: COSMOS_SOURCES,
       resolver: COSMOS_RESOLVER,
       changedFiles: COSMOS_CHANGED_FILES,
+      changes: COSMOS_CHANGES,
     });
     const nodesById = new Map(graph.nodes.map((node) => [node.id, node]));
     const sectionsById = new Map(graph.levels.dirs.sections.map((section) => [section.id, section]));
@@ -156,6 +211,8 @@ describe('src/graph', () => {
       changedCount: 0,
       dependentCount: 0,
       dependencyCount: 0,
+      additions: 0,
+      deletions: 0,
       changedFiles: [],
       status: 'normal',
     });
@@ -201,6 +258,13 @@ describe('src/graph', () => {
       dependencyCount: 0,
       changedFiles: ['apps/cosmos/section-01/changed.ts'],
       status: 'changed',
+      additions: 7,
+      deletions: 3,
+      downstream: [
+        { id: 'apps/cosmos/section-02', count: 1 },
+        { id: 'apps/cosmos/section-04', count: 1 },
+      ],
+      downstreamTotal: 2,
     });
     expect(sectionsById.get('apps/cosmos/section-03')).toMatchObject({
       loc: 30,
@@ -213,10 +277,28 @@ describe('src/graph', () => {
       dependencyCount: 1,
       status: 'dependent',
     });
+    expect(sectionsById.get('apps/cosmos/(other)')).toMatchObject({
+      additions: 0,
+      deletions: 4,
+    });
+    expect(graph.changes.files[1]).toEqual({
+      path: 'apps/cosmos/section-12/deleted.ts',
+      status: 'D',
+      additions: 0,
+      deletions: 4,
+      section: 'apps/cosmos/(other)',
+      group: 'apps/cosmos',
+      rootGroup: 'apps',
+    });
   });
 
   test('buildGraph levels roots', () => {
-    const graph = buildGraph({ sources: SOURCES, resolver: RESOLVER, changedFiles: CHANGED_FILES });
+    const graph = buildGraph({
+      sources: SOURCES,
+      resolver: RESOLVER,
+      changedFiles: CHANGED_FILES,
+      changes: CHANGES,
+    });
     const nodesById = new Map(graph.nodes.map((node) => [node.id, node]));
     const rootsById = new Map(graph.levels.roots.sections.map((section) => [section.id, section]));
 
@@ -236,6 +318,10 @@ describe('src/graph', () => {
       changedCount: 2,
       dependentCount: 1,
       dependencyCount: 1,
+      additions: 14,
+      deletions: 11,
+      downstream: [],
+      downstreamTotal: 0,
       status: 'changed',
     });
     expect(graph.levels.roots.links).toContainEqual({
@@ -258,6 +344,7 @@ describe('src/graph', () => {
       sources: COSMOS_SOURCES,
       resolver: COSMOS_RESOLVER,
       changedFiles: COSMOS_CHANGED_FILES,
+      changes: COSMOS_CHANGES,
     });
     expect(cappedGraph.levels.roots.sections.map((section) => section.id)).toEqual([
       'apps',
@@ -268,12 +355,21 @@ describe('src/graph', () => {
     expect(cappedGraph.levels.roots.sections.find((section) => section.id === 'apps')).toMatchObject({
       group: 'apps',
       fileCount: 17,
+      additions: 7,
+      deletions: 7,
+      downstream: [],
+      downstreamTotal: 0,
     });
     expect(cappedGraph.levels.roots.sections.some((section) => section.id.includes('(other)'))).toBe(false);
   });
 
   test('buildGraph levels groups', () => {
-    const graph = buildGraph({ sources: SOURCES, resolver: RESOLVER, changedFiles: CHANGED_FILES });
+    const graph = buildGraph({
+      sources: SOURCES,
+      resolver: RESOLVER,
+      changedFiles: CHANGED_FILES,
+      changes: CHANGES,
+    });
     const nodesById = new Map(graph.nodes.map((node) => [node.id, node]));
     const groupsById = new Map(graph.levels.groups.sections.map((group) => [group.id, group]));
 
@@ -295,7 +391,11 @@ describe('src/graph', () => {
       changedCount: 2,
       dependentCount: 1,
       dependencyCount: 1,
+      additions: 14,
+      deletions: 11,
       changedFiles: ['apps/web/entry.ts', 'apps/web/consumer.ts'],
+      downstream: [],
+      downstreamTotal: 0,
       status: 'changed',
     });
     expect(groupsById.get('packages/shared')).toMatchObject({

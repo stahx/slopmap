@@ -28,7 +28,14 @@ const locateLibrary = () => {
 export const renderHtml = ({ graph, repoName, modeLabel, context }) => {
   const librarySource = fs.readFileSync(locateLibrary(), 'utf8');
   const template = fs.readFileSync(path.join(toolRoot, 'src', 'template.html'), 'utf8');
-  const serializedData = JSON.stringify({ graph, repoName, modeLabel, context }).replace(/</g, '\\u003c');
+  const { changes, ...graphPayload } = graph;
+  const serializedData = JSON.stringify({
+    graph: graphPayload,
+    changes,
+    repoName,
+    modeLabel,
+    context,
+  }).replace(/</g, '\\u003c');
   const title = `slopmap · ${repoName} · ${modeLabel}`;
 
   return template

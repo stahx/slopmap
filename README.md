@@ -1,6 +1,6 @@
 # slopmap
 
-slopmap turns any JavaScript or TypeScript repository into a 3D architecture map. Its default Compact view rolls files up into groups shown as planets, while diff views reveal a pull request's blast radius. The name is a joke, and unfortunately an accurate one.
+slopmap turns any JavaScript or TypeScript repository into a 3D architecture map. Its default Compact view rolls files up into groups shown as planets, while diff views reveal a pull request's blast radius. A mission-control panel keeps branch, PR, change totals, distribution, compactness, and theme controls together without covering the map. The name is a joke, and unfortunately an accurate one.
 
 ## Install
 
@@ -29,9 +29,9 @@ slopmap --pr 123
 - `slopmap --base <ref>` renders changes against a Git ref and their blast radius.
 - `slopmap --pr <number>` renders the files changed by a GitHub pull request and their blast radius.
 
-When GitHub PR metadata is available, the map panel links directly to the pull request.
+When GitHub PR metadata is available, the context card shows its state and change totals. The section drawer also provides an `Open PR` action.
 
-Every map has two views: Compact rolls files up with a compactness slider (`roots` → `groups` → `dirs`), and Advanced shows the full file graph. Import lines show how items at the active Compact level connect. Click a Compact ball for details, then choose `open in Files` to jump to the matching filtered Advanced graph. Advanced also provides search highlighting and the impact-only and isolated-file toggles.
+Every map has two views: Compact rolls files up with a compactness slider (`roots` → `groups` → `dirs`), and Advanced shows the full file graph. Import lines show how items at the active Compact level connect. Click a Compact ball to open the right drawer, where diff maps list file statuses, additions, deletions, and downstream sections. `Isolate blast` jumps to the matching filtered Advanced graph with impact-only enabled. Advanced also provides search highlighting and the impact-only and isolated-file toggles.
 
 | Option | Description |
 | --- | --- |

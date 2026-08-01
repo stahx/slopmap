@@ -29,6 +29,8 @@ const createSectionRecord = (sectionId, groupName) => ({
   changedCount: 0,
   dependentCount: 0,
   dependencyCount: 0,
+  additions: 0,
+  deletions: 0,
   changedFiles: [],
   status: 'normal',
 });
@@ -104,7 +106,52 @@ const breadthFirst = (startIds, adjacency) => {
   return visited;
 };
 
-export const buildGraph = ({ sources, resolver, changedFiles }) => {
+const annotateAggregate = ({
+  aggregate,
+  nodesById,
+  changedIds,
+  reverseAdjacency,
+  sectionOfNode,
+  changeFiles,
+  changeSectionKey,
+}) => {
+  const sectionsById = new Map(aggregate.sections.map((section) => [section.id, section]));
+  for (const changeFile of changeFiles) {
+    const section = sectionsById.get(changeFile[changeSectionKey]);
+    if (section === undefined) continue;
+    section.additions += changeFile.additions;
+    section.deletions += changeFile.deletions;
+  }
+
+  for (const section of aggregate.sections) {
+    if (section.changedCount === 0) continue;
+    const sectionChangedIds = new Set(
+      [...changedIds].filter((nodeId) => sectionOfNode(nodesById.get(nodeId)) === section.id)
+    );
+    const reachedIds = breadthFirst(sectionChangedIds, reverseAdjacency);
+    const downstreamCounts = new Map();
+    for (const reachedId of reachedIds) {
+      const downstreamId = sectionOfNode(nodesById.get(reachedId));
+      if (downstreamId === section.id) continue;
+      downstreamCounts.set(downstreamId, (downstreamCounts.get(downstreamId) || 0) + 1);
+    }
+    section.downstream = [...downstreamCounts.entries()]
+      .map(([id, count]) => ({ id, count }))
+      .sort((firstEntry, secondEntry) =>
+        secondEntry.count - firstEntry.count || firstEntry.id.localeCompare(secondEntry.id)
+      )
+      .slice(0, 6);
+    section.downstreamTotal = [...downstreamCounts.values()]
+      .reduce((totalCount, count) => totalCount + count, 0);
+  }
+};
+
+export const buildGraph = ({
+  sources,
+  resolver,
+  changedFiles = new Set(),
+  changes = { files: [], totals: null },
+}) => {
   const nodesById = new Map();
   for (const source of sources) {
     nodesById.set(source.filePath, {
@@ -188,6 +235,20 @@ export const buildGraph = ({ sources, resolver, changedFiles }) => {
     }
   }
 
+  const annotatedChangeFiles = changes.files.map((changeFile) => {
+    const group = groupFor(changeFile.path);
+    const initialSection = sectionFor(changeFile.path);
+    const section = droppedSectionsByGroup.get(group)?.has(initialSection)
+      ? `${group}/(other)`
+      : initialSection;
+    return {
+      ...changeFile,
+      section,
+      group,
+      rootGroup: rootOf(changeFile.path),
+    };
+  });
+
   for (const link of links) {
     const sourceStatus = nodesById.get(link.source).status;
     const targetStatus = nodesById.get(link.target).status;
@@ -217,6 +278,34 @@ export const buildGraph = ({ sources, resolver, changedFiles }) => {
   const roots = buildAggregate(nodesById, links, rootOf);
   const groups = buildAggregate(nodesById, links, groupFor);
 
+  annotateAggregate({
+    aggregate: roots,
+    nodesById,
+    changedIds,
+    reverseAdjacency,
+    sectionOfNode: (node) => node.rootGroup,
+    changeFiles: annotatedChangeFiles,
+    changeSectionKey: 'rootGroup',
+  });
+  annotateAggregate({
+    aggregate: groups,
+    nodesById,
+    changedIds,
+    reverseAdjacency,
+    sectionOfNode: (node) => node.group,
+    changeFiles: annotatedChangeFiles,
+    changeSectionKey: 'group',
+  });
+  annotateAggregate({
+    aggregate: dirs,
+    nodesById,
+    changedIds,
+    reverseAdjacency,
+    sectionOfNode: (node) => node.section,
+    changeFiles: annotatedChangeFiles,
+    changeSectionKey: 'section',
+  });
+
   const groupCounts = new Map();
   for (const node of nodesById.values()) {
     groupCounts.set(node.group, (groupCounts.get(node.group) || 0) + 1);
@@ -230,6 +319,7 @@ export const buildGraph = ({ sources, resolver, changedFiles }) => {
     links,
     groups: groupSummaries,
     levels: { roots, groups, dirs },
+    changes: { files: annotatedChangeFiles, totals: changes.totals },
     stats: {
       fileCount: nodesById.size,
       linkCount: links.length,
