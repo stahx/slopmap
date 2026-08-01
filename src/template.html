@@ -617,6 +617,8 @@
     let starsFrameId = null;
     let starFieldWidth = window.innerWidth;
     let starFieldHeight = window.innerHeight;
+    let accumulatedPanX = 0;
+    let previousAzimuth = null;
     const STAR_DEPTH_BUCKETS = [0.4, 0.7, 1.0];
     const pickDepthFactor = () =>
       STAR_DEPTH_BUCKETS[Math.floor(Math.random() * STAR_DEPTH_BUCKETS.length)];
@@ -677,17 +679,26 @@
       deepContext.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
       deepContext.clearRect(0, 0, starFieldWidth, deepHeight);
       const maxDimension = Math.max(starFieldWidth, deepHeight);
-      deepContext.save();
-      deepContext.translate(starFieldWidth / 2, deepHeight / 2);
-      deepContext.rotate(-0.5);
-      const bandHeight = deepHeight * 0.45;
-      const bandGradient = deepContext.createLinearGradient(0, -bandHeight / 2, 0, bandHeight / 2);
-      bandGradient.addColorStop(0, 'rgba(201,215,255,0)');
-      bandGradient.addColorStop(0.5, 'rgba(201,215,255,0.055)');
-      bandGradient.addColorStop(1, 'rgba(201,215,255,0)');
-      deepContext.fillStyle = bandGradient;
-      deepContext.fillRect(-starFieldWidth * 1.5, -bandHeight / 2, starFieldWidth * 3, bandHeight);
-      deepContext.restore();
+      const primaryBandHeight = starFieldHeight * 0.35;
+      const primaryBandTop = deepHeight * 0.38 - primaryBandHeight / 2;
+      const primaryBandGradient = deepContext.createLinearGradient(
+        0, primaryBandTop, 0, primaryBandTop + primaryBandHeight
+      );
+      primaryBandGradient.addColorStop(0, 'rgba(201,215,255,0)');
+      primaryBandGradient.addColorStop(0.5, 'rgba(201,215,255,0.05)');
+      primaryBandGradient.addColorStop(1, 'rgba(201,215,255,0)');
+      deepContext.fillStyle = primaryBandGradient;
+      deepContext.fillRect(0, primaryBandTop, starFieldWidth, primaryBandHeight);
+      const secondaryBandHeight = starFieldHeight * 0.18;
+      const secondaryBandTop = deepHeight * 0.55 - secondaryBandHeight / 2;
+      const secondaryBandGradient = deepContext.createLinearGradient(
+        0, secondaryBandTop, 0, secondaryBandTop + secondaryBandHeight
+      );
+      secondaryBandGradient.addColorStop(0, 'rgba(201,215,255,0)');
+      secondaryBandGradient.addColorStop(0.5, 'rgba(201,215,255,0.03)');
+      secondaryBandGradient.addColorStop(1, 'rgba(201,215,255,0)');
+      deepContext.fillStyle = secondaryBandGradient;
+      deepContext.fillRect(0, secondaryBandTop, starFieldWidth, secondaryBandHeight);
       const nebulaBlobs = [
         { colorChannels: '144,133,233', alpha: 0.1, centerX: starFieldWidth * 0.25, centerY: deepHeight * 0.3, blobRadius: maxDimension * 0.38 },
         { colorChannels: '57,135,229', alpha: 0.08, centerX: starFieldWidth * 0.72, centerY: deepHeight * 0.58, blobRadius: maxDimension * 0.32 },
@@ -695,15 +706,18 @@
         { colorChannels: '236,131,90', alpha: 0.035, centerX: starFieldWidth * 0.85, centerY: deepHeight * 0.18, blobRadius: maxDimension * 0.18 },
       ];
       for (const blob of nebulaBlobs) {
-        const gradient = deepContext.createRadialGradient(
-          blob.centerX, blob.centerY, 0,
-          blob.centerX, blob.centerY, blob.blobRadius
-        );
-        gradient.addColorStop(0, `rgba(${blob.colorChannels},${blob.alpha})`);
-        gradient.addColorStop(0.45, `rgba(${blob.colorChannels},${blob.alpha})`);
-        gradient.addColorStop(1, `rgba(${blob.colorChannels},0)`);
-        deepContext.fillStyle = gradient;
-        deepContext.fillRect(0, 0, starFieldWidth, deepHeight);
+        for (const wrapOffset of [-starFieldWidth, 0, starFieldWidth]) {
+          const wrappedCenterX = blob.centerX + wrapOffset;
+          const gradient = deepContext.createRadialGradient(
+            wrappedCenterX, blob.centerY, 0,
+            wrappedCenterX, blob.centerY, blob.blobRadius
+          );
+          gradient.addColorStop(0, `rgba(${blob.colorChannels},${blob.alpha})`);
+          gradient.addColorStop(0.45, `rgba(${blob.colorChannels},${blob.alpha})`);
+          gradient.addColorStop(1, `rgba(${blob.colorChannels},0)`);
+          deepContext.fillStyle = gradient;
+          deepContext.fillRect(0, 0, starFieldWidth, deepHeight);
+        }
       }
     };
 
@@ -742,7 +756,6 @@
         starsFrameId = null;
         return;
       }
-      let panX = 0;
       let panY = 0;
       if (typeof graphInstance !== 'undefined' && graphInstance.camera()) {
         const cameraPosition = graphInstance.camera().position;
@@ -751,13 +764,22 @@
           cameraPosition.y,
           Math.hypot(cameraPosition.x, cameraPosition.z)
         );
-        panX = ((azimuth + Math.PI) / (2 * Math.PI)) * starFieldWidth * 2;
+        if (previousAzimuth === null) {
+          previousAzimuth = azimuth;
+        } else {
+          let azimuthDelta = azimuth - previousAzimuth;
+          if (azimuthDelta > Math.PI) azimuthDelta -= 2 * Math.PI;
+          if (azimuthDelta < -Math.PI) azimuthDelta += 2 * Math.PI;
+          accumulatedPanX += (azimuthDelta / (2 * Math.PI)) * starFieldWidth * 2;
+          previousAzimuth = azimuth;
+        }
         panY = (elevation / (Math.PI / 2)) * starFieldHeight * 0.5;
       }
       starsContext.clearRect(0, 0, starFieldWidth, starFieldHeight);
       starsContext.drawImage(baseCanvas, 0, 0, starFieldWidth, starFieldHeight);
       const deepHeight = starFieldHeight * 1.6;
-      const deepOffsetX = (panX * 0.25) % starFieldWidth;
+      const deepOffsetX =
+        (((accumulatedPanX * 0.25) % starFieldWidth) + starFieldWidth) % starFieldWidth;
       const deepOffsetY = -0.3 * starFieldHeight + panY * 0.25;
       starsContext.drawImage(deepCanvas, deepOffsetX, deepOffsetY, starFieldWidth, deepHeight);
       starsContext.drawImage(
@@ -771,9 +793,11 @@
         if (star.yPosition < 0) star.yPosition += starFieldHeight;
         if (star.yPosition > starFieldHeight) star.yPosition -= starFieldHeight;
         const screenX =
-          (star.xPosition + panX * star.depthFactor + starFieldWidth) % starFieldWidth;
+          (((star.xPosition + accumulatedPanX * star.depthFactor) % starFieldWidth) +
+            starFieldWidth) % starFieldWidth;
         const screenY =
-          (star.yPosition + panY * star.depthFactor + starFieldHeight) % starFieldHeight;
+          (((star.yPosition + panY * star.depthFactor) % starFieldHeight) +
+            starFieldHeight) % starFieldHeight;
         starsContext.globalAlpha =
           0.25 + 0.55 * Math.abs(Math.sin(star.twinklePhase + timestamp * 0.001 * star.twinkleSpeed));
         starsContext.fillStyle = star.color;
