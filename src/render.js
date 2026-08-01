@@ -25,10 +25,10 @@ const locateLibrary = () => {
   throw new Error('slopmap: cannot locate 3d-force-graph UMD bundle');
 };
 
-export const renderHtml = ({ graph, repoName, modeLabel }) => {
+export const renderHtml = ({ graph, repoName, modeLabel, context }) => {
   const librarySource = fs.readFileSync(locateLibrary(), 'utf8');
   const template = fs.readFileSync(path.join(toolRoot, 'src', 'template.html'), 'utf8');
-  const serializedData = JSON.stringify({ graph, repoName, modeLabel }).replace(/</g, '\\u003c');
+  const serializedData = JSON.stringify({ graph, repoName, modeLabel, context }).replace(/</g, '\\u003c');
   const title = `slopmap · ${repoName} · ${modeLabel}`;
 
   return template

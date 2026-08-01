@@ -29,6 +29,8 @@ slopmap --pr 123
 - `slopmap --base <ref>` renders changes against a Git ref and their blast radius.
 - `slopmap --pr <number>` renders the files changed by a GitHub pull request and their blast radius.
 
+When GitHub PR metadata is available, the map panel links directly to the pull request.
+
 Every map opens in the cosmic view, where planets represent repository sections and import lines show how those sections connect. Click a section to see its changed files, then choose `open in advanced` to inspect that section at file level. The advanced view contains the full file graph, search highlighting, and the impact-only and isolated-file toggles.
 
 | Option | Description |
