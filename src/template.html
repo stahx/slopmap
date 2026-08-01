@@ -82,7 +82,7 @@
 
     #view-toggle {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-columns: 1fr 1fr;
       gap: 2px;
       margin-bottom: 12px;
       padding: 2px;
@@ -103,6 +103,27 @@
     .view-button.active {
       color: #ffffff;
       background: #262624;
+    }
+
+    #compactness-setting {
+      margin-bottom: 12px;
+    }
+
+    #compactness-label,
+    #compactness-levels {
+      color: #898781;
+      font-size: 11px;
+    }
+
+    #compactness {
+      width: 100%;
+      margin: 3px 0 0;
+      accent-color: #ec835a;
+    }
+
+    #compactness-levels {
+      display: flex;
+      justify-content: space-between;
     }
 
     #panel-title {
@@ -375,9 +396,17 @@
   <div id="labels"></div>
   <section id="panel">
     <div id="view-toggle" aria-label="Graph view">
-      <button class="view-button active" type="button" data-view="roots">Roots</button>
-      <button class="view-button" type="button" data-view="dirs">Dirs</button>
-      <button class="view-button" type="button" data-view="files">Files</button>
+      <button class="view-button active" type="button" data-view="compact">Compact</button>
+      <button class="view-button" type="button" data-view="files">Advanced</button>
+    </div>
+    <div id="compactness-setting">
+      <div id="compactness-label">compactness</div>
+      <input id="compactness" type="range" min="1" max="3" step="1" aria-label="Compactness">
+      <div id="compactness-levels">
+        <span>roots</span>
+        <span>groups</span>
+        <span>dirs</span>
+      </div>
     </div>
     <div id="panel-title">__SLOPMAP_TITLE__</div>
     <div id="context-row" hidden>
@@ -429,7 +458,16 @@
     const GROUP_COLORS = ['#3987e5', '#d95926', '#199e70', '#c98500', '#d55181', '#008300', '#9085e9', '#e66767'];
     const MUTED_COLOR = '#898781';
     const filterState = { searchTerm: '' };
-    let currentView = 'roots';
+    let currentView = 'compact';
+    const readStoredCompactness = () => {
+      try {
+        const storedLevel = Number(localStorage.getItem('slopmap-compactness'));
+        return [1, 2, 3].includes(storedLevel) ? storedLevel : 2;
+      } catch (storageError) {
+        return 2;
+      }
+    };
+    let compactnessLevel = readStoredCompactness();
     let aggregateFilter = null;
     let selectedSection = null;
     let selectedNode = null;
@@ -447,6 +485,8 @@
     const metaElement = document.getElementById('meta');
     const legendElement = document.getElementById('legend');
     const labelsElement = document.getElementById('labels');
+    const compactnessSettingElement = document.getElementById('compactness-setting');
+    const compactnessInput = document.getElementById('compactness');
     const filesControlsElement = document.getElementById('files-controls');
     const searchInput = document.getElementById('search');
     const impactOption = document.getElementById('impact-option');
@@ -465,8 +505,10 @@
     const viewButtons = [...document.querySelectorAll('#view-toggle .view-button')];
     const themeButtons = [...document.querySelectorAll('#theme-toggle .view-button')];
     const sectionLabelElements = new Map();
-    const isAggregatedView = () => currentView !== 'files';
-    const activeAggregate = () => payload.graph.levels[currentView === 'roots' ? 'roots' : 'dirs'];
+    const isAggregatedView = () => currentView === 'compact';
+    const activeAggregate = () => payload.graph.levels[
+      { 1: 'roots', 2: 'groups', 3: 'dirs' }[compactnessLevel]
+    ];
 
     const renderContext = () => {
       const context = payload.context;
@@ -575,8 +617,11 @@
 
     const nodeValueFor = (node) => {
       if (!isAggregatedView()) return Math.max(1, Math.min(14, node.loc / 60));
-      if (currentView === 'roots') {
+      if (compactnessLevel === 1) {
         return Math.max(10, Math.min(90, Math.sqrt(node.fileCount) * 2.4));
+      }
+      if (compactnessLevel === 2) {
+        return Math.max(8, Math.min(70, Math.sqrt(node.fileCount) * 2.0));
       }
       return Math.max(4, Math.min(40, node.fileCount));
     };
@@ -600,9 +645,11 @@
     const applyFilters = () => {
       let nodes = payload.graph.nodes;
       if (aggregateFilter !== null) {
-        nodes = nodes.filter((node) => aggregateFilter.mode === 'root'
-          ? node.rootGroup === aggregateFilter.value
-          : node.section === aggregateFilter.value);
+        nodes = nodes.filter((node) => {
+          if (aggregateFilter.mode === 'root') return node.rootGroup === aggregateFilter.value;
+          if (aggregateFilter.mode === 'group') return node.group === aggregateFilter.value;
+          return node.section === aggregateFilter.value;
+        });
       }
       if (diffMode && impactOnlyInput.checked) {
         nodes = nodes.filter((node) => node.status !== 'normal');
@@ -686,9 +733,11 @@
         }
       } else {
         const sectionFiles = payload.graph.nodes
-          .filter((node) => currentView === 'roots'
-            ? node.rootGroup === section.id
-            : node.section === section.id)
+          .filter((node) => {
+            if (compactnessLevel === 1) return node.rootGroup === section.id;
+            if (compactnessLevel === 2) return node.group === section.id;
+            return node.section === section.id;
+          })
           .sort((firstNode, secondNode) => secondNode.loc - firstNode.loc)
           .slice(0, 10);
         if (sectionFiles.length === 0) {
@@ -705,7 +754,7 @@
       labelsElement.replaceChildren();
       for (const section of activeAggregate().sections) {
         const labelElement = document.createElement('div');
-        const isHub = currentView === 'roots' || section.id === section.group;
+        const isHub = compactnessLevel !== 3 || section.id === section.group;
         labelElement.className = isHub
           ? 'section-label section-label-hub'
           : 'section-label section-label-subsection';
@@ -998,6 +1047,7 @@
         viewButton.classList.toggle('active', viewButton.dataset.view === view);
       }
       labelsElement.hidden = !isAggregatedView();
+      compactnessSettingElement.hidden = !isAggregatedView();
       filesControlsElement.hidden = isAggregatedView();
       hintElement.textContent = isAggregatedView()
         ? 'drag rotate · scroll zoom · click ball = details'
@@ -1010,9 +1060,13 @@
           links: aggregate.links,
         });
         graphInstance.d3Force('charge').strength(-160);
-        graphInstance.d3Force('link').distance(view === 'roots'
-          ? 120
-          : (link) => link.kind === 'orbit' ? 70 : 110);
+        graphInstance.d3Force('link').distance(
+          compactnessLevel === 1
+            ? 120
+            : compactnessLevel === 2
+              ? 100
+              : (link) => link.kind === 'orbit' ? 70 : 110
+        );
       } else {
         graphInstance.graphData(applyFilters());
         graphInstance.d3Force('charge').strength(-45);
@@ -1100,6 +1154,14 @@
     for (const viewButton of viewButtons) {
       viewButton.addEventListener('click', () => showView(viewButton.dataset.view));
     }
+    compactnessInput.value = String(compactnessLevel);
+    compactnessInput.addEventListener('input', () => {
+      compactnessLevel = Number(compactnessInput.value);
+      try {
+        localStorage.setItem('slopmap-compactness', String(compactnessLevel));
+      } catch (storageError) {}
+      showView('compact');
+    });
     for (const themeButton of themeButtons) {
       themeButton.addEventListener('click', () => setBackgroundTheme(themeButton.dataset.theme));
     }
@@ -1118,7 +1180,7 @@
     openFilesButton.addEventListener('click', () => {
       if (selectedSection === null) return;
       aggregateFilter = {
-        mode: currentView === 'roots' ? 'root' : 'section',
+        mode: compactnessLevel === 1 ? 'root' : compactnessLevel === 2 ? 'group' : 'section',
         value: selectedSection.id,
       };
       renderAggregateFilter();

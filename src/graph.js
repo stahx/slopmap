@@ -215,20 +215,21 @@ export const buildGraph = ({ sources, resolver, changedFiles }) => {
     .map((section) => ({ source: section.group, target: section.id, kind: 'orbit' }));
   dirs.links = [...orbitLinks, ...dirs.links];
   const roots = buildAggregate(nodesById, links, rootOf);
+  const groups = buildAggregate(nodesById, links, groupFor);
 
   const groupCounts = new Map();
   for (const node of nodesById.values()) {
     groupCounts.set(node.group, (groupCounts.get(node.group) || 0) + 1);
   }
-  const groups = [...groupCounts.entries()]
+  const groupSummaries = [...groupCounts.entries()]
     .map(([name, count]) => ({ name, count }))
     .sort((first, second) => second.count - first.count);
 
   return {
     nodes: [...nodesById.values()],
     links,
-    groups,
-    levels: { roots, dirs },
+    groups: groupSummaries,
+    levels: { roots, groups, dirs },
     stats: {
       fileCount: nodesById.size,
       linkCount: links.length,

@@ -271,4 +271,52 @@ describe('src/graph', () => {
     });
     expect(cappedGraph.levels.roots.sections.some((section) => section.id.includes('(other)'))).toBe(false);
   });
+
+  test('buildGraph levels groups', () => {
+    const graph = buildGraph({ sources: SOURCES, resolver: RESOLVER, changedFiles: CHANGED_FILES });
+    const nodesById = new Map(graph.nodes.map((node) => [node.id, node]));
+    const groupsById = new Map(graph.levels.groups.sections.map((group) => [group.id, group]));
+
+    expect(graph.levels.groups.sections.map((group) => group.id)).toEqual([
+      'apps/web',
+      'packages/shared',
+      '(root)',
+      'utils',
+    ]);
+    expect(nodesById.get('apps/web/entry.ts')).toMatchObject({
+      rootGroup: 'apps',
+      group: 'apps/web',
+      section: 'apps/web',
+    });
+    expect(groupsById.get('apps/web')).toMatchObject({
+      group: 'apps/web',
+      fileCount: 4,
+      loc: 310,
+      changedCount: 2,
+      dependentCount: 1,
+      dependencyCount: 1,
+      changedFiles: ['apps/web/entry.ts', 'apps/web/consumer.ts'],
+      status: 'changed',
+    });
+    expect(groupsById.get('packages/shared')).toMatchObject({
+      group: 'packages/shared',
+      fileCount: 1,
+      status: 'dependency',
+    });
+    expect(graph.levels.groups.links).toContainEqual({
+      source: 'apps/web',
+      target: 'packages/shared',
+      kind: 'imports',
+      weight: 2,
+      hot: 1,
+    });
+    expect(graph.levels.groups.links).toContainEqual({
+      source: 'utils',
+      target: '(root)',
+      kind: 'imports',
+      weight: 1,
+      hot: 0,
+    });
+    expect(graph.levels.groups.links.some((link) => link.kind === 'orbit')).toBe(false);
+  });
 });
