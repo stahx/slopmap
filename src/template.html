@@ -929,9 +929,10 @@
       starsContext.clearRect(0, 0, starFieldWidth, starFieldHeight);
       starsContext.drawImage(baseCanvas, 0, 0, starFieldWidth, starFieldHeight);
       const deepHeight = starFieldHeight * 1.6;
-      const deepOffsetX =
-        (((accumulatedPanX * 0.25) % starFieldWidth) + starFieldWidth) % starFieldWidth;
-      const deepOffsetY = -0.3 * starFieldHeight + panY * 0.25;
+      const deepOffsetX = Math.round(
+        (((accumulatedPanX * 0.25) % starFieldWidth) + starFieldWidth) % starFieldWidth
+      );
+      const deepOffsetY = Math.round(-0.3 * starFieldHeight + panY * 0.25);
       starsContext.drawImage(deepCanvas, deepOffsetX, deepOffsetY, starFieldWidth, deepHeight);
       starsContext.drawImage(
         deepCanvas, deepOffsetX - starFieldWidth, deepOffsetY, starFieldWidth, deepHeight
