@@ -82,7 +82,7 @@
 
     #view-toggle {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr 1fr 1fr;
       gap: 2px;
       margin-bottom: 12px;
       padding: 2px;
@@ -357,7 +357,7 @@
       font-size: 12px;
     }
 
-    #open-advanced {
+    #open-files {
       margin-top: 14px;
       padding: 6px 9px;
       color: #c3c2b7;
@@ -375,8 +375,9 @@
   <div id="labels"></div>
   <section id="panel">
     <div id="view-toggle" aria-label="Graph view">
-      <button class="view-button active" type="button" data-view="cosmos">Compact</button>
-      <button class="view-button" type="button" data-view="advanced">Advanced</button>
+      <button class="view-button active" type="button" data-view="roots">Roots</button>
+      <button class="view-button" type="button" data-view="dirs">Dirs</button>
+      <button class="view-button" type="button" data-view="files">Files</button>
     </div>
     <div id="panel-title">__SLOPMAP_TITLE__</div>
     <div id="context-row" hidden>
@@ -385,7 +386,7 @@
     </div>
     <div id="meta"></div>
     <div id="legend"></div>
-    <div id="advanced-controls" hidden>
+    <div id="files-controls" hidden>
       <input id="search" type="search" placeholder="filter files…" aria-label="Filter files">
       <div id="filters">
         <label id="impact-option" class="checkbox-label">
@@ -409,7 +410,7 @@
       <span id="section-filter-label"></span>
       <button id="clear-section-filter" type="button" aria-label="Clear section filter">×</button>
     </div>
-    <div id="hint">drag rotate · scroll zoom · click section = details</div>
+    <div id="hint">drag rotate · scroll zoom · click ball = details</div>
   </section>
   <section id="detail-panel" hidden>
     <div id="detail-header">
@@ -418,7 +419,7 @@
     </div>
     <div id="detail-meta"></div>
     <div id="detail-body"></div>
-    <button id="open-advanced" type="button">open in Advanced</button>
+    <button id="open-files" type="button">open in Files</button>
   </section>
   <script>__SLOPMAP_LIB__</script>
   <script>
@@ -428,8 +429,8 @@
     const GROUP_COLORS = ['#3987e5', '#d95926', '#199e70', '#c98500', '#d55181', '#008300', '#9085e9', '#e66767'];
     const MUTED_COLOR = '#898781';
     const filterState = { searchTerm: '' };
-    let currentView = 'cosmos';
-    let sectionFilter = null;
+    let currentView = 'roots';
+    let aggregateFilter = null;
     let selectedSection = null;
     let selectedNode = null;
     let simulationNodes = [];
@@ -446,7 +447,7 @@
     const metaElement = document.getElementById('meta');
     const legendElement = document.getElementById('legend');
     const labelsElement = document.getElementById('labels');
-    const advancedControlsElement = document.getElementById('advanced-controls');
+    const filesControlsElement = document.getElementById('files-controls');
     const searchInput = document.getElementById('search');
     const impactOption = document.getElementById('impact-option');
     const impactOnlyInput = document.getElementById('impact-only');
@@ -460,10 +461,12 @@
     const detailMetaElement = document.getElementById('detail-meta');
     const detailBodyElement = document.getElementById('detail-body');
     const detailCloseButton = document.getElementById('detail-close');
-    const openAdvancedButton = document.getElementById('open-advanced');
+    const openFilesButton = document.getElementById('open-files');
     const viewButtons = [...document.querySelectorAll('#view-toggle .view-button')];
     const themeButtons = [...document.querySelectorAll('#theme-toggle .view-button')];
     const sectionLabelElements = new Map();
+    const isAggregatedView = () => currentView !== 'files';
+    const activeAggregate = () => payload.graph.levels[currentView === 'roots' ? 'roots' : 'dirs'];
 
     const renderContext = () => {
       const context = payload.context;
@@ -528,7 +531,6 @@
       }
     };
 
-    const isSectionNode = (node) => node.fileCount !== undefined;
     const idOf = (endpoint) => typeof endpoint === 'object' ? endpoint.id : endpoint;
 
     const blendTowardWhite = (hexColor, blendRatio) => {
@@ -543,7 +545,7 @@
 
     const nodeColorFor = (node) => {
       let baseColor;
-      if (isSectionNode(node)) {
+      if (isAggregatedView()) {
         baseColor = diffMode
           ? (node.status === 'normal' ? 'rgba(137,135,129,0.5)' : STATUS_COLORS[node.status])
           : (groupColors.get(node.group) || MUTED_COLOR);
@@ -563,7 +565,7 @@
     };
 
     const nodeLabelFor = (node) => {
-      if (isSectionNode(node)) {
+      if (isAggregatedView()) {
         return `${node.id} · ${node.fileCount} files` +
           (node.changedCount > 0 ? ` · ${node.changedCount} changed` : '');
       }
@@ -571,9 +573,13 @@
         (node.status !== 'normal' ? ` · ${node.status}` : '');
     };
 
-    const nodeValueFor = (node) => isSectionNode(node)
-      ? Math.max(4, Math.min(40, node.fileCount))
-      : Math.max(1, Math.min(14, node.loc / 60));
+    const nodeValueFor = (node) => {
+      if (!isAggregatedView()) return Math.max(1, Math.min(14, node.loc / 60));
+      if (currentView === 'roots') {
+        return Math.max(10, Math.min(90, Math.sqrt(node.fileCount) * 2.4));
+      }
+      return Math.max(4, Math.min(40, node.fileCount));
+    };
 
     const linkWidthFor = (link) => {
       if (link.kind === undefined) return 1;
@@ -593,8 +599,10 @@
 
     const applyFilters = () => {
       let nodes = payload.graph.nodes;
-      if (sectionFilter !== null) {
-        nodes = nodes.filter((node) => node.section === sectionFilter);
+      if (aggregateFilter !== null) {
+        nodes = nodes.filter((node) => aggregateFilter.mode === 'root'
+          ? node.rootGroup === aggregateFilter.value
+          : node.section === aggregateFilter.value);
       }
       if (diffMode && impactOnlyInput.checked) {
         nodes = nodes.filter((node) => node.status !== 'normal');
@@ -618,13 +626,13 @@
       return { nodes, links };
     };
 
-    const refreshAdvancedView = () => {
-      if (currentView === 'advanced') graphInstance.graphData(applyFilters());
+    const refreshFilesView = () => {
+      if (currentView === 'files') graphInstance.graphData(applyFilters());
     };
 
-    const renderSectionFilter = () => {
-      sectionFilterElement.hidden = sectionFilter === null;
-      sectionFilterLabelElement.textContent = sectionFilter === null ? '' : `section: ${sectionFilter}`;
+    const renderAggregateFilter = () => {
+      sectionFilterElement.hidden = aggregateFilter === null;
+      sectionFilterLabelElement.textContent = aggregateFilter === null ? '' : aggregateFilter.value;
     };
 
     const closeDetailPanel = () => {
@@ -678,7 +686,9 @@
         }
       } else {
         const sectionFiles = payload.graph.nodes
-          .filter((node) => node.section === section.id)
+          .filter((node) => currentView === 'roots'
+            ? node.rootGroup === section.id
+            : node.section === section.id)
           .sort((firstNode, secondNode) => secondNode.loc - firstNode.loc)
           .slice(0, 10);
         if (sectionFiles.length === 0) {
@@ -690,12 +700,28 @@
       detailPanelElement.hidden = false;
     };
 
+    const rebuildSectionLabels = () => {
+      sectionLabelElements.clear();
+      labelsElement.replaceChildren();
+      for (const section of activeAggregate().sections) {
+        const labelElement = document.createElement('div');
+        const isHub = currentView === 'roots' || section.id === section.group;
+        labelElement.className = isHub
+          ? 'section-label section-label-hub'
+          : 'section-label section-label-subsection';
+        labelElement.textContent = isHub ? section.id : section.id.split('/').at(-1);
+        labelElement.style.visibility = 'hidden';
+        sectionLabelElements.set(section.id, labelElement);
+        labelsElement.append(labelElement);
+      }
+    };
+
     const renderSectionLabels = () => {
-      if (currentView !== 'cosmos') {
+      if (!isAggregatedView()) {
         labelFrameId = null;
         return;
       }
-      for (const section of payload.graph.cosmos.sections) {
+      for (const section of activeAggregate().sections) {
         const labelElement = sectionLabelElements.get(section.id);
         if (!labelElement) continue;
         if (
@@ -715,9 +741,9 @@
     };
 
     const updateSectionLabelLoop = () => {
-      if (currentView === 'cosmos' && labelFrameId === null) {
+      if (isAggregatedView() && labelFrameId === null) {
         labelFrameId = requestAnimationFrame(renderSectionLabels);
-      } else if (currentView !== 'cosmos' && labelFrameId !== null) {
+      } else if (!isAggregatedView() && labelFrameId !== null) {
         cancelAnimationFrame(labelFrameId);
         labelFrameId = null;
       }
@@ -966,23 +992,27 @@
     const showView = (view) => {
       currentView = view;
       selectedNode = null;
+      closeDetailPanel();
       for (const viewButton of viewButtons) {
         viewButton.classList.toggle('active', viewButton.dataset.view === view);
       }
-      labelsElement.hidden = view !== 'cosmos';
-      advancedControlsElement.hidden = view !== 'advanced';
-      hintElement.textContent = view === 'cosmos'
-        ? 'drag rotate · scroll zoom · click section = details'
+      labelsElement.hidden = !isAggregatedView();
+      filesControlsElement.hidden = isAggregatedView();
+      hintElement.textContent = isAggregatedView()
+        ? 'drag rotate · scroll zoom · click ball = details'
         : 'drag rotate · scroll zoom · click node = focus';
-      if (view === 'cosmos') {
+      if (isAggregatedView()) {
+        const aggregate = activeAggregate();
+        rebuildSectionLabels();
         graphInstance.graphData({
-          nodes: payload.graph.cosmos.sections,
-          links: payload.graph.cosmos.links,
+          nodes: aggregate.sections,
+          links: aggregate.links,
         });
         graphInstance.d3Force('charge').strength(-160);
-        graphInstance.d3Force('link').distance((link) => link.kind === 'orbit' ? 70 : 110);
+        graphInstance.d3Force('link').distance(view === 'roots'
+          ? 120
+          : (link) => link.kind === 'orbit' ? 70 : 110);
       } else {
-        closeDetailPanel();
         graphInstance.graphData(applyFilters());
         graphInstance.d3Force('charge').strength(-45);
         graphInstance.d3Force('link').distance(35);
@@ -993,7 +1023,7 @@
 
     const clickRepelForce = (alpha) => {
       if (selectedNode === null) return;
-      const repelRadius = currentView === 'cosmos' ? 180 : 90;
+      const repelRadius = isAggregatedView() ? 180 : 90;
       for (const simulationNode of simulationNodes) {
         if (simulationNode === selectedNode) continue;
         const deltaX = simulationNode.x - selectedNode.x;
@@ -1014,7 +1044,7 @@
       const isDeselecting = selectedNode === node;
       selectedNode = isDeselecting ? null : node;
       if (!isDeselecting) {
-        if (isSectionNode(node)) {
+        if (isAggregatedView()) {
           openSectionDetail(node);
         } else {
           const distance = 140;
@@ -1046,18 +1076,6 @@
     impactOption.hidden = !diffMode;
     renderLegend();
 
-    for (const section of payload.graph.cosmos.sections) {
-      const labelElement = document.createElement('div');
-      const isHub = section.id === section.group;
-      labelElement.className = isHub
-        ? 'section-label section-label-hub'
-        : 'section-label section-label-subsection';
-      labelElement.textContent = isHub ? section.id : section.id.split('/').at(-1);
-      labelElement.style.visibility = 'hidden';
-      sectionLabelElements.set(section.id, labelElement);
-      labelsElement.append(labelElement);
-    }
-
     const graphInstance = ForceGraph3D()(document.getElementById('graph'))
       .backgroundColor('rgba(26,26,25,0)')
       .nodeLabel(nodeLabelFor)
@@ -1088,26 +1106,29 @@
       filterState.searchTerm = searchInput.value.toLowerCase();
       graphInstance.nodeColor(nodeColorFor);
     });
-    impactOnlyInput.addEventListener('change', refreshAdvancedView);
-    hideIsolatedInput.addEventListener('change', refreshAdvancedView);
+    impactOnlyInput.addEventListener('change', refreshFilesView);
+    hideIsolatedInput.addEventListener('change', refreshFilesView);
     clearSectionFilterButton.addEventListener('click', () => {
-      sectionFilter = null;
-      renderSectionFilter();
-      refreshAdvancedView();
+      aggregateFilter = null;
+      renderAggregateFilter();
+      refreshFilesView();
     });
     detailCloseButton.addEventListener('click', closeDetailPanel);
-    openAdvancedButton.addEventListener('click', () => {
+    openFilesButton.addEventListener('click', () => {
       if (selectedSection === null) return;
-      sectionFilter = selectedSection.id;
-      renderSectionFilter();
+      aggregateFilter = {
+        mode: currentView === 'roots' ? 'root' : 'section',
+        value: selectedSection.id,
+      };
+      renderAggregateFilter();
       closeDetailPanel();
-      showView('advanced');
+      showView('files');
     });
 
     resizeStarsCanvas();
     window.addEventListener('resize', resizeStarsCanvas);
 
-    renderSectionFilter();
+    renderAggregateFilter();
     setBackgroundTheme(backgroundTheme);
     showView(currentView);
   </script>

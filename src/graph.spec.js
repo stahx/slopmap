@@ -6,7 +6,13 @@ const SOURCES = [
   {
     filePath: 'apps/web/entry.ts',
     loc: 120,
-    specifiers: ['./dep-one', './duplicate-dep', './missing', 'external-package'],
+    specifiers: [
+      './dep-one',
+      './duplicate-dep',
+      '../../packages/shared/dep-two',
+      './missing',
+      'external-package',
+    ],
   },
   {
     filePath: 'apps/web/dep-one.ts',
@@ -23,6 +29,7 @@ const SOURCES = [
 const RESOLUTIONS = new Map([
   ['apps/web/entry.ts\0./dep-one', 'apps/web/dep-one.ts'],
   ['apps/web/entry.ts\0./duplicate-dep', 'apps/web/dep-one.ts'],
+  ['apps/web/entry.ts\0../../packages/shared/dep-two', 'packages/shared/dep-two.ts'],
   ['apps/web/dep-one.ts\0../../packages/shared/dep-two', 'packages/shared/dep-two.ts'],
   ['apps/web/consumer.ts\0./entry', 'apps/web/entry.ts'],
   ['apps/web/page.ts\0./consumer', 'apps/web/consumer.ts'],
@@ -95,6 +102,7 @@ describe('src/graph', () => {
     expect(nodesById.get('index.ts').status).toBe('normal');
     expect(graph.links).toEqual([
       { source: 'apps/web/entry.ts', target: 'apps/web/dep-one.ts', hot: 1 },
+      { source: 'apps/web/entry.ts', target: 'packages/shared/dep-two.ts', hot: 1 },
       { source: 'apps/web/dep-one.ts', target: 'packages/shared/dep-two.ts', hot: 1 },
       { source: 'apps/web/consumer.ts', target: 'apps/web/entry.ts', hot: 1 },
       { source: 'apps/web/page.ts', target: 'apps/web/consumer.ts', hot: 1 },
@@ -108,7 +116,7 @@ describe('src/graph', () => {
     ]);
     expect(graph.stats).toEqual({
       fileCount: 7,
-      linkCount: 5,
+      linkCount: 6,
       unresolvedCount: 1,
       changedCount: 2,
       dependentCount: 1,
@@ -116,14 +124,14 @@ describe('src/graph', () => {
     });
   });
 
-  test('buildGraph cosmos', () => {
+  test('buildGraph dirs', () => {
     const graph = buildGraph({
       sources: COSMOS_SOURCES,
       resolver: COSMOS_RESOLVER,
       changedFiles: COSMOS_CHANGED_FILES,
     });
     const nodesById = new Map(graph.nodes.map((node) => [node.id, node]));
-    const sectionsById = new Map(graph.cosmos.sections.map((section) => [section.id, section]));
+    const sectionsById = new Map(graph.levels.dirs.sections.map((section) => [section.id, section]));
 
     expect(nodesById.get('apps/cosmos/section-01/changed.ts').section).toBe('apps/cosmos/section-01');
     expect(nodesById.get('apps/cosmos/hub.ts').section).toBe('apps/cosmos');
@@ -133,7 +141,7 @@ describe('src/graph', () => {
     expect(nodesById.get('apps/cosmos/section-12/file.ts').section).toBe('apps/cosmos/(other)');
     expect(nodesById.get('apps/cosmos/section-13/file.ts').section).toBe('apps/cosmos/(other)');
     expect(
-      graph.cosmos.sections.filter(
+      graph.levels.dirs.sections.filter(
         (section) => section.group === 'apps/cosmos' && section.id !== 'apps/cosmos'
       )
     ).toHaveLength(12);
@@ -151,29 +159,29 @@ describe('src/graph', () => {
       changedFiles: [],
       status: 'normal',
     });
-    expect(graph.cosmos.links).toContainEqual({
+    expect(graph.levels.dirs.links).toContainEqual({
       source: 'apps/cosmos',
       target: 'apps/cosmos/section-01',
       kind: 'orbit',
     });
-    expect(graph.cosmos.links).toContainEqual({
+    expect(graph.levels.dirs.links).toContainEqual({
       source: 'apps/cosmos',
       target: 'apps/cosmos/(other)',
       kind: 'orbit',
     });
-    expect(graph.cosmos.links).toContainEqual({
+    expect(graph.levels.dirs.links).toContainEqual({
       source: 'packages/ui',
       target: 'packages/ui/components',
       kind: 'orbit',
     });
-    expect(graph.cosmos.links).toContainEqual({
+    expect(graph.levels.dirs.links).toContainEqual({
       source: 'apps/cosmos/section-01',
       target: 'apps/cosmos/section-03',
       kind: 'imports',
       weight: 2,
       hot: 1,
     });
-    expect(graph.cosmos.links).toContainEqual({
+    expect(graph.levels.dirs.links).toContainEqual({
       source: 'e2e/cypress',
       target: 'e2e',
       kind: 'imports',
@@ -181,7 +189,7 @@ describe('src/graph', () => {
       hot: 0,
     });
     expect(
-      graph.cosmos.links.some(
+      graph.levels.dirs.links.some(
         (link) => link.kind === 'imports' && link.source === link.target
       )
     ).toBe(false);
@@ -205,5 +213,62 @@ describe('src/graph', () => {
       dependencyCount: 1,
       status: 'dependent',
     });
+  });
+
+  test('buildGraph levels roots', () => {
+    const graph = buildGraph({ sources: SOURCES, resolver: RESOLVER, changedFiles: CHANGED_FILES });
+    const nodesById = new Map(graph.nodes.map((node) => [node.id, node]));
+    const rootsById = new Map(graph.levels.roots.sections.map((section) => [section.id, section]));
+
+    expect(graph.levels.roots.sections.map((section) => section.id)).toEqual([
+      'apps',
+      'packages',
+      '(root)',
+      'utils',
+    ]);
+    expect(nodesById.get('apps/web/entry.ts').rootGroup).toBe('apps');
+    expect(nodesById.get('packages/shared/dep-two.ts').rootGroup).toBe('packages');
+    expect(nodesById.get('index.ts').rootGroup).toBe('(root)');
+    expect(rootsById.get('apps')).toMatchObject({
+      group: 'apps',
+      fileCount: 4,
+      loc: 310,
+      changedCount: 2,
+      dependentCount: 1,
+      dependencyCount: 1,
+      status: 'changed',
+    });
+    expect(graph.levels.roots.links).toContainEqual({
+      source: 'apps',
+      target: 'packages',
+      kind: 'imports',
+      weight: 2,
+      hot: 1,
+    });
+    expect(graph.levels.roots.links).toContainEqual({
+      source: 'utils',
+      target: '(root)',
+      kind: 'imports',
+      weight: 1,
+      hot: 0,
+    });
+    expect(graph.levels.roots.links.some((link) => link.kind === 'orbit')).toBe(false);
+
+    const cappedGraph = buildGraph({
+      sources: COSMOS_SOURCES,
+      resolver: COSMOS_RESOLVER,
+      changedFiles: COSMOS_CHANGED_FILES,
+    });
+    expect(cappedGraph.levels.roots.sections.map((section) => section.id)).toEqual([
+      'apps',
+      'e2e',
+      '(root)',
+      'packages',
+    ]);
+    expect(cappedGraph.levels.roots.sections.find((section) => section.id === 'apps')).toMatchObject({
+      group: 'apps',
+      fileCount: 17,
+    });
+    expect(cappedGraph.levels.roots.sections.some((section) => section.id.includes('(other)'))).toBe(false);
   });
 });
