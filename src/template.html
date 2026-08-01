@@ -20,9 +20,17 @@
       font: inherit;
     }
 
+    #stars {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      display: block;
+    }
+
     #graph {
       position: fixed;
       inset: 0;
+      z-index: 1;
     }
 
     #labels {
@@ -307,12 +315,13 @@
   </style>
 </head>
 <body>
+  <canvas id="stars"></canvas>
   <div id="graph"></div>
   <div id="labels"></div>
   <section id="panel">
     <div id="view-toggle" aria-label="Graph view">
-      <button class="view-button active" type="button" data-view="cosmos">cosmos</button>
-      <button class="view-button" type="button" data-view="advanced">advanced</button>
+      <button class="view-button active" type="button" data-view="cosmos">Compact</button>
+      <button class="view-button" type="button" data-view="advanced">Advanced</button>
     </div>
     <div id="panel-title">__SLOPMAP_TITLE__</div>
     <div id="meta"></div>
@@ -343,7 +352,7 @@
     </div>
     <div id="detail-meta"></div>
     <div id="detail-body"></div>
-    <button id="open-advanced" type="button">open in advanced</button>
+    <button id="open-advanced" type="button">open in Advanced</button>
   </section>
   <script>__SLOPMAP_LIB__</script>
   <script>
@@ -597,12 +606,100 @@
       }
     };
 
+    const starsCanvas = document.getElementById('stars');
+    const starsContext = starsCanvas.getContext('2d');
+    const nebulaCanvas = document.createElement('canvas');
+    const nebulaContext = nebulaCanvas.getContext('2d');
+    let starsFrameId = null;
+    let starFieldWidth = window.innerWidth;
+    let starFieldHeight = window.innerHeight;
+
+    const stars = Array.from({ length: 260 }, () => ({
+      xPosition: Math.random() * starFieldWidth,
+      yPosition: Math.random() * starFieldHeight,
+      radius: 0.4 + Math.random() * 1.2,
+      twinklePhase: Math.random() * Math.PI * 2,
+      twinkleSpeed: 0.5 + Math.random() * 1.5,
+      driftX: (Math.random() - 0.5) * 0.04,
+      driftY: (Math.random() - 0.5) * 0.04,
+      color: Math.random() < 0.8 ? '#ffffff' : '#c3c2b7',
+    }));
+
+    const drawNebula = () => {
+      const pixelRatio = window.devicePixelRatio || 1;
+      nebulaCanvas.width = starsCanvas.width;
+      nebulaCanvas.height = starsCanvas.height;
+      nebulaContext.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+      nebulaContext.clearRect(0, 0, starFieldWidth, starFieldHeight);
+      const maxDimension = Math.max(starFieldWidth, starFieldHeight);
+      const nebulaBlobs = [
+        { colorChannels: '144,133,233', alpha: 0.05, centerX: starFieldWidth * 0.25, centerY: starFieldHeight * 0.3, blobRadius: maxDimension * 0.35 },
+        { colorChannels: '57,135,229', alpha: 0.04, centerX: starFieldWidth * 0.7, centerY: starFieldHeight * 0.6, blobRadius: maxDimension * 0.3 },
+        { colorChannels: '213,81,129', alpha: 0.03, centerX: starFieldWidth * 0.5, centerY: starFieldHeight * 0.85, blobRadius: maxDimension * 0.25 },
+      ];
+      for (const blob of nebulaBlobs) {
+        const gradient = nebulaContext.createRadialGradient(
+          blob.centerX, blob.centerY, 0,
+          blob.centerX, blob.centerY, blob.blobRadius
+        );
+        gradient.addColorStop(0, `rgba(${blob.colorChannels},${blob.alpha})`);
+        gradient.addColorStop(1, `rgba(${blob.colorChannels},0)`);
+        nebulaContext.fillStyle = gradient;
+        nebulaContext.fillRect(0, 0, starFieldWidth, starFieldHeight);
+      }
+    };
+
+    const resizeStarsCanvas = () => {
+      const pixelRatio = window.devicePixelRatio || 1;
+      starFieldWidth = window.innerWidth;
+      starFieldHeight = window.innerHeight;
+      starsCanvas.width = starFieldWidth * pixelRatio;
+      starsCanvas.height = starFieldHeight * pixelRatio;
+      starsContext.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+      drawNebula();
+    };
+
+    const renderStars = (timestamp) => {
+      if (currentView !== 'cosmos') {
+        starsFrameId = null;
+        return;
+      }
+      starsContext.clearRect(0, 0, starFieldWidth, starFieldHeight);
+      starsContext.drawImage(nebulaCanvas, 0, 0, starFieldWidth, starFieldHeight);
+      for (const star of stars) {
+        star.xPosition += star.driftX;
+        star.yPosition += star.driftY;
+        if (star.xPosition < 0) star.xPosition += starFieldWidth;
+        if (star.xPosition > starFieldWidth) star.xPosition -= starFieldWidth;
+        if (star.yPosition < 0) star.yPosition += starFieldHeight;
+        if (star.yPosition > starFieldHeight) star.yPosition -= starFieldHeight;
+        starsContext.globalAlpha =
+          0.25 + 0.55 * Math.abs(Math.sin(star.twinklePhase + timestamp * 0.001 * star.twinkleSpeed));
+        starsContext.fillStyle = star.color;
+        starsContext.beginPath();
+        starsContext.arc(star.xPosition, star.yPosition, star.radius, 0, Math.PI * 2);
+        starsContext.fill();
+      }
+      starsContext.globalAlpha = 1;
+      starsFrameId = requestAnimationFrame(renderStars);
+    };
+
+    const updateStarsLoop = () => {
+      if (currentView === 'cosmos' && starsFrameId === null) {
+        starsFrameId = requestAnimationFrame(renderStars);
+      } else if (currentView !== 'cosmos' && starsFrameId !== null) {
+        cancelAnimationFrame(starsFrameId);
+        starsFrameId = null;
+      }
+    };
+
     const showView = (view) => {
       currentView = view;
       for (const viewButton of viewButtons) {
         viewButton.classList.toggle('active', viewButton.dataset.view === view);
       }
       labelsElement.hidden = view !== 'cosmos';
+      starsCanvas.style.display = view === 'cosmos' ? 'block' : 'none';
       advancedControlsElement.hidden = view !== 'advanced';
       hintElement.textContent = view === 'cosmos'
         ? 'drag rotate · scroll zoom · click section = details'
@@ -617,6 +714,7 @@
         graphInstance.graphData(applyFilters());
       }
       updateSectionLabelLoop();
+      updateStarsLoop();
       graphInstance.zoomToFit(600);
     };
 
@@ -655,7 +753,7 @@
     }
 
     const graphInstance = ForceGraph3D()(document.getElementById('graph'))
-      .backgroundColor('#1a1a19')
+      .backgroundColor('rgba(26,26,25,0)')
       .nodeLabel(nodeLabelFor)
       .nodeVal(nodeValueFor)
       .nodeColor(nodeColorFor)
@@ -693,6 +791,9 @@
       closeDetailPanel();
       showView('advanced');
     });
+
+    resizeStarsCanvas();
+    window.addEventListener('resize', resizeStarsCanvas);
 
     renderSectionFilter();
     showView(currentView);
