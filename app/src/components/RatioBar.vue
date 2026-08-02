@@ -14,16 +14,20 @@ const props = defineProps({
     type: Number,
     default: null,
   },
+  detail: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const hasChangedLines = computed(
   () => props.additions !== 0 || props.deletions !== 0
 );
 const additionsFlex = computed(() =>
-  hasChangedLines.value ? Math.max(props.additions, 1) : 0
+  props.detail || hasChangedLines.value ? Math.max(props.additions, 1) : 0
 );
 const deletionsFlex = computed(() =>
-  hasChangedLines.value ? Math.max(props.deletions, 1) : 0
+  props.detail || hasChangedLines.value ? Math.max(props.deletions, 1) : 0
 );
 const remainderFlex = computed(() =>
   props.remainder === null ? null : Math.max(props.remainder, 1)
@@ -31,7 +35,11 @@ const remainderFlex = computed(() =>
 </script>
 
 <template>
-  <span class="ratio-bar" aria-hidden="true">
+  <span
+    class="ratio-bar"
+    :class="{ 'ratio-bar-detail': detail }"
+    aria-hidden="true"
+  >
     <span class="ratio-additions" :style="{ flex: additionsFlex }"></span>
     <span class="ratio-deletions" :style="{ flex: deletionsFlex }"></span>
     <span
@@ -74,5 +82,16 @@ const remainderFlex = computed(() =>
 
 .ratio-remainder {
   background: rgba(255, 255, 255, 0.07);
+}
+
+.ratio-bar-detail {
+  height: 5px;
+}
+
+.ratio-bar-detail .ratio-additions,
+.ratio-bar-detail .ratio-deletions,
+.ratio-bar-detail .ratio-remainder {
+  min-width: 1px;
+  opacity: 1;
 }
 </style>

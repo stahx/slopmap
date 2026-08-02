@@ -1,10 +1,15 @@
 <script setup>
+import { useSelection } from '../composables/useSelection.js';
+
 const emit = defineEmits(['select']);
+
+const { selectedSection } = useSelection();
 </script>
 
 <template>
   <aside class="inspector-panel">
-    <InspectorOverview @select="emit('select', $event)" />
+    <InspectorDetail v-if="selectedSection !== null" />
+    <InspectorOverview v-else @select="emit('select', $event)" />
   </aside>
 </template>
 
