@@ -256,9 +256,17 @@ export const collectChanges = (repoRoot, options, changedFiles) => {
     } catch {
       patchesByPath = new Map();
     }
+    const statusFromPatch = (patch) => {
+      if (!patch) return 'M';
+      const header = patch.split('@@')[0];
+      if (header.includes('\nnew file mode')) return 'A';
+      if (header.includes('\ndeleted file mode')) return 'D';
+      if (header.includes('\nrename from ')) return 'R';
+      return 'M';
+    };
     const files = pullRequest.files.map((file) => ({
       path: file.path,
-      status: 'M',
+      status: statusFromPatch(patchesByPath.get(file.path)),
       additions: file.additions,
       deletions: file.deletions,
       patch: patchesByPath.get(file.path) ?? null,
