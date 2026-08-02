@@ -27,7 +27,7 @@ export const renderHtml = ({
     modeLabel,
     context,
   }).replace(/</g, '\\u003c');
-  const title = `slopmap · ${repoName} · ${modeLabel}`;
+  const title = ['slopmap', repoName, modeLabel].filter(Boolean).join(' · ');
 
   return template
     .replaceAll('__SLOPMAP_TITLE__', () => title)
