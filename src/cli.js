@@ -111,7 +111,7 @@ const porcelainPath = (line) => {
   return renameSeparator === -1 ? entry : entry.slice(renameSeparator + 4);
 };
 
-const collectChanges = (repoRoot, options, changedFiles) => {
+export const collectChanges = (repoRoot, options, changedFiles) => {
   if (options.pr) {
     const pullRequest = options.pullRequestData;
     return {
@@ -180,7 +180,7 @@ const collectChanges = (repoRoot, options, changedFiles) => {
   return { files, totals };
 };
 
-const resolveChangedFiles = (repoRoot, options) => {
+export const resolveChangedFiles = (repoRoot, options) => {
   if (options.pr) {
     const output = execFileSync(
       'gh',
