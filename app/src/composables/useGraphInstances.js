@@ -114,6 +114,19 @@ const refreshCameraBounds = () => {
   graph2dInstance.minZoom(fitZoom * 0.5);
 };
 
+const relaxCameraLimits = () => {
+  cameraBounds = null;
+  if (graph3dInstance !== null) {
+    const controls = graph3dInstance.controls();
+    controls.minDistance = 0;
+    controls.maxDistance = Infinity;
+  }
+  if (graph2dInstance !== null) {
+    graph2dInstance.minZoom(0.01);
+    graph2dInstance.maxZoom(12);
+  }
+};
+
 const assertRawGraphData = (graphData) => {
   if (!import.meta.env.DEV) return;
   const proxiedNode = graphData.nodes.find((node) => isProxy(node));
@@ -168,11 +181,11 @@ const pin3dNodes = () => {
     node.fy = node.y;
     node.fz = node.z;
   }
+  refreshCameraBounds();
   if (pendingFitAfterStop && dimension.value === '3d') {
     pendingFitAfterStop = false;
     graph3dInstance.zoomToFit(600);
   }
-  refreshCameraBounds();
 };
 
 const pin2dNodes = () => {
@@ -181,11 +194,11 @@ const pin2dNodes = () => {
     node.fx = node.x;
     node.fy = node.y;
   }
+  refreshCameraBounds();
   if (pendingFitAfterStop && dimension.value === '2d') {
     pendingFitAfterStop = false;
     graph2dInstance.zoomToFit(600);
   }
-  refreshCameraBounds();
 };
 
 const drawSpacedCanvasText = (canvasContext, labelText, centerX, baselineY, characterSpacing) => {
@@ -348,7 +361,7 @@ const resizeGraphs = (width, height) => {
 const refreshFilesGraph = () => {
   if (currentView.value !== 'files') return;
   feedGraph(activeGraph(), filteredFilesGraph());
-  refreshCameraBounds();
+  relaxCameraLimits();
 };
 
 const applyView = () => {
@@ -376,7 +389,7 @@ const applyView = () => {
     graph.d3Force('charge').strength(-45);
     graph.d3Force('link').distance(35);
   }
-  refreshCameraBounds();
+  relaxCameraLimits();
   restartLabelLoop();
   graph.zoomToFit(600);
   pendingFitAfterStop = true;

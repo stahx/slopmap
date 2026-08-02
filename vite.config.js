@@ -6,11 +6,22 @@ import { viteSingleFile } from 'vite-plugin-singlefile';
 
 import assertSingleFile from './app/plugins/assert-single-file.js';
 
+const componentIdFor = (filePath, sourceCode, isProduction, getHash) => {
+  const legacyFilePath = filePath.replace(/^(src\/components\/([^/]+))\/\2\.vue$/, '$1.vue');
+  const legacySourceCode =
+    legacyFilePath === filePath ? sourceCode : sourceCode.replaceAll("from '../../", "from '../");
+  return getHash(legacyFilePath + (isProduction ? legacySourceCode : ''));
+};
+
 export default defineConfig({
   root: 'app',
   base: './',
   plugins: [
-    vue(),
+    vue({
+      features: {
+        componentIdGenerator: componentIdFor,
+      },
+    }),
     AutoImport({
       imports: ['vue'],
       dts: 'app/src/auto-imports.d.ts',
