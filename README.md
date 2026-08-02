@@ -1,6 +1,6 @@
 # slopmap
 
-slopmap turns any JavaScript or TypeScript repository into a 3D architecture map. Its default Compact view rolls files up into groups shown as planets, while diff views reveal a pull request's blast radius. A mission-control panel keeps branch, PR, change totals, distribution, compactness, and theme controls together without covering the map. The name is a joke, and unfortunately an accurate one.
+slopmap turns any JavaScript or TypeScript repository into a 3D architecture map. Its default Compact view rolls files up into groups shown as planets, while diff views reveal a pull request's blast radius. The flight-deck shell keeps view and dimension controls on a left icon rail, repository and pull-request context in the top header, map settings in a bottom controls pill, and details in a permanent tabbed inspector. The name is a joke, and unfortunately an accurate one.
 
 ## Install
 
@@ -29,11 +29,11 @@ slopmap --pr 123
 - `slopmap --base <ref>` renders changes against a Git ref and their blast radius.
 - `slopmap --pr <number>` renders the files changed by a GitHub pull request and their blast radius.
 
-When GitHub PR metadata is available, the context card shows its state and change totals. The section drawer also provides an `Open PR` action.
+When GitHub PR metadata is available, the header shows its state and change totals. The inspector also provides a direct review action.
 
-Every map has two views: Compact rolls files up with a compactness slider (`roots` → `groups` → `dirs`), and Advanced shows the full file graph. Import lines show how items at the active Compact level connect. Click a Compact ball to open the right drawer, where diff maps list file statuses, additions, deletions, and downstream sections. `Isolate blast` jumps to the matching filtered Advanced graph with impact-only enabled. Advanced also provides search highlighting and the impact-only and isolated-file toggles.
+Every map has two views on the rail: Compact rolls files up with a compactness slider (`roots` → `groups` → `dirs`), and the files view shows the full graph. Import lines show how items at the active Compact level connect. The inspector overview shows the graph distribution and changed sections; selecting a Compact ball opens Files, Dependents, and Imports tabs with change ratios, importer counts, paths, and blast-radius details. `Copy paths` copies the selected section's paths, while `Isolate blast` jumps to the matching filtered files graph with impact-only enabled. Search, impact-only, isolated-file, theme, and compactness controls live in the floating bottom pill.
 
-Use the dimension switch for a 3D orbit or flat 2D canvas; the choice is remembered between visits.
+Use the rail's dimension button for a 3D orbit or flat 2D canvas; the choice is remembered between visits. In 2D, a selected changed section also shows its blast-radius ring.
 
 | Option | Description |
 | --- | --- |
