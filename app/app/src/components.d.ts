@@ -17,6 +17,7 @@ declare module 'vue' {
     ControlsPill: typeof import('./../../src/components/ControlsPill.vue')['default']
     DetailFooter: typeof import('./../../src/components/DetailFooter.vue')['default']
     DetailStatTiles: typeof import('./../../src/components/DetailStatTiles.vue')['default']
+    DiffModal: typeof import('./../../src/components/DiffModal.vue')['default']
     DistributionBar: typeof import('./../../src/components/DistributionBar.vue')['default']
     EmptyState: typeof import('./../../src/components/EmptyState.vue')['default']
     FilesFilters: typeof import('./../../src/components/FilesFilters.vue')['default']

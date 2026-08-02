@@ -31,7 +31,7 @@ slopmap --pr 123
 
 When GitHub PR metadata is available, the header shows its state and change totals. The inspector also provides a direct review action.
 
-Every map has two views on the rail: Compact rolls files up with a compactness slider (`roots` → `groups` → `dirs`), and the files view shows the full graph. Import lines show how items at the active Compact level connect. The inspector overview shows the graph distribution and changed sections; selecting a Compact ball opens Files, Dependents, and Imports tabs with change ratios, importer counts, paths, and blast-radius details. `Copy paths` copies the selected section's paths, while `Isolate blast` jumps to the matching filtered files graph with impact-only enabled. Search, impact-only, isolated-file, theme, and compactness controls live in the floating bottom pill.
+Every map has two views on the rail: Compact rolls files up with a compactness slider (`roots` → `groups` → `dirs`), and the files view shows the full graph. Import lines show how items at the active Compact level connect. The inspector overview shows the graph distribution and changed sections; selecting a Compact ball opens Files, Dependents, and Imports tabs with change ratios, importer counts, paths, and blast-radius details, and clicking a changed-file card opens its embedded unified diff. `Copy paths` copies the selected section's paths, while `Isolate blast` jumps to the matching filtered files graph with impact-only enabled. Search, impact-only, isolated-file, theme, and compactness controls live in the floating bottom pill.
 
 Use the rail's dimension button for a 3D orbit or flat 2D canvas; the choice is remembered between visits. In 2D, a selected changed section also shows its blast-radius ring.
 

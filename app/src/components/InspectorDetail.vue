@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, shallowRef } from 'vue';
 
 import { useInspector } from '../composables/useInspector.js';
 import { usePayload } from '../composables/usePayload.js';
@@ -23,6 +23,8 @@ const {
   isolateBlast,
 } = useInspector();
 
+const diffFile = shallowRef(null);
+
 const statusStyle = computed(() => {
   const statusColor = STATUS_COLORS[activeSection.value?.status] ?? MUTED_COLOR;
   return {
@@ -32,6 +34,12 @@ const statusStyle = computed(() => {
 });
 
 const importerCountFor = (path) => importerCountsByTarget.value.get(path) ?? 0;
+const openDiff = (changeFile) => {
+  diffFile.value = changeFile;
+};
+const closeDiff = () => {
+  diffFile.value = null;
+};
 </script>
 
 <template>
@@ -55,6 +63,7 @@ const importerCountFor = (path) => importerCountsByTarget.value.get(path) ?? 0;
           :change-file="changeFile"
           :section-id="activeSection.id"
           :importer-count="importerCountFor(changeFile.path)"
+          @open-diff="openDiff"
         />
         <EmptyState v-if="changedFiles.length === 0" message="no changed files here" />
       </template>
@@ -97,6 +106,7 @@ const importerCountFor = (path) => importerCountsByTarget.value.get(path) ?? 0;
       @isolate="isolateBlast"
     />
   </div>
+  <DiffModal v-if="diffFile" :change-file="diffFile" @close="closeDiff" />
 </template>
 
 <style scoped>
