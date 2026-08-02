@@ -58,24 +58,25 @@ describe('app/src/lib/filterGraph', () => {
     expect(
       filterFixture({
         aggregateFilter: { mode: 'root', value: 'src' },
-      }).nodes
+      }).nodes,
     ).toEqual([NODES_FIXTURE[0], NODES_FIXTURE[1]]);
     expect(
       filterFixture({
         aggregateFilter: { mode: 'group', value: 'src/lib' },
-      }).nodes
+      }).nodes,
     ).toEqual([NODES_FIXTURE[1]]);
     expect(
       filterFixture({
         aggregateFilter: { mode: 'section', value: 'test' },
-      }).nodes
+      }).nodes,
     ).toEqual([NODES_FIXTURE[2]]);
   });
 
   test('filterGraph impactOnly', () => {
-    expect(
-      filterFixture({ impactOnly: true, diffMode: true }).nodes
-    ).toEqual([NODES_FIXTURE[0], NODES_FIXTURE[2]]);
+    expect(filterFixture({ impactOnly: true, diffMode: true }).nodes).toEqual([
+      NODES_FIXTURE[0],
+      NODES_FIXTURE[2],
+    ]);
     expect(filterFixture({ impactOnly: true }).nodes).toEqual(NODES_FIXTURE);
   });
 
@@ -87,8 +88,6 @@ describe('app/src/lib/filterGraph', () => {
 
     expect(result.nodes).toEqual([NODES_FIXTURE[0], NODES_FIXTURE[1]]);
     expect(result.links).toEqual([LINKS_FIXTURE[0]]);
-    expect(filterFixture({ hideIsolated: true }).nodes).toEqual(
-      NODES_FIXTURE.slice(0, 3)
-    );
+    expect(filterFixture({ hideIsolated: true }).nodes).toEqual(NODES_FIXTURE.slice(0, 3));
   });
 });

@@ -1,6 +1,6 @@
 :root {
-  --font-sans: "Inter Tight", "Inter", system-ui, sans-serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --font-sans: 'Inter Tight', 'Inter', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
   color-scheme: dark;
 }
 
@@ -26,17 +26,8 @@ body {
   overflow: hidden;
   color: #e8e6df;
   background:
-    radial-gradient(
-      circle at 20% 24%,
-      rgba(110, 120, 200, 0.16),
-      transparent 45%
-    ),
-    radial-gradient(
-      circle at 74% 70%,
-      rgba(120, 70, 130, 0.14),
-      transparent 50%
-    ),
-    #12142a;
+    radial-gradient(circle at 20% 24%, rgba(110, 120, 200, 0.16), transparent 45%),
+    radial-gradient(circle at 74% 70%, rgba(120, 70, 130, 0.14), transparent 50%), #12142a;
   font-family: var(--font-sans);
 }
 

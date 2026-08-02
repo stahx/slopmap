@@ -32,9 +32,7 @@ const tabDefinitions = [
       @click="emit('update:tab', tabDefinition.id)"
     >
       {{ tabDefinition.label }}
-      <span class="inspector-tab-count">{{
-        props.counts[tabDefinition.id]
-      }}</span>
+      <span class="inspector-tab-count">{{ props.counts[tabDefinition.id] }}</span>
     </button>
   </div>
 </template>

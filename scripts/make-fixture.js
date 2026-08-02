@@ -10,11 +10,7 @@ import { collectRepoFiles, scanSources } from '../src/scan.js';
 const parseArguments = (argumentsList) => {
   const positionalArguments = [];
   let baseRef = null;
-  for (
-    let argumentIndex = 0;
-    argumentIndex < argumentsList.length;
-    argumentIndex += 1
-  ) {
+  for (let argumentIndex = 0; argumentIndex < argumentsList.length; argumentIndex += 1) {
     const argument = argumentsList[argumentIndex];
     if (argument === '--base') {
       argumentIndex += 1;
@@ -27,15 +23,11 @@ const parseArguments = (argumentsList) => {
     throw new Error('slopmap: missing value for --base');
   }
   if (positionalArguments.length > 2) {
-    throw new Error(
-      'Usage: node scripts/make-fixture.js [repo] [output] [--base ref]'
-    );
+    throw new Error('Usage: node scripts/make-fixture.js [repo] [output] [--base ref]');
   }
   return {
     repoPath: positionalArguments[0] ?? '.',
-    outputPath:
-      positionalArguments[1] ??
-      `app/fixtures/payload.${baseRef ? 'diff' : 'full'}.json`,
+    outputPath: positionalArguments[1] ?? `app/fixtures/payload.${baseRef ? 'diff' : 'full'}.json`,
     baseRef,
   };
 };
@@ -56,10 +48,7 @@ const detectBranch = (repoRoot) => {
 };
 
 const makeFixture = ({ repoPath, outputPath, baseRef }) => {
-  const repoRoot = git(path.resolve(repoPath), [
-    'rev-parse',
-    '--show-toplevel',
-  ]);
+  const repoRoot = git(path.resolve(repoPath), ['rev-parse', '--show-toplevel']);
   const options = { base: baseRef, pr: null };
   const changed = resolveChangedFiles(repoRoot, options);
   const changes = collectChanges(repoRoot, options, changed.files);
@@ -88,11 +77,7 @@ const makeFixture = ({ repoPath, outputPath, baseRef }) => {
   };
   const resolvedOutputPath = path.resolve(outputPath);
   fs.mkdirSync(path.dirname(resolvedOutputPath), { recursive: true });
-  fs.writeFileSync(
-    resolvedOutputPath,
-    `${JSON.stringify(fixture, null, 2)}\n`,
-    'utf8'
-  );
+  fs.writeFileSync(resolvedOutputPath, `${JSON.stringify(fixture, null, 2)}\n`, 'utf8');
   process.stdout.write(`slopmap: wrote ${resolvedOutputPath}\n`);
 };
 

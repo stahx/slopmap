@@ -13,9 +13,7 @@ const props = defineProps({
 
 const emit = defineEmits(['select']);
 
-const changedSections = computed(() =>
-  sortChangedSections(props.activeAggregate?.sections ?? [])
-);
+const changedSections = computed(() => sortChangedSections(props.activeAggregate?.sections ?? []));
 
 const statusColor = (status) => STATUS_COLORS[status] ?? MUTED_COLOR;
 </script>
@@ -29,10 +27,7 @@ const statusColor = (status) => STATUS_COLORS[status] ?? MUTED_COLOR;
       type="button"
       @click="emit('select', section)"
     >
-      <span
-        class="changed-section-dot"
-        :style="{ background: statusColor(section.status) }"
-      ></span>
+      <span class="changed-section-dot" :style="{ background: statusColor(section.status) }"></span>
       <span class="changed-section-id">{{ section.id }}</span>
       <span class="changed-section-count">{{ section.changedCount }}</span>
     </button>

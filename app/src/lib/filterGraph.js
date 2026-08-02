@@ -27,8 +27,7 @@ export const filterGraph = ({
 
   let keptNodeIds = new Set(filteredNodes.map((node) => node.id));
   let filteredLinks = links.filter(
-    (link) =>
-      keptNodeIds.has(idOf(link.source)) && keptNodeIds.has(idOf(link.target))
+    (link) => keptNodeIds.has(idOf(link.source)) && keptNodeIds.has(idOf(link.target)),
   );
   if (hideIsolated) {
     const linkedNodeIds = new Set();
@@ -39,8 +38,7 @@ export const filterGraph = ({
     filteredNodes = filteredNodes.filter((node) => linkedNodeIds.has(node.id));
     keptNodeIds = new Set(filteredNodes.map((node) => node.id));
     filteredLinks = filteredLinks.filter(
-      (link) =>
-        keptNodeIds.has(idOf(link.source)) && keptNodeIds.has(idOf(link.target))
+      (link) => keptNodeIds.has(idOf(link.source)) && keptNodeIds.has(idOf(link.target)),
     );
   }
 

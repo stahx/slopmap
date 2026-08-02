@@ -15,16 +15,12 @@ export const nodeMatchesSection = (node, section, level) =>
 
 export const displayPathFor = (path, sectionId) => {
   const sectionPrefix = `${sectionId}/`;
-  return path.startsWith(sectionPrefix)
-    ? path.slice(sectionPrefix.length)
-    : path;
+  return path.startsWith(sectionPrefix) ? path.slice(sectionPrefix.length) : path;
 };
 
 export const changedFilesFor = (changes, section, level) => {
   const changeFiles = Array.isArray(changes) ? changes : (changes?.files ?? []);
-  return changeFiles.filter((changeFile) =>
-    changeMatchesSection(changeFile, section, level)
-  );
+  return changeFiles.filter((changeFile) => changeMatchesSection(changeFile, section, level));
 };
 
 export const sectionFilesFor = (nodes, section, level) =>
@@ -33,13 +29,7 @@ export const sectionFilesFor = (nodes, section, level) =>
     .sort((firstNode, secondNode) => secondNode.loc - firstNode.loc)
     .slice(0, 10);
 
-export const importedFilesFor = (
-  links,
-  changedFileIds,
-  section,
-  level,
-  nodeMatcher
-) => {
+export const importedFilesFor = (links, changedFileIds, section, level, nodeMatcher) => {
   const changedIds = new Set(changedFileIds);
   const importedIds = new Set();
   for (const link of links) {
@@ -49,9 +39,7 @@ export const importedFilesFor = (
     if (nodeMatcher(link.target, section, level)) continue;
     importedIds.add(targetId);
   }
-  return [...importedIds].sort((firstId, secondId) =>
-    firstId.localeCompare(secondId)
-  );
+  return [...importedIds].sort((firstId, secondId) => firstId.localeCompare(secondId));
 };
 
 export const sortChangedSections = (sections) =>
@@ -61,5 +49,5 @@ export const sortChangedSections = (sections) =>
     .sort(
       (firstSection, secondSection) =>
         secondSection.changedCount - firstSection.changedCount ||
-        firstSection.id.localeCompare(secondSection.id)
+        firstSection.id.localeCompare(secondSection.id),
     );

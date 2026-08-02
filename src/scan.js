@@ -38,7 +38,8 @@ const IMPORT_PATTERNS = [
 ];
 
 const isIgnored = (filePath) =>
-  filePath.endsWith('.min.js') || filePath.split('/').some((segment) => IGNORED_SEGMENTS.has(segment));
+  filePath.endsWith('.min.js') ||
+  filePath.split('/').some((segment) => IGNORED_SEGMENTS.has(segment));
 
 const stripComments = (content) =>
   content.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/(^|[^:])\/\/.*$/gm, '$1');
@@ -60,9 +61,9 @@ export const collectRepoFiles = (repoRoot) => {
       .split('\0')
       .filter(Boolean);
 
-  const allFiles = [...new Set([...listFiles([]), ...listFiles(['--others', '--exclude-standard'])])].filter(
-    (filePath) => !isIgnored(filePath)
-  );
+  const allFiles = [
+    ...new Set([...listFiles([]), ...listFiles(['--others', '--exclude-standard'])]),
+  ].filter((filePath) => !isIgnored(filePath));
 
   return {
     sourceFiles: allFiles.filter((filePath) => SOURCE_EXTENSIONS.has(path.extname(filePath))),

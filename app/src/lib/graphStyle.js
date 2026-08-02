@@ -2,10 +2,7 @@ import { MUTED_COLOR, STATUS_COLORS } from './graphTokens.js';
 
 export const blendTowardWhite = (hexColor, ratio) => {
   const blendChannel = (channelOffset) => {
-    const channelValue = Number.parseInt(
-      hexColor.slice(channelOffset, channelOffset + 2),
-      16
-    );
+    const channelValue = Number.parseInt(hexColor.slice(channelOffset, channelOffset + 2), 16);
     return Math.round(channelValue + (255 - channelValue) * ratio)
       .toString(16)
       .padStart(2, '0');
@@ -22,10 +19,7 @@ export const nodeColorFor = (node, context) => {
         ? 'rgba(139,143,163,.5)'
         : STATUS_COLORS[node.status]
       : context.groupColors.get(node.group) || MUTED_COLOR;
-  } else if (
-    context.searchTerm &&
-    node.id.toLowerCase().includes(context.searchTerm)
-  ) {
+  } else if (context.searchTerm && node.id.toLowerCase().includes(context.searchTerm)) {
     baseColor = '#ffffff';
   } else if (node.status !== 'normal') {
     baseColor = STATUS_COLORS[node.status];
@@ -49,10 +43,7 @@ export const nodeLabelFor = (node, context) => {
     );
   }
 
-  return (
-    `${node.id} · ${node.loc} loc` +
-    (node.status !== 'normal' ? ` · ${node.status}` : '')
-  );
+  return `${node.id} · ${node.loc} loc` + (node.status !== 'normal' ? ` · ${node.status}` : '');
 };
 
 export const nodeValueFor = (node, context) => {
@@ -70,9 +61,7 @@ export const nodeValueFor = (node, context) => {
 
 export const linkWidthFor = (link) => {
   if (link.kind === undefined) return 1;
-  return link.kind === 'imports'
-    ? Math.min(4, Math.log2(link.weight + 1))
-    : 0.2;
+  return link.kind === 'imports' ? Math.min(4, Math.log2(link.weight + 1)) : 0.2;
 };
 
 export const linkColorFor = (link) => {

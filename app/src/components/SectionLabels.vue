@@ -11,11 +11,9 @@ const { registerLabel } = useSectionLabels();
 
 const sections = computed(() => activeAggregate.value?.sections ?? []);
 
-const isHub = (section) =>
-  compactnessLevel.value !== 3 || section.id === section.group;
+const isHub = (section) => compactnessLevel.value !== 3 || section.id === section.group;
 
-const labelText = (section) =>
-  isHub(section) ? section.id : section.id.split('/').at(-1);
+const labelText = (section) => (isHub(section) ? section.id : section.id.split('/').at(-1));
 </script>
 
 <template>
@@ -55,14 +53,22 @@ const labelText = (section) =>
 
 .section-label-hub {
   color: #ffffff;
-  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  font-family:
+    'Inter',
+    system-ui,
+    -apple-system,
+    sans-serif;
   font-size: 13px;
   font-weight: 600;
 }
 
 .section-label-subsection {
   color: rgba(255, 255, 255, 0.72);
-  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  font-family:
+    'Inter',
+    system-ui,
+    -apple-system,
+    sans-serif;
   font-size: 12px;
   font-weight: 500;
 }

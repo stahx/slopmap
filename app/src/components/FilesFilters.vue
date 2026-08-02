@@ -3,13 +3,8 @@ import { usePayload } from '../composables/usePayload.js';
 import { useViewState } from '../composables/useViewState.js';
 
 const { diffMode } = usePayload();
-const {
-  aggregateFilter,
-  searchTerm,
-  impactOnly,
-  hideIsolated,
-  clearAggregateFilter,
-} = useViewState();
+const { aggregateFilter, searchTerm, impactOnly, hideIsolated, clearAggregateFilter } =
+  useViewState();
 </script>
 
 <template>

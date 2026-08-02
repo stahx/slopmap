@@ -51,48 +51,28 @@ const NODES_FIXTURE = [
 
 describe('app/src/lib/sections', () => {
   test('changeMatchesSection', () => {
-    expect(changeMatchesSection(CHANGES_FIXTURE[0], { id: 'apps' }, 1)).toBe(
-      true
-    );
-    expect(changeMatchesSection(CHANGES_FIXTURE[0], SECTION_FIXTURE, 2)).toBe(
-      true
-    );
-    expect(
-      changeMatchesSection(CHANGES_FIXTURE[0], { id: 'apps/web/src' }, 3)
-    ).toBe(true);
-    expect(changeMatchesSection(CHANGES_FIXTURE[1], SECTION_FIXTURE, 2)).toBe(
-      false
-    );
+    expect(changeMatchesSection(CHANGES_FIXTURE[0], { id: 'apps' }, 1)).toBe(true);
+    expect(changeMatchesSection(CHANGES_FIXTURE[0], SECTION_FIXTURE, 2)).toBe(true);
+    expect(changeMatchesSection(CHANGES_FIXTURE[0], { id: 'apps/web/src' }, 3)).toBe(true);
+    expect(changeMatchesSection(CHANGES_FIXTURE[1], SECTION_FIXTURE, 2)).toBe(false);
   });
 
   test('nodeMatchesSection', () => {
     expect(nodeMatchesSection(NODES_FIXTURE[0], { id: 'apps' }, 1)).toBe(true);
     expect(nodeMatchesSection(NODES_FIXTURE[0], SECTION_FIXTURE, 2)).toBe(true);
-    expect(
-      nodeMatchesSection(NODES_FIXTURE[0], { id: 'apps/web/src' }, 3)
-    ).toBe(true);
-    expect(nodeMatchesSection(NODES_FIXTURE[2], SECTION_FIXTURE, 2)).toBe(
-      false
-    );
+    expect(nodeMatchesSection(NODES_FIXTURE[0], { id: 'apps/web/src' }, 3)).toBe(true);
+    expect(nodeMatchesSection(NODES_FIXTURE[2], SECTION_FIXTURE, 2)).toBe(false);
   });
 
   test('displayPathFor', () => {
-    expect(displayPathFor('apps/web/src/main.js', 'apps/web')).toBe(
-      'src/main.js'
-    );
+    expect(displayPathFor('apps/web/src/main.js', 'apps/web')).toBe('src/main.js');
     expect(displayPathFor('apps/web', 'apps/web')).toBe('apps/web');
-    expect(displayPathFor('apps/website/main.js', 'apps/web')).toBe(
-      'apps/website/main.js'
-    );
+    expect(displayPathFor('apps/website/main.js', 'apps/web')).toBe('apps/website/main.js');
   });
 
   test('changedFilesFor', () => {
-    expect(changedFilesFor(CHANGES_FIXTURE, SECTION_FIXTURE, 2)).toEqual([
-      CHANGES_FIXTURE[0],
-    ]);
-    expect(
-      changedFilesFor({ files: CHANGES_FIXTURE }, { id: 'apps' }, 1)
-    ).toEqual(CHANGES_FIXTURE);
+    expect(changedFilesFor(CHANGES_FIXTURE, SECTION_FIXTURE, 2)).toEqual([CHANGES_FIXTURE[0]]);
+    expect(changedFilesFor({ files: CHANGES_FIXTURE }, { id: 'apps' }, 1)).toEqual(CHANGES_FIXTURE);
   });
 
   test('sectionFilesFor', () => {
@@ -106,11 +86,7 @@ describe('app/src/lib/sections', () => {
         loc: 100 - nodeIndex,
       });
     }
-    const result = sectionFilesFor(
-      [...NODES_FIXTURE, ...extraNodes],
-      SECTION_FIXTURE,
-      2
-    );
+    const result = sectionFilesFor([...NODES_FIXTURE, ...extraNodes], SECTION_FIXTURE, 2);
 
     expect(result).toHaveLength(10);
     expect(result[0]).toBe(NODES_FIXTURE[1]);
@@ -159,17 +135,11 @@ describe('app/src/lib/sections', () => {
       nodeMatchesSection(
         typeof nodeOrId === 'object' ? nodeOrId : nodesById.get(nodeOrId),
         section,
-        level
+        level,
       );
 
     expect(
-      importedFilesFor(
-        links,
-        ['apps/web/src/main.js'],
-        SECTION_FIXTURE,
-        2,
-        matchesSection
-      )
+      importedFilesFor(links, ['apps/web/src/main.js'], SECTION_FIXTURE, 2, matchesSection),
     ).toEqual(['packages/shared.js', 'packages/types.js']);
   });
 
@@ -181,11 +151,7 @@ describe('app/src/lib/sections', () => {
       { id: 'empty', changedCount: 0 },
     ];
 
-    expect(sortChangedSections(sections)).toEqual([
-      sections[2],
-      sections[1],
-      sections[0],
-    ]);
+    expect(sortChangedSections(sections)).toEqual([sections[2], sections[1], sections[0]]);
     expect(sections[0].id).toBe('zeta');
   });
 });

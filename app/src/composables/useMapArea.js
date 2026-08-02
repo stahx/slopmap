@@ -1,10 +1,6 @@
 import { ref } from 'vue';
 
-import {
-  HEADER_HEIGHT,
-  INSPECTOR_WIDTH,
-  RAIL_WIDTH,
-} from '../lib/layout.js';
+import { HEADER_HEIGHT, INSPECTOR_WIDTH, RAIL_WIDTH } from '../lib/layout.js';
 
 const mapWidth = ref(0);
 const mapHeight = ref(0);
@@ -26,7 +22,7 @@ const readElementSize = () => {
 const readFallbackSize = () => {
   setSize(
     globalThis.innerWidth - RAIL_WIDTH - INSPECTOR_WIDTH,
-    globalThis.innerHeight - HEADER_HEIGHT
+    globalThis.innerHeight - HEADER_HEIGHT,
   );
 };
 
@@ -45,9 +41,7 @@ const observe = (stageElement) => {
   observedElement = stageElement;
   if (typeof globalThis.ResizeObserver === 'function') {
     resizeObserver = new globalThis.ResizeObserver((entries) => {
-      const stageEntry = entries.find(
-        (entry) => entry.target === observedElement
-      );
+      const stageEntry = entries.find((entry) => entry.target === observedElement);
       if (stageEntry === undefined) return;
       setSize(stageEntry.contentRect.width, stageEntry.contentRect.height);
     });

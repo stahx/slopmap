@@ -816,15 +816,6 @@
         "rootGroup": "src"
       },
       {
-        "path": "src/template.html",
-        "status": "M",
-        "additions": 1776,
-        "deletions": 430,
-        "section": "src",
-        "group": "src",
-        "rootGroup": "src"
-      },
-      {
         "path": "app/.eslintrc-auto-import.json",
         "status": "A",
         "additions": 79,
@@ -997,8 +988,8 @@
       }
     ],
     "totals": {
-      "additions": 6599,
-      "deletions": 530
+      "additions": 4823,
+      "deletions": 100
     }
   },
   "repoName": "slopmap",

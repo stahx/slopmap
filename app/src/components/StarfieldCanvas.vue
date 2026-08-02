@@ -13,8 +13,8 @@ useStarfield(canvasElement);
 
 <template>
   <canvas
-    ref="canvasElement"
     v-show="theme === 'galaxy'"
+    ref="canvasElement"
     class="starfield-canvas"
     aria-hidden="true"
   ></canvas>

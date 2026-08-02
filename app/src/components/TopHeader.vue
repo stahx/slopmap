@@ -12,9 +12,7 @@ let relativeTimeIntervalId = null;
 const pullRequest = computed(() => context.value?.pullRequest ?? null);
 const totals = computed(() => changes.value?.totals ?? null);
 const metaText = computed(() => {
-  const analyzedText = relativeTimeText.value
-    ? ` · analyzed ${relativeTimeText.value}`
-    : '';
+  const analyzedText = relativeTimeText.value ? ` · analyzed ${relativeTimeText.value}` : '';
   return `${stats.value?.fileCount ?? 0} files · ${stats.value?.linkCount ?? 0} imports${analyzedText}`;
 });
 
@@ -67,11 +65,7 @@ const refreshRelativeTime = () => {
     <div v-if="totals" class="context-totals">
       <span class="total-additions">+{{ totals.additions }}</span>
       <span class="total-deletions">−{{ totals.deletions }}</span>
-      <RatioBar
-        class="totals-ratio"
-        :additions="totals.additions"
-        :deletions="totals.deletions"
-      />
+      <RatioBar class="totals-ratio" :additions="totals.additions" :deletions="totals.deletions" />
     </div>
   </header>
 </template>

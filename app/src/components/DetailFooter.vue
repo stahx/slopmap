@@ -26,9 +26,7 @@ const emit = defineEmits(['copy', 'isolate']);
     <button class="detail-action" type="button" @click="emit('copy')">
       {{ copied ? 'Copied' : 'Copy paths' }}
     </button>
-    <button class="detail-action" type="button" @click="emit('isolate')">
-      Isolate blast
-    </button>
+    <button class="detail-action" type="button" @click="emit('isolate')">Isolate blast</button>
   </div>
 </template>
 

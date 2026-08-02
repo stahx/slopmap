@@ -19,7 +19,7 @@ const sectionFor = (filePath) => {
   return segments.length >= 3 ? `${segments[0]}/${segments[1]}` : segments[0];
 };
 
-const rootOf = (filePath) => filePath.includes('/') ? filePath.split('/')[0] : '(root)';
+const rootOf = (filePath) => (filePath.includes('/') ? filePath.split('/')[0] : '(root)');
 
 const createSectionRecord = (sectionId, groupName) => ({
   id: sectionId,
@@ -57,13 +57,14 @@ const buildAggregate = (nodesById, links, sectionOf) => {
 
   const sections = [...sectionRecordsById.values()];
   for (const section of sections) {
-    section.status = section.changedCount > 0
-      ? 'changed'
-      : section.dependentCount > 0
-        ? 'dependent'
-        : section.dependencyCount > 0
-          ? 'dependency'
-          : 'normal';
+    section.status =
+      section.changedCount > 0
+        ? 'changed'
+        : section.dependentCount > 0
+          ? 'dependent'
+          : section.dependencyCount > 0
+            ? 'dependency'
+            : 'normal';
   }
 
   const importLinksByKey = new Map();
@@ -126,7 +127,7 @@ const annotateAggregate = ({
   for (const section of aggregate.sections) {
     if (section.changedCount === 0) continue;
     const sectionChangedIds = new Set(
-      [...changedIds].filter((nodeId) => sectionOfNode(nodesById.get(nodeId)) === section.id)
+      [...changedIds].filter((nodeId) => sectionOfNode(nodesById.get(nodeId)) === section.id),
     );
     const reachedIds = breadthFirst(sectionChangedIds, reverseAdjacency);
     const downstreamCounts = new Map();
@@ -142,12 +143,15 @@ const annotateAggregate = ({
       .slice(0, 200);
     section.downstream = [...downstreamCounts.entries()]
       .map(([id, count]) => ({ id, count }))
-      .sort((firstEntry, secondEntry) =>
-        secondEntry.count - firstEntry.count || firstEntry.id.localeCompare(secondEntry.id)
+      .sort(
+        (firstEntry, secondEntry) =>
+          secondEntry.count - firstEntry.count || firstEntry.id.localeCompare(secondEntry.id),
       )
       .slice(0, 6);
-    section.downstreamTotal = [...downstreamCounts.values()]
-      .reduce((totalCount, count) => totalCount + count, 0);
+    section.downstreamTotal = [...downstreamCounts.values()].reduce(
+      (totalCount, count) => totalCount + count,
+      0,
+    );
   }
 };
 
@@ -230,7 +234,7 @@ export const buildGraph = ({
       .sort((firstSection, secondSection) => secondSection[1] - firstSection[1]);
     droppedSectionsByGroup.set(
       groupName,
-      new Set(subsectionCounts.slice(11).map(([sectionId]) => sectionId))
+      new Set(subsectionCounts.slice(11).map(([sectionId]) => sectionId)),
     );
   }
 

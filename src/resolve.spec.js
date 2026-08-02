@@ -34,7 +34,10 @@ beforeEach(() => {
   repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'slopmap-'));
   fs.mkdirSync(path.join(repoRoot, 'packages/ui'), { recursive: true });
   fs.writeFileSync(path.join(repoRoot, 'package.json'), JSON.stringify(ROOT_MANIFEST));
-  fs.writeFileSync(path.join(repoRoot, 'packages/ui/package.json'), JSON.stringify(WORKSPACE_MANIFEST));
+  fs.writeFileSync(
+    path.join(repoRoot, 'packages/ui/package.json'),
+    JSON.stringify(WORKSPACE_MANIFEST),
+  );
 });
 
 describe('src/resolve', () => {
