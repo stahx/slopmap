@@ -8,6 +8,10 @@ import { createResolver } from './resolve.js';
 import { buildGraph } from './graph.js';
 import { renderHtml, writeOutput } from './render.js';
 
+const PATCH_BUFFER_LIMIT = 64 * 1024 * 1024;
+const PATCH_LINE_LIMIT = 500;
+const PATCH_TOTAL_BYTE_LIMIT = 3 * 1024 * 1024;
+
 const HELP_TEXT = `slopmap — 3D architecture map of a repo or PR
 
 Usage:
@@ -23,7 +27,7 @@ Options:
   --help             show this help
 `;
 
-const git = (cwd, args) => execFileSync('git', args, { cwd, encoding: 'utf8' }).trim();
+const git = (cwd, args) => execFileSync('git', args, { cwd, encoding: 'utf8' }).trimEnd();
 
 const outputLines = (output) => output.split('\n').filter(Boolean);
 
@@ -40,6 +44,136 @@ const lineCount = (content) => {
   if (content.length === 0) return 0;
   return content.split('\n').length - (content.endsWith('\n') ? 1 : 0);
 };
+
+const decodeGitPath = (gitPath) => {
+  if (!gitPath.startsWith('"') || !gitPath.endsWith('"')) return gitPath;
+  const pathBytes = [];
+  const quotedPath = gitPath.slice(1, -1);
+  const escapeCharacters = {
+    a: '\x07',
+    b: '\b',
+    f: '\f',
+    n: '\n',
+    r: '\r',
+    t: '\t',
+    v: '\v',
+    '"': '"',
+    '\\': '\\',
+  };
+  for (let characterIndex = 0; characterIndex < quotedPath.length; characterIndex += 1) {
+    const character = quotedPath[characterIndex];
+    if (character !== '\\') {
+      pathBytes.push(...Buffer.from(character, 'utf8'));
+      continue;
+    }
+    const escapedValue = quotedPath[characterIndex + 1];
+    if (escapedValue === undefined) {
+      pathBytes.push(...Buffer.from('\\', 'utf8'));
+      continue;
+    }
+    const octalMatch = quotedPath.slice(characterIndex + 1).match(/^[0-7]{1,3}/);
+    if (octalMatch !== null) {
+      pathBytes.push(Number.parseInt(octalMatch[0], 8));
+      characterIndex += octalMatch[0].length;
+      continue;
+    }
+    pathBytes.push(...Buffer.from(escapeCharacters[escapedValue] ?? escapedValue, 'utf8'));
+    characterIndex += 1;
+  }
+  return Buffer.from(pathBytes).toString('utf8');
+};
+
+const patchPathFromHeader = (header) => {
+  const headerPrefix = 'diff --git ';
+  if (!header.startsWith(headerPrefix)) return null;
+  const headerPaths = header.slice(headerPrefix.length);
+  let targetPathValue = null;
+  if (headerPaths.startsWith('"')) {
+    const quotedHeaderMatch = headerPaths.match(
+      /^"(?:\\.|[^"])*" (?<targetPath>"(?:\\.|[^"])*"|b\/.*)$/,
+    );
+    targetPathValue = quotedHeaderMatch?.groups?.targetPath ?? null;
+  } else {
+    const unquotedSeparatorIndex = headerPaths.indexOf(' b/');
+    const quotedSeparatorIndex = headerPaths.indexOf(' "b/');
+    const separatorIndexes = [unquotedSeparatorIndex, quotedSeparatorIndex].filter(
+      (separatorIndex) => separatorIndex >= 0,
+    );
+    const separatorIndex = Math.min(...separatorIndexes);
+    if (Number.isFinite(separatorIndex)) targetPathValue = headerPaths.slice(separatorIndex + 1);
+  }
+  if (targetPathValue === null) return null;
+  const targetPath = decodeGitPath(targetPathValue);
+  return targetPath.startsWith('b/') ? targetPath.slice(2) : targetPath;
+};
+
+const capPatchLines = (patchLines, lineLimit) => {
+  if (patchLines.length <= lineLimit) return patchLines.join('\n');
+  return [
+    ...patchLines.slice(0, lineLimit),
+    `@@ slopmap: diff truncated (${patchLines.length} lines) @@`,
+  ].join('\n');
+};
+
+const parsePatches = (patchOutput, lineLimit) => {
+  const patchesByPath = new Map();
+  const patchChunks = patchOutput
+    .split(/(?=^diff --git )/m)
+    .filter((patchChunk) => patchChunk.startsWith('diff --git '));
+  for (const patchChunk of patchChunks) {
+    const normalizedChunk = patchChunk.endsWith('\n') ? patchChunk.slice(0, -1) : patchChunk;
+    const patchLines = normalizedChunk.split('\n');
+    const filePath = patchPathFromHeader(patchLines[0]);
+    if (filePath === null) continue;
+    const binaryLine = patchLines.find((patchLine) => /^Binary files .* differ$/.test(patchLine));
+    patchesByPath.set(
+      filePath,
+      binaryLine === undefined ? capPatchLines(patchLines, lineLimit) : binaryLine,
+    );
+  }
+  return patchesByPath;
+};
+
+const untrackedPatch = (filePath, content, lineLimit) => {
+  const contentLines = content.length === 0 ? [] : content.split('\n');
+  if (contentLines.at(-1) === '') contentLines.pop();
+  return capPatchLines(
+    [
+      `diff --git a/${filePath} b/${filePath}`,
+      'new file',
+      ...contentLines.map((line) => `+${line}`),
+    ],
+    lineLimit,
+  );
+};
+
+const enforceTotalPatchSize = (files) => {
+  const patchFiles = files
+    .filter((file) => typeof file.patch === 'string')
+    .map((file) => ({ file, byteLength: Buffer.byteLength(file.patch, 'utf8') }))
+    .sort(
+      (firstFile, secondFile) =>
+        secondFile.byteLength - firstFile.byteLength ||
+        firstFile.file.path.localeCompare(secondFile.file.path),
+    );
+  let totalByteLength = patchFiles.reduce(
+    (totalBytes, patchFile) => totalBytes + patchFile.byteLength,
+    0,
+  );
+  for (const patchFile of patchFiles) {
+    if (totalByteLength <= PATCH_TOTAL_BYTE_LIMIT) break;
+    patchFile.file.patch = null;
+    totalByteLength -= patchFile.byteLength;
+  }
+};
+
+const collectPatchOutput = (command, argumentsList, repoRoot) =>
+  execFileSync(command, argumentsList, {
+    cwd: repoRoot,
+    encoding: 'utf8',
+    maxBuffer: PATCH_BUFFER_LIMIT,
+    stdio: ['ignore', 'pipe', 'ignore'],
+  });
 
 const detectBranch = (repoRoot) => {
   try {
@@ -112,15 +246,26 @@ const porcelainPath = (line) => {
 };
 
 export const collectChanges = (repoRoot, options, changedFiles) => {
+  const patchLineLimit = options.patchLineLimit ?? PATCH_LINE_LIMIT;
   if (options.pr) {
     const pullRequest = options.pullRequestData;
+    let patchesByPath = new Map();
+    try {
+      const patchOutput = collectPatchOutput('gh', ['pr', 'diff', String(options.pr)], repoRoot);
+      patchesByPath = parsePatches(patchOutput, patchLineLimit);
+    } catch {
+      patchesByPath = new Map();
+    }
+    const files = pullRequest.files.map((file) => ({
+      path: file.path,
+      status: 'M',
+      additions: file.additions,
+      deletions: file.deletions,
+      patch: patchesByPath.get(file.path) ?? null,
+    }));
+    enforceTotalPatchSize(files);
     return {
-      files: pullRequest.files.map((file) => ({
-        path: file.path,
-        status: 'M',
-        additions: file.additions,
-        deletions: file.deletions,
-      })),
+      files,
       totals: {
         additions: pullRequest.additions,
         deletions: pullRequest.deletions,
@@ -129,10 +274,19 @@ export const collectChanges = (repoRoot, options, changedFiles) => {
   }
   if (!options.base) return { files: [], totals: null };
 
+  const patchOutput = collectPatchOutput('git', ['diff', options.base], repoRoot);
+  const patchesByPath = parsePatches(patchOutput, patchLineLimit);
+
   const filesByPath = new Map();
   const ensureFile = (filePath) => {
     if (!filesByPath.has(filePath)) {
-      filesByPath.set(filePath, { path: filePath, status: 'M', additions: 0, deletions: 0 });
+      filesByPath.set(filePath, {
+        path: filePath,
+        status: 'M',
+        additions: 0,
+        deletions: 0,
+        patch: patchesByPath.get(filePath) ?? null,
+      });
     }
     return filesByPath.get(filePath);
   };
@@ -164,16 +318,27 @@ export const collectChanges = (repoRoot, options, changedFiles) => {
     git(repoRoot, ['ls-files', '--others', '--exclude-standard']),
   )) {
     let additions = 0;
+    let patch = null;
     try {
-      additions = lineCount(fs.readFileSync(path.join(repoRoot, filePath), 'utf8'));
+      const content = fs.readFileSync(path.join(repoRoot, filePath), 'utf8');
+      additions = lineCount(content);
+      patch = untrackedPatch(filePath, content, patchLineLimit);
     } catch {
       additions = 0;
+      patch = null;
     }
-    filesByPath.set(filePath, { path: filePath, status: 'A', additions, deletions: 0 });
+    filesByPath.set(filePath, {
+      path: filePath,
+      status: 'A',
+      additions,
+      deletions: 0,
+      patch,
+    });
   }
   for (const filePath of changedFiles) ensureFile(filePath);
 
   const files = [...filesByPath.values()];
+  enforceTotalPatchSize(files);
   const totals = files.reduce(
     (summary, file) => ({
       additions: summary.additions + file.additions,

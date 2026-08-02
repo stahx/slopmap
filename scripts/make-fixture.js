@@ -49,7 +49,7 @@ const detectBranch = (repoRoot) => {
 
 const makeFixture = ({ repoPath, outputPath, baseRef }) => {
   const repoRoot = git(path.resolve(repoPath), ['rev-parse', '--show-toplevel']);
-  const options = { base: baseRef, pr: null };
+  const options = { base: baseRef, pr: null, patchLineLimit: 120 };
   const changed = resolveChangedFiles(repoRoot, options);
   const changes = collectChanges(repoRoot, options, changed.files);
   const repoFiles = collectRepoFiles(repoRoot);

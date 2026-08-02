@@ -18,6 +18,8 @@ const props = defineProps({
   },
 });
 
+const emit = defineEmits(['open-diff']);
+
 const displayPath = computed(() => displayPathFor(props.changeFile.path, props.sectionId));
 const isDeleted = computed(() => props.changeFile.status === 'D');
 const metaText = computed(() => {
@@ -29,7 +31,7 @@ const metaText = computed(() => {
 </script>
 
 <template>
-  <div class="detail-file-card">
+  <button class="detail-file-card" type="button" @click="emit('open-diff', changeFile)">
     <div class="detail-file-primary">
       <StatusBadge :status="changeFile.status" />
       <span class="detail-file-name" :class="{ deleted: isDeleted }">{{ displayPath }}</span>
@@ -54,18 +56,29 @@ const metaText = computed(() => {
     <div class="detail-file-meta" :class="{ warning: isDeleted && importerCount > 0 }">
       {{ metaText }}
     </div>
-  </div>
+  </button>
 </template>
 
 <style scoped>
 .detail-file-card {
+  display: block;
+  width: 100%;
+  margin: 0;
   padding: 11px 12px;
+  color: inherit;
+  text-align: left;
+  background: transparent;
+  border: 0;
   border-radius: 9px;
+  cursor: pointer;
 }
 
-.detail-file-card:first-child,
 .detail-file-card:hover {
   background: rgba(255, 255, 255, 0.05);
+}
+
+.detail-file-card[hidden] {
+  display: none;
 }
 
 .detail-file-primary {

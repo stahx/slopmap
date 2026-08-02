@@ -3,96 +3,6 @@
   "graph": {
     "nodes": [
       {
-        "id": "bin/slopmap.js",
-        "group": "bin",
-        "loc": 5,
-        "status": "normal",
-        "inDegree": 0,
-        "outDegree": 1,
-        "section": "bin",
-        "rootGroup": "bin"
-      },
-      {
-        "id": "src/cli.js",
-        "group": "src",
-        "loc": 274,
-        "status": "normal",
-        "inDegree": 2,
-        "outDegree": 4,
-        "section": "src",
-        "rootGroup": "src"
-      },
-      {
-        "id": "src/graph.js",
-        "group": "src",
-        "loc": 338,
-        "status": "normal",
-        "inDegree": 3,
-        "outDegree": 0,
-        "section": "src",
-        "rootGroup": "src"
-      },
-      {
-        "id": "src/graph.spec.js",
-        "group": "src",
-        "loc": 461,
-        "status": "normal",
-        "inDegree": 0,
-        "outDegree": 1,
-        "section": "src",
-        "rootGroup": "src"
-      },
-      {
-        "id": "src/render.js",
-        "group": "src",
-        "loc": 48,
-        "status": "normal",
-        "inDegree": 2,
-        "outDegree": 0,
-        "section": "src",
-        "rootGroup": "src"
-      },
-      {
-        "id": "src/resolve.js",
-        "group": "src",
-        "loc": 102,
-        "status": "normal",
-        "inDegree": 3,
-        "outDegree": 0,
-        "section": "src",
-        "rootGroup": "src"
-      },
-      {
-        "id": "src/resolve.spec.js",
-        "group": "src",
-        "loc": 69,
-        "status": "normal",
-        "inDegree": 0,
-        "outDegree": 1,
-        "section": "src",
-        "rootGroup": "src"
-      },
-      {
-        "id": "src/scan.js",
-        "group": "src",
-        "loc": 87,
-        "status": "normal",
-        "inDegree": 3,
-        "outDegree": 0,
-        "section": "src",
-        "rootGroup": "src"
-      },
-      {
-        "id": "src/scan.spec.js",
-        "group": "src",
-        "loc": 45,
-        "status": "normal",
-        "inDegree": 0,
-        "outDegree": 1,
-        "section": "src",
-        "rootGroup": "src"
-      },
-      {
         "id": "app/app/src/auto-imports.d.ts",
         "group": "app",
         "loc": 74,
@@ -103,9 +13,19 @@
         "rootGroup": "app"
       },
       {
+        "id": "app/app/src/components.d.ts",
+        "group": "app",
+        "loc": 42,
+        "status": "normal",
+        "inDegree": 0,
+        "outDegree": 26,
+        "section": "app/app",
+        "rootGroup": "app"
+      },
+      {
         "id": "app/plugins/assert-single-file.js",
         "group": "app",
-        "loc": 56,
+        "loc": 41,
         "status": "normal",
         "inDegree": 1,
         "outDegree": 0,
@@ -115,7 +35,17 @@
       {
         "id": "app/src/App.vue",
         "group": "app",
-        "loc": 65,
+        "loc": 36,
+        "status": "normal",
+        "inDegree": 1,
+        "outDegree": 3,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/components/ChangedFileCard.vue",
+        "group": "app",
+        "loc": 154,
         "status": "normal",
         "inDegree": 1,
         "outDegree": 1,
@@ -123,12 +53,502 @@
         "rootGroup": "app"
       },
       {
+        "id": "app/src/components/ChangedSectionsList.vue",
+        "group": "app",
+        "loc": 90,
+        "status": "normal",
+        "inDegree": 1,
+        "outDegree": 2,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/components/CompactnessSlider.vue",
+        "group": "app",
+        "loc": 54,
+        "status": "normal",
+        "inDegree": 1,
+        "outDegree": 2,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/components/ControlsPill.vue",
+        "group": "app",
+        "loc": 44,
+        "status": "normal",
+        "inDegree": 1,
+        "outDegree": 1,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/components/DetailFooter.vue",
+        "group": "app",
+        "loc": 81,
+        "status": "normal",
+        "inDegree": 1,
+        "outDegree": 0,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/components/DetailStatTiles.vue",
+        "group": "app",
+        "loc": 116,
+        "status": "normal",
+        "inDegree": 1,
+        "outDegree": 0,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/components/DistributionBar.vue",
+        "group": "app",
+        "loc": 79,
+        "status": "normal",
+        "inDegree": 1,
+        "outDegree": 1,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/components/EmptyState.vue",
+        "group": "app",
+        "loc": 21,
+        "status": "normal",
+        "inDegree": 1,
+        "outDegree": 0,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/components/FilesFilters.vue",
+        "group": "app",
+        "loc": 134,
+        "status": "normal",
+        "inDegree": 1,
+        "outDegree": 2,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/components/GraphStage.vue",
+        "group": "app",
+        "loc": 62,
+        "status": "normal",
+        "inDegree": 1,
+        "outDegree": 4,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/components/HelpPopover.vue",
+        "group": "app",
+        "loc": 37,
+        "status": "normal",
+        "inDegree": 1,
+        "outDegree": 0,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/components/IconRail.vue",
+        "group": "app",
+        "loc": 148,
+        "status": "normal",
+        "inDegree": 1,
+        "outDegree": 2,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/components/InspectorDetail.vue",
+        "group": "app",
+        "loc": 178,
+        "status": "normal",
+        "inDegree": 1,
+        "outDegree": 4,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/components/InspectorOverview.vue",
+        "group": "app",
+        "loc": 139,
+        "status": "normal",
+        "inDegree": 1,
+        "outDegree": 3,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/components/InspectorPanel.vue",
+        "group": "app",
+        "loc": 35,
+        "status": "normal",
+        "inDegree": 1,
+        "outDegree": 1,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/components/InspectorTabs.vue",
+        "group": "app",
+        "loc": 77,
+        "status": "normal",
+        "inDegree": 1,
+        "outDegree": 0,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/components/LegendList.vue",
+        "group": "app",
+        "loc": 67,
+        "status": "normal",
+        "inDegree": 1,
+        "outDegree": 0,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/components/PathRow.vue",
+        "group": "app",
+        "loc": 69,
+        "status": "normal",
+        "inDegree": 1,
+        "outDegree": 0,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/components/RatioBar.vue",
+        "group": "app",
+        "loc": 92,
+        "status": "normal",
+        "inDegree": 1,
+        "outDegree": 0,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/components/SectionFileRow.vue",
+        "group": "app",
+        "loc": 57,
+        "status": "normal",
+        "inDegree": 1,
+        "outDegree": 0,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/components/SectionLabels.vue",
+        "group": "app",
+        "loc": 76,
+        "status": "normal",
+        "inDegree": 1,
+        "outDegree": 3,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/components/StarfieldCanvas.vue",
+        "group": "app",
+        "loc": 38,
+        "status": "normal",
+        "inDegree": 1,
+        "outDegree": 2,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/components/StatusBadge.vue",
+        "group": "app",
+        "loc": 52,
+        "status": "normal",
+        "inDegree": 1,
+        "outDegree": 0,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/components/ThemeToggle.vue",
+        "group": "app",
+        "loc": 58,
+        "status": "normal",
+        "inDegree": 1,
+        "outDegree": 1,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/components/TopHeader.vue",
+        "group": "app",
+        "loc": 232,
+        "status": "normal",
+        "inDegree": 1,
+        "outDegree": 2,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/composables/useGraphInstances.js",
+        "group": "app",
+        "loc": 392,
+        "status": "normal",
+        "inDegree": 3,
+        "outDegree": 10,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/composables/useInspector.js",
+        "group": "app",
+        "loc": 120,
+        "status": "normal",
+        "inDegree": 1,
+        "outDegree": 6,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/composables/useMapArea.js",
+        "group": "app",
+        "loc": 64,
+        "status": "normal",
+        "inDegree": 2,
+        "outDegree": 1,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
         "id": "app/src/composables/usePayload.js",
         "group": "app",
-        "loc": 48,
+        "loc": 45,
+        "status": "normal",
+        "inDegree": 9,
+        "outDegree": 0,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/composables/useSectionLabels.js",
+        "group": "app",
+        "loc": 73,
+        "status": "normal",
+        "inDegree": 1,
+        "outDegree": 3,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/composables/useSelection.js",
+        "group": "app",
+        "loc": 124,
+        "status": "normal",
+        "inDegree": 5,
+        "outDegree": 5,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/composables/useSettings.js",
+        "group": "app",
+        "loc": 41,
+        "status": "normal",
+        "inDegree": 13,
+        "outDegree": 0,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/composables/useSettings.spec.js",
+        "group": "app",
+        "loc": 114,
+        "status": "normal",
+        "inDegree": 0,
+        "outDegree": 1,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/composables/useStarfield.js",
+        "group": "app",
+        "loc": 309,
+        "status": "normal",
+        "inDegree": 1,
+        "outDegree": 3,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/composables/useViewState.js",
+        "group": "app",
+        "loc": 47,
+        "status": "normal",
+        "inDegree": 11,
+        "outDegree": 2,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/lib/displacement.js",
+        "group": "app",
+        "loc": 28,
         "status": "normal",
         "inDegree": 2,
         "outDegree": 0,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/lib/displacement.spec.js",
+        "group": "app",
+        "loc": 51,
+        "status": "normal",
+        "inDegree": 0,
+        "outDegree": 1,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/lib/filterGraph.js",
+        "group": "app",
+        "loc": 47,
+        "status": "normal",
+        "inDegree": 3,
+        "outDegree": 0,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/lib/filterGraph.spec.js",
+        "group": "app",
+        "loc": 94,
+        "status": "normal",
+        "inDegree": 0,
+        "outDegree": 1,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/lib/graphStyle.js",
+        "group": "app",
+        "loc": 79,
+        "status": "normal",
+        "inDegree": 2,
+        "outDegree": 1,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/lib/graphStyle.spec.js",
+        "group": "app",
+        "loc": 149,
+        "status": "normal",
+        "inDegree": 0,
+        "outDegree": 1,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/lib/graphTokens.js",
+        "group": "app",
+        "loc": 21,
+        "status": "normal",
+        "inDegree": 9,
+        "outDegree": 0,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/lib/layout.js",
+        "group": "app",
+        "loc": 4,
+        "status": "normal",
+        "inDegree": 2,
+        "outDegree": 0,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/lib/payloadIndex.js",
+        "group": "app",
+        "loc": 27,
+        "status": "normal",
+        "inDegree": 3,
+        "outDegree": 1,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/lib/payloadIndex.spec.js",
+        "group": "app",
+        "loc": 51,
+        "status": "normal",
+        "inDegree": 0,
+        "outDegree": 2,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/lib/relativeTime.js",
+        "group": "app",
+        "loc": 12,
+        "status": "normal",
+        "inDegree": 2,
+        "outDegree": 0,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/lib/relativeTime.spec.js",
+        "group": "app",
+        "loc": 17,
+        "status": "normal",
+        "inDegree": 0,
+        "outDegree": 1,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/lib/sections.js",
+        "group": "app",
+        "loc": 54,
+        "status": "normal",
+        "inDegree": 4,
+        "outDegree": 0,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/lib/sections.spec.js",
+        "group": "app",
+        "loc": 158,
+        "status": "normal",
+        "inDegree": 0,
+        "outDegree": 1,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/lib/starfieldMath.js",
+        "group": "app",
+        "loc": 11,
+        "status": "normal",
+        "inDegree": 3,
+        "outDegree": 0,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/lib/starfieldMath.spec.js",
+        "group": "app",
+        "loc": 24,
+        "status": "normal",
+        "inDegree": 0,
+        "outDegree": 1,
         "section": "app/src",
         "rootGroup": "app"
       },
@@ -143,9 +563,29 @@
         "rootGroup": "app"
       },
       {
+        "id": "bin/slopmap.js",
+        "group": "bin",
+        "loc": 5,
+        "status": "normal",
+        "inDegree": 0,
+        "outDegree": 1,
+        "section": "bin",
+        "rootGroup": "bin"
+      },
+      {
+        "id": "eslint.config.js",
+        "group": "(root)",
+        "loc": 40,
+        "status": "normal",
+        "inDegree": 0,
+        "outDegree": 0,
+        "section": "(root)",
+        "rootGroup": "(root)"
+      },
+      {
         "id": "scripts/make-fixture.js",
         "group": "scripts",
-        "loc": 100,
+        "loc": 85,
         "status": "normal",
         "inDegree": 0,
         "outDegree": 4,
@@ -153,9 +593,89 @@
         "rootGroup": "scripts"
       },
       {
+        "id": "src/cli.js",
+        "group": "src",
+        "loc": 449,
+        "status": "normal",
+        "inDegree": 2,
+        "outDegree": 4,
+        "section": "src",
+        "rootGroup": "src"
+      },
+      {
+        "id": "src/graph.js",
+        "group": "src",
+        "loc": 342,
+        "status": "normal",
+        "inDegree": 3,
+        "outDegree": 0,
+        "section": "src",
+        "rootGroup": "src"
+      },
+      {
+        "id": "src/graph.spec.js",
+        "group": "src",
+        "loc": 497,
+        "status": "normal",
+        "inDegree": 0,
+        "outDegree": 1,
+        "section": "src",
+        "rootGroup": "src"
+      },
+      {
+        "id": "src/render.js",
+        "group": "src",
+        "loc": 41,
+        "status": "normal",
+        "inDegree": 2,
+        "outDegree": 0,
+        "section": "src",
+        "rootGroup": "src"
+      },
+      {
         "id": "src/render.spec.js",
         "group": "src",
-        "loc": 104,
+        "loc": 100,
+        "status": "normal",
+        "inDegree": 0,
+        "outDegree": 1,
+        "section": "src",
+        "rootGroup": "src"
+      },
+      {
+        "id": "src/resolve.js",
+        "group": "src",
+        "loc": 113,
+        "status": "normal",
+        "inDegree": 3,
+        "outDegree": 0,
+        "section": "src",
+        "rootGroup": "src"
+      },
+      {
+        "id": "src/resolve.spec.js",
+        "group": "src",
+        "loc": 72,
+        "status": "normal",
+        "inDegree": 0,
+        "outDegree": 1,
+        "section": "src",
+        "rootGroup": "src"
+      },
+      {
+        "id": "src/scan.js",
+        "group": "src",
+        "loc": 88,
+        "status": "normal",
+        "inDegree": 3,
+        "outDegree": 0,
+        "section": "src",
+        "rootGroup": "src"
+      },
+      {
+        "id": "src/scan.spec.js",
+        "group": "src",
+        "loc": 45,
         "status": "normal",
         "inDegree": 0,
         "outDegree": 1,
@@ -181,12 +701,577 @@
         "outDegree": 0,
         "section": "(root)",
         "rootGroup": "(root)"
+      },
+      {
+        "id": "app/src/components/DiffModal.vue",
+        "group": "app",
+        "loc": 201,
+        "status": "normal",
+        "inDegree": 1,
+        "outDegree": 1,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/lib/diffFormat.js",
+        "group": "app",
+        "loc": 22,
+        "status": "normal",
+        "inDegree": 2,
+        "outDegree": 0,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/lib/diffFormat.spec.js",
+        "group": "app",
+        "loc": 45,
+        "status": "normal",
+        "inDegree": 0,
+        "outDegree": 1,
+        "section": "app/src",
+        "rootGroup": "app"
       }
     ],
     "links": [
       {
+        "source": "app/app/src/components.d.ts",
+        "target": "app/src/components/ChangedFileCard.vue",
+        "hot": 0
+      },
+      {
+        "source": "app/app/src/components.d.ts",
+        "target": "app/src/components/ChangedSectionsList.vue",
+        "hot": 0
+      },
+      {
+        "source": "app/app/src/components.d.ts",
+        "target": "app/src/components/CompactnessSlider.vue",
+        "hot": 0
+      },
+      {
+        "source": "app/app/src/components.d.ts",
+        "target": "app/src/components/ControlsPill.vue",
+        "hot": 0
+      },
+      {
+        "source": "app/app/src/components.d.ts",
+        "target": "app/src/components/DetailFooter.vue",
+        "hot": 0
+      },
+      {
+        "source": "app/app/src/components.d.ts",
+        "target": "app/src/components/DetailStatTiles.vue",
+        "hot": 0
+      },
+      {
+        "source": "app/app/src/components.d.ts",
+        "target": "app/src/components/DiffModal.vue",
+        "hot": 0
+      },
+      {
+        "source": "app/app/src/components.d.ts",
+        "target": "app/src/components/DistributionBar.vue",
+        "hot": 0
+      },
+      {
+        "source": "app/app/src/components.d.ts",
+        "target": "app/src/components/EmptyState.vue",
+        "hot": 0
+      },
+      {
+        "source": "app/app/src/components.d.ts",
+        "target": "app/src/components/FilesFilters.vue",
+        "hot": 0
+      },
+      {
+        "source": "app/app/src/components.d.ts",
+        "target": "app/src/components/GraphStage.vue",
+        "hot": 0
+      },
+      {
+        "source": "app/app/src/components.d.ts",
+        "target": "app/src/components/HelpPopover.vue",
+        "hot": 0
+      },
+      {
+        "source": "app/app/src/components.d.ts",
+        "target": "app/src/components/IconRail.vue",
+        "hot": 0
+      },
+      {
+        "source": "app/app/src/components.d.ts",
+        "target": "app/src/components/InspectorDetail.vue",
+        "hot": 0
+      },
+      {
+        "source": "app/app/src/components.d.ts",
+        "target": "app/src/components/InspectorOverview.vue",
+        "hot": 0
+      },
+      {
+        "source": "app/app/src/components.d.ts",
+        "target": "app/src/components/InspectorPanel.vue",
+        "hot": 0
+      },
+      {
+        "source": "app/app/src/components.d.ts",
+        "target": "app/src/components/InspectorTabs.vue",
+        "hot": 0
+      },
+      {
+        "source": "app/app/src/components.d.ts",
+        "target": "app/src/components/LegendList.vue",
+        "hot": 0
+      },
+      {
+        "source": "app/app/src/components.d.ts",
+        "target": "app/src/components/PathRow.vue",
+        "hot": 0
+      },
+      {
+        "source": "app/app/src/components.d.ts",
+        "target": "app/src/components/RatioBar.vue",
+        "hot": 0
+      },
+      {
+        "source": "app/app/src/components.d.ts",
+        "target": "app/src/components/SectionFileRow.vue",
+        "hot": 0
+      },
+      {
+        "source": "app/app/src/components.d.ts",
+        "target": "app/src/components/SectionLabels.vue",
+        "hot": 0
+      },
+      {
+        "source": "app/app/src/components.d.ts",
+        "target": "app/src/components/StarfieldCanvas.vue",
+        "hot": 0
+      },
+      {
+        "source": "app/app/src/components.d.ts",
+        "target": "app/src/components/StatusBadge.vue",
+        "hot": 0
+      },
+      {
+        "source": "app/app/src/components.d.ts",
+        "target": "app/src/components/ThemeToggle.vue",
+        "hot": 0
+      },
+      {
+        "source": "app/app/src/components.d.ts",
+        "target": "app/src/components/TopHeader.vue",
+        "hot": 0
+      },
+      {
+        "source": "app/src/App.vue",
+        "target": "app/src/composables/useSelection.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/App.vue",
+        "target": "app/src/composables/useSettings.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/App.vue",
+        "target": "app/src/lib/layout.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/components/ChangedFileCard.vue",
+        "target": "app/src/lib/sections.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/components/ChangedSectionsList.vue",
+        "target": "app/src/lib/graphTokens.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/components/ChangedSectionsList.vue",
+        "target": "app/src/lib/sections.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/components/CompactnessSlider.vue",
+        "target": "app/src/composables/useSettings.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/components/CompactnessSlider.vue",
+        "target": "app/src/composables/useViewState.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/components/ControlsPill.vue",
+        "target": "app/src/composables/useViewState.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/components/DistributionBar.vue",
+        "target": "app/src/lib/graphTokens.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/components/FilesFilters.vue",
+        "target": "app/src/composables/usePayload.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/components/FilesFilters.vue",
+        "target": "app/src/composables/useViewState.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/components/GraphStage.vue",
+        "target": "app/src/composables/useGraphInstances.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/components/GraphStage.vue",
+        "target": "app/src/composables/useMapArea.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/components/GraphStage.vue",
+        "target": "app/src/composables/useSettings.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/components/GraphStage.vue",
+        "target": "app/src/composables/useViewState.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/components/IconRail.vue",
+        "target": "app/src/composables/useSettings.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/components/IconRail.vue",
+        "target": "app/src/composables/useViewState.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/components/InspectorDetail.vue",
+        "target": "app/src/composables/useInspector.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/components/InspectorDetail.vue",
+        "target": "app/src/composables/usePayload.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/components/InspectorDetail.vue",
+        "target": "app/src/composables/useSelection.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/components/InspectorDetail.vue",
+        "target": "app/src/lib/graphTokens.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/components/InspectorOverview.vue",
+        "target": "app/src/composables/usePayload.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/components/InspectorOverview.vue",
+        "target": "app/src/composables/useViewState.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/components/InspectorOverview.vue",
+        "target": "app/src/lib/graphTokens.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/components/InspectorPanel.vue",
+        "target": "app/src/composables/useSelection.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/components/SectionLabels.vue",
+        "target": "app/src/composables/useSectionLabels.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/components/SectionLabels.vue",
+        "target": "app/src/composables/useSettings.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/components/SectionLabels.vue",
+        "target": "app/src/composables/useViewState.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/components/StarfieldCanvas.vue",
+        "target": "app/src/composables/useStarfield.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/components/StarfieldCanvas.vue",
+        "target": "app/src/composables/useSettings.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/components/ThemeToggle.vue",
+        "target": "app/src/composables/useSettings.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/components/TopHeader.vue",
+        "target": "app/src/composables/usePayload.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/components/TopHeader.vue",
+        "target": "app/src/lib/relativeTime.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/composables/useGraphInstances.js",
+        "target": "app/src/lib/filterGraph.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/composables/useGraphInstances.js",
+        "target": "app/src/lib/graphStyle.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/composables/useGraphInstances.js",
+        "target": "app/src/lib/graphTokens.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/composables/useGraphInstances.js",
+        "target": "app/src/lib/payloadIndex.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/composables/useGraphInstances.js",
+        "target": "app/src/lib/starfieldMath.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/composables/useGraphInstances.js",
+        "target": "app/src/composables/useMapArea.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/composables/useGraphInstances.js",
+        "target": "app/src/composables/usePayload.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/composables/useGraphInstances.js",
+        "target": "app/src/composables/useSelection.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/composables/useGraphInstances.js",
+        "target": "app/src/composables/useSettings.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/composables/useGraphInstances.js",
+        "target": "app/src/composables/useViewState.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/composables/useInspector.js",
+        "target": "app/src/lib/payloadIndex.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/composables/useInspector.js",
+        "target": "app/src/lib/sections.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/composables/useInspector.js",
+        "target": "app/src/composables/usePayload.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/composables/useInspector.js",
+        "target": "app/src/composables/useSelection.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/composables/useInspector.js",
+        "target": "app/src/composables/useSettings.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/composables/useInspector.js",
+        "target": "app/src/composables/useViewState.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/composables/useMapArea.js",
+        "target": "app/src/lib/layout.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/composables/useSectionLabels.js",
+        "target": "app/src/composables/useGraphInstances.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/composables/useSectionLabels.js",
+        "target": "app/src/composables/useSettings.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/composables/useSectionLabels.js",
+        "target": "app/src/composables/useViewState.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/composables/useSelection.js",
+        "target": "app/src/lib/displacement.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/composables/useSelection.js",
+        "target": "app/src/lib/filterGraph.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/composables/useSelection.js",
+        "target": "app/src/lib/graphTokens.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/composables/useSelection.js",
+        "target": "app/src/composables/usePayload.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/composables/useSelection.js",
+        "target": "app/src/composables/useViewState.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/composables/useSettings.spec.js",
+        "target": "app/src/composables/useSettings.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/composables/useStarfield.js",
+        "target": "app/src/lib/starfieldMath.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/composables/useStarfield.js",
+        "target": "app/src/composables/useGraphInstances.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/composables/useStarfield.js",
+        "target": "app/src/composables/useSettings.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/composables/useViewState.js",
+        "target": "app/src/composables/usePayload.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/composables/useViewState.js",
+        "target": "app/src/composables/useSettings.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/lib/displacement.spec.js",
+        "target": "app/src/lib/displacement.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/lib/filterGraph.spec.js",
+        "target": "app/src/lib/filterGraph.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/lib/graphStyle.js",
+        "target": "app/src/lib/graphTokens.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/lib/graphStyle.spec.js",
+        "target": "app/src/lib/graphStyle.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/lib/payloadIndex.js",
+        "target": "app/src/lib/graphTokens.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/lib/payloadIndex.spec.js",
+        "target": "app/src/lib/graphTokens.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/lib/payloadIndex.spec.js",
+        "target": "app/src/lib/payloadIndex.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/lib/relativeTime.spec.js",
+        "target": "app/src/lib/relativeTime.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/lib/sections.spec.js",
+        "target": "app/src/lib/sections.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/lib/starfieldMath.spec.js",
+        "target": "app/src/lib/starfieldMath.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/main.js",
+        "target": "app/src/App.vue",
+        "hot": 0
+      },
+      {
+        "source": "app/src/main.js",
+        "target": "app/src/composables/usePayload.js",
+        "hot": 0
+      },
+      {
         "source": "bin/slopmap.js",
         "target": "src/cli.js",
+        "hot": 0
+      },
+      {
+        "source": "scripts/make-fixture.js",
+        "target": "src/cli.js",
+        "hot": 0
+      },
+      {
+        "source": "scripts/make-fixture.js",
+        "target": "src/graph.js",
+        "hot": 0
+      },
+      {
+        "source": "scripts/make-fixture.js",
+        "target": "src/resolve.js",
+        "hot": 0
+      },
+      {
+        "source": "scripts/make-fixture.js",
+        "target": "src/scan.js",
         "hot": 0
       },
       {
@@ -215,6 +1300,11 @@
         "hot": 0
       },
       {
+        "source": "src/render.spec.js",
+        "target": "src/render.js",
+        "hot": 0
+      },
+      {
         "source": "src/resolve.spec.js",
         "target": "src/resolve.js",
         "hot": 0
@@ -225,63 +1315,33 @@
         "hot": 0
       },
       {
-        "source": "app/src/App.vue",
-        "target": "app/src/composables/usePayload.js",
-        "hot": 0
-      },
-      {
-        "source": "app/src/main.js",
-        "target": "app/src/App.vue",
-        "hot": 0
-      },
-      {
-        "source": "app/src/main.js",
-        "target": "app/src/composables/usePayload.js",
-        "hot": 0
-      },
-      {
-        "source": "scripts/make-fixture.js",
-        "target": "src/cli.js",
-        "hot": 0
-      },
-      {
-        "source": "scripts/make-fixture.js",
-        "target": "src/graph.js",
-        "hot": 0
-      },
-      {
-        "source": "scripts/make-fixture.js",
-        "target": "src/resolve.js",
-        "hot": 0
-      },
-      {
-        "source": "scripts/make-fixture.js",
-        "target": "src/scan.js",
-        "hot": 0
-      },
-      {
-        "source": "src/render.spec.js",
-        "target": "src/render.js",
-        "hot": 0
-      },
-      {
         "source": "vite.config.js",
         "target": "app/plugins/assert-single-file.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/components/DiffModal.vue",
+        "target": "app/src/lib/diffFormat.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/lib/diffFormat.spec.js",
+        "target": "app/src/lib/diffFormat.js",
         "hot": 0
       }
     ],
     "groups": [
       {
+        "name": "app",
+        "count": 59
+      },
+      {
         "name": "src",
         "count": 9
       },
       {
-        "name": "app",
-        "count": 5
-      },
-      {
         "name": "(root)",
-        "count": 2
+        "count": 3
       },
       {
         "name": "bin",
@@ -296,6 +1356,19 @@
       "roots": {
         "sections": [
           {
+            "id": "app",
+            "group": "app",
+            "fileCount": 59,
+            "loc": 4817,
+            "changedCount": 0,
+            "dependentCount": 0,
+            "dependencyCount": 0,
+            "additions": 0,
+            "deletions": 0,
+            "changedFiles": [],
+            "status": "normal"
+          },
+          {
             "id": "bin",
             "group": "bin",
             "fileCount": 1,
@@ -309,23 +1382,10 @@
             "status": "normal"
           },
           {
-            "id": "src",
-            "group": "src",
-            "fileCount": 9,
-            "loc": 1528,
-            "changedCount": 0,
-            "dependentCount": 0,
-            "dependencyCount": 0,
-            "additions": 0,
-            "deletions": 0,
-            "changedFiles": [],
-            "status": "normal"
-          },
-          {
-            "id": "app",
-            "group": "app",
-            "fileCount": 5,
-            "loc": 253,
+            "id": "(root)",
+            "group": "(root)",
+            "fileCount": 3,
+            "loc": 110,
             "changedCount": 0,
             "dependentCount": 0,
             "dependencyCount": 0,
@@ -338,7 +1398,7 @@
             "id": "scripts",
             "group": "scripts",
             "fileCount": 1,
-            "loc": 100,
+            "loc": 85,
             "changedCount": 0,
             "dependentCount": 0,
             "dependencyCount": 0,
@@ -348,10 +1408,10 @@
             "status": "normal"
           },
           {
-            "id": "(root)",
-            "group": "(root)",
-            "fileCount": 2,
-            "loc": 70,
+            "id": "src",
+            "group": "src",
+            "fileCount": 9,
+            "loc": 1747,
             "changedCount": 0,
             "dependentCount": 0,
             "dependencyCount": 0,
@@ -388,6 +1448,19 @@
       "groups": {
         "sections": [
           {
+            "id": "app",
+            "group": "app",
+            "fileCount": 59,
+            "loc": 4817,
+            "changedCount": 0,
+            "dependentCount": 0,
+            "dependencyCount": 0,
+            "additions": 0,
+            "deletions": 0,
+            "changedFiles": [],
+            "status": "normal"
+          },
+          {
             "id": "bin",
             "group": "bin",
             "fileCount": 1,
@@ -401,23 +1474,10 @@
             "status": "normal"
           },
           {
-            "id": "src",
-            "group": "src",
-            "fileCount": 9,
-            "loc": 1528,
-            "changedCount": 0,
-            "dependentCount": 0,
-            "dependencyCount": 0,
-            "additions": 0,
-            "deletions": 0,
-            "changedFiles": [],
-            "status": "normal"
-          },
-          {
-            "id": "app",
-            "group": "app",
-            "fileCount": 5,
-            "loc": 253,
+            "id": "(root)",
+            "group": "(root)",
+            "fileCount": 3,
+            "loc": 110,
             "changedCount": 0,
             "dependentCount": 0,
             "dependencyCount": 0,
@@ -430,7 +1490,7 @@
             "id": "scripts",
             "group": "scripts",
             "fileCount": 1,
-            "loc": 100,
+            "loc": 85,
             "changedCount": 0,
             "dependentCount": 0,
             "dependencyCount": 0,
@@ -440,10 +1500,10 @@
             "status": "normal"
           },
           {
-            "id": "(root)",
-            "group": "(root)",
-            "fileCount": 2,
-            "loc": 70,
+            "id": "src",
+            "group": "src",
+            "fileCount": 9,
+            "loc": 1747,
             "changedCount": 0,
             "dependentCount": 0,
             "dependencyCount": 0,
@@ -480,6 +1540,45 @@
       "dirs": {
         "sections": [
           {
+            "id": "app/app",
+            "group": "app",
+            "fileCount": 2,
+            "loc": 116,
+            "changedCount": 0,
+            "dependentCount": 0,
+            "dependencyCount": 0,
+            "additions": 0,
+            "deletions": 0,
+            "changedFiles": [],
+            "status": "normal"
+          },
+          {
+            "id": "app/plugins",
+            "group": "app",
+            "fileCount": 1,
+            "loc": 41,
+            "changedCount": 0,
+            "dependentCount": 0,
+            "dependencyCount": 0,
+            "additions": 0,
+            "deletions": 0,
+            "changedFiles": [],
+            "status": "normal"
+          },
+          {
+            "id": "app/src",
+            "group": "app",
+            "fileCount": 56,
+            "loc": 4660,
+            "changedCount": 0,
+            "dependentCount": 0,
+            "dependencyCount": 0,
+            "additions": 0,
+            "deletions": 0,
+            "changedFiles": [],
+            "status": "normal"
+          },
+          {
             "id": "bin",
             "group": "bin",
             "fileCount": 1,
@@ -493,49 +1592,10 @@
             "status": "normal"
           },
           {
-            "id": "src",
-            "group": "src",
-            "fileCount": 9,
-            "loc": 1528,
-            "changedCount": 0,
-            "dependentCount": 0,
-            "dependencyCount": 0,
-            "additions": 0,
-            "deletions": 0,
-            "changedFiles": [],
-            "status": "normal"
-          },
-          {
-            "id": "app/app",
-            "group": "app",
-            "fileCount": 1,
-            "loc": 74,
-            "changedCount": 0,
-            "dependentCount": 0,
-            "dependencyCount": 0,
-            "additions": 0,
-            "deletions": 0,
-            "changedFiles": [],
-            "status": "normal"
-          },
-          {
-            "id": "app/plugins",
-            "group": "app",
-            "fileCount": 1,
-            "loc": 56,
-            "changedCount": 0,
-            "dependentCount": 0,
-            "dependencyCount": 0,
-            "additions": 0,
-            "deletions": 0,
-            "changedFiles": [],
-            "status": "normal"
-          },
-          {
-            "id": "app/src",
-            "group": "app",
+            "id": "(root)",
+            "group": "(root)",
             "fileCount": 3,
-            "loc": 123,
+            "loc": 110,
             "changedCount": 0,
             "dependentCount": 0,
             "dependencyCount": 0,
@@ -548,7 +1608,7 @@
             "id": "scripts",
             "group": "scripts",
             "fileCount": 1,
-            "loc": 100,
+            "loc": 85,
             "changedCount": 0,
             "dependentCount": 0,
             "dependencyCount": 0,
@@ -558,10 +1618,10 @@
             "status": "normal"
           },
           {
-            "id": "(root)",
-            "group": "(root)",
-            "fileCount": 2,
-            "loc": 70,
+            "id": "src",
+            "group": "src",
+            "fileCount": 9,
+            "loc": 1747,
             "changedCount": 0,
             "dependentCount": 0,
             "dependencyCount": 0,
@@ -601,6 +1661,13 @@
             "kind": "orbit"
           },
           {
+            "source": "app/app",
+            "target": "app/src",
+            "kind": "imports",
+            "weight": 26,
+            "hot": 0
+          },
+          {
             "source": "bin",
             "target": "src",
             "kind": "imports",
@@ -625,9 +1692,9 @@
       }
     },
     "stats": {
-      "fileCount": 18,
-      "linkCount": 17,
-      "unresolvedCount": 11,
+      "fileCount": 73,
+      "linkCount": 119,
+      "unresolvedCount": 12,
       "changedCount": 0,
       "dependentCount": 0,
       "dependencyCount": 0
@@ -643,6 +1710,6 @@
     "branch": "sb/vue-viewer",
     "baseRef": null,
     "pullRequest": null,
-    "generatedAt": "2026-08-02T00:23:06.759Z"
+    "generatedAt": "2026-08-02T10:04:30.916Z"
   }
 }
