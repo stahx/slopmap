@@ -1,14 +1,70 @@
 :root {
   --font-sans: "Inter Tight", "Inter", system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --rail-w: 60px;
+  --header-h: 64px;
+  --inspector-w: 452px;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+  scrollbar-color: rgba(232, 230, 223, 0.18) transparent;
+  scrollbar-width: thin;
 }
 
 [hidden] {
   display: none !important;
 }
 
+html,
+body,
+#app {
+  min-height: 100%;
+}
+
 body {
   margin: 0;
-  background: #12142a;
+  min-height: 100vh;
+  overflow: hidden;
+  color: #e8e6df;
+  background:
+    radial-gradient(
+      circle at 20% 24%,
+      rgba(110, 120, 200, 0.16),
+      transparent 45%
+    ),
+    radial-gradient(
+      circle at 74% 70%,
+      rgba(120, 70, 130, 0.14),
+      transparent 50%
+    ),
+    #12142a;
   font-family: var(--font-sans);
+}
+
+button,
+input {
+  font-family: inherit;
+}
+
+button:focus-visible,
+input:focus-visible,
+a:focus-visible {
+  outline: 1px solid #f08a4b;
+  outline-offset: 2px;
+}
+
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(232, 230, 223, 0.18);
+  border-radius: 999px;
 }
