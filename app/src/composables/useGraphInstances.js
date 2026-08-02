@@ -2,6 +2,7 @@ import ForceGraph3D from '3d-force-graph';
 import ForceGraph from 'force-graph';
 import { isProxy, onBeforeUnmount, ref, watch } from 'vue';
 
+import { clampToBounds, computeBounds, expandBounds } from '../lib/cameraBounds.js';
 import { filterGraph } from '../lib/filterGraph.js';
 import {
   linkColorFor,
@@ -36,8 +37,11 @@ const { mapWidth, mapHeight, disconnect } = useMapArea();
 
 let graph3dInstance = null;
 let graph2dInstance = null;
+let cameraBounds = null;
 let groupColors = new Map();
 let pendingFitAfterStop = false;
+let snappingBack = false;
+let snapBackTimeoutId = null;
 let parallaxFrameId = null;
 let previousAzimuth = null;
 let accumulatedPan3dX = 0;
@@ -83,6 +87,32 @@ const nodeLabelAccessor = (node) => nodeLabelFor(node, styleContext());
 const nodeValueAccessor = (node) => nodeValueFor(node, styleContext());
 
 const activeGraph = () => (dimension.value === '2d' ? graph2dInstance : graph3dInstance);
+
+const refreshCameraBounds = () => {
+  const graph = activeGraph();
+  if (graph === null) {
+    cameraBounds = null;
+    return;
+  }
+  const bounds = computeBounds(graph.graphData().nodes);
+  cameraBounds = bounds === null ? null : expandBounds(bounds, 0.25, 150);
+  if (cameraBounds === null) return;
+  if (dimension.value === '3d') {
+    const controls = graph3dInstance.controls();
+    controls.minDistance = Math.max(40, cameraBounds.radius * 0.08);
+    controls.maxDistance = cameraBounds.radius * 4;
+    return;
+  }
+  if (graph2dInstance === null) return;
+  graph2dInstance.maxZoom(12);
+  const width = mapWidth.value;
+  const height = mapHeight.value;
+  if (width <= 0 || height <= 0) return;
+  const boundsWidth = cameraBounds.maxX - cameraBounds.minX;
+  const boundsHeight = cameraBounds.maxY - cameraBounds.minY;
+  const fitZoom = Math.min(width / boundsWidth, height / boundsHeight);
+  graph2dInstance.minZoom(fitZoom * 0.5);
+};
 
 const assertRawGraphData = (graphData) => {
   if (!import.meta.env.DEV) return;
@@ -138,9 +168,11 @@ const pin3dNodes = () => {
     node.fy = node.y;
     node.fz = node.z;
   }
-  if (!pendingFitAfterStop || dimension.value !== '3d') return;
-  pendingFitAfterStop = false;
-  graph3dInstance.zoomToFit(600);
+  if (pendingFitAfterStop && dimension.value === '3d') {
+    pendingFitAfterStop = false;
+    graph3dInstance.zoomToFit(600);
+  }
+  refreshCameraBounds();
 };
 
 const pin2dNodes = () => {
@@ -149,9 +181,11 @@ const pin2dNodes = () => {
     node.fx = node.x;
     node.fy = node.y;
   }
-  if (!pendingFitAfterStop || dimension.value !== '2d') return;
-  pendingFitAfterStop = false;
-  graph2dInstance.zoomToFit(600);
+  if (pendingFitAfterStop && dimension.value === '2d') {
+    pendingFitAfterStop = false;
+    graph2dInstance.zoomToFit(600);
+  }
+  refreshCameraBounds();
 };
 
 const drawSpacedCanvasText = (canvasContext, labelText, centerX, baselineY, characterSpacing) => {
@@ -267,14 +301,54 @@ const captureParallax = () => {
   parallaxFrameId = globalThis.requestAnimationFrame(captureParallax);
 };
 
+const clamp3dTarget = (controls) => {
+  if (cameraBounds === null) return;
+  controls.target.x = clampToBounds(controls.target.x, cameraBounds.minX, cameraBounds.maxX);
+  controls.target.y = clampToBounds(controls.target.y, cameraBounds.minY, cameraBounds.maxY);
+  controls.target.z = clampToBounds(controls.target.z, cameraBounds.minZ, cameraBounds.maxZ);
+};
+
+const handle2dZoomEnd = ({ k: zoomScale, x: transformX, y: transformY }) => {
+  if (snappingBack) {
+    snappingBack = false;
+    if (snapBackTimeoutId !== null) {
+      globalThis.clearTimeout(snapBackTimeoutId);
+      snapBackTimeoutId = null;
+    }
+    return;
+  }
+  if (
+    cameraBounds === null ||
+    graph2dInstance === null ||
+    zoomScale <= 0 ||
+    mapWidth.value <= 0 ||
+    mapHeight.value <= 0
+  ) {
+    return;
+  }
+  const centerGraphX = (mapWidth.value / 2 - transformX) / zoomScale;
+  const centerGraphY = (mapHeight.value / 2 - transformY) / zoomScale;
+  const clampedX = clampToBounds(centerGraphX, cameraBounds.minX, cameraBounds.maxX);
+  const clampedY = clampToBounds(centerGraphY, cameraBounds.minY, cameraBounds.maxY);
+  if (clampedX === centerGraphX && clampedY === centerGraphY) return;
+  snappingBack = true;
+  snapBackTimeoutId = globalThis.setTimeout(() => {
+    snappingBack = false;
+    snapBackTimeoutId = null;
+  }, 400);
+  graph2dInstance.centerAt(clampedX, clampedY, 350);
+};
+
 const resizeGraphs = (width, height) => {
   graph3dInstance?.width(width).height(height);
   graph2dInstance?.width(width).height(height);
+  if (dimension.value === '2d') refreshCameraBounds();
 };
 
 const refreshFilesGraph = () => {
   if (currentView.value !== 'files') return;
   feedGraph(activeGraph(), filteredFilesGraph());
+  refreshCameraBounds();
 };
 
 const applyView = () => {
@@ -302,6 +376,7 @@ const applyView = () => {
     graph.d3Force('charge').strength(-45);
     graph.d3Force('link').distance(35);
   }
+  refreshCameraBounds();
   restartLabelLoop();
   graph.zoomToFit(600);
   pendingFitAfterStop = true;
@@ -334,6 +409,8 @@ const createGraphInstances = (host3dElement, host2dElement) => {
     .onNodeClick(handleNodeClick)
     .onBackgroundClick(handleBackgroundClick)
     .onEngineStop(pin3dNodes);
+  const controls = graph3dInstance.controls();
+  controls.addEventListener('change', () => clamp3dTarget(controls));
   graph2dInstance = ForceGraph()(host2dElement)
     .backgroundColor('rgba(18,20,42,0)')
     .nodeVal(nodeValueAccessor)
@@ -352,7 +429,8 @@ const createGraphInstances = (host3dElement, host2dElement) => {
     .onZoom(({ x: transformX, y: transformY }) => {
       pan2dX = transformX;
       pan2dY = transformY;
-    });
+    })
+    .onZoomEnd(handle2dZoomEnd);
   setGraphHooks({ recolor, repaint });
   if (mapWidth.value > 0 && mapHeight.value > 0) {
     resizeGraphs(mapWidth.value, mapHeight.value);
@@ -368,6 +446,12 @@ const destroyGraphInstances = () => {
   graph2dInstance?._destructor?.();
   graph3dInstance = null;
   graph2dInstance = null;
+  cameraBounds = null;
+  snappingBack = false;
+  if (snapBackTimeoutId !== null) {
+    globalThis.clearTimeout(snapBackTimeoutId);
+    snapBackTimeoutId = null;
+  }
   disconnect();
   if (parallaxFrameId !== null) {
     globalThis.cancelAnimationFrame(parallaxFrameId);
