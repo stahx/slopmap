@@ -130,11 +130,16 @@ const annotateAggregate = ({
     );
     const reachedIds = breadthFirst(sectionChangedIds, reverseAdjacency);
     const downstreamCounts = new Map();
+    const downstreamFileIds = [];
     for (const reachedId of reachedIds) {
       const downstreamId = sectionOfNode(nodesById.get(reachedId));
       if (downstreamId === section.id) continue;
+      downstreamFileIds.push(reachedId);
       downstreamCounts.set(downstreamId, (downstreamCounts.get(downstreamId) || 0) + 1);
     }
+    section.downstreamFiles = downstreamFileIds
+      .sort((firstId, secondId) => firstId.localeCompare(secondId))
+      .slice(0, 200);
     section.downstream = [...downstreamCounts.entries()]
       .map(([id, count]) => ({ id, count }))
       .sort((firstEntry, secondEntry) =>

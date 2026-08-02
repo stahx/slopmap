@@ -106,6 +106,21 @@ const COSMOS_CHANGES = {
   totals: { additions: 7, deletions: 7 },
 };
 
+const CAPPED_DOWNSTREAM_SOURCES = [
+  { filePath: 'core/changed.ts', loc: 20, specifiers: [] },
+  ...Array.from({ length: 205 }, (unusedValue, fileIndex) => ({
+    filePath: `consumers/file-${String(fileIndex).padStart(3, '0')}.ts`,
+    loc: 10,
+    specifiers: ['../core/changed'],
+  })),
+];
+
+const CAPPED_DOWNSTREAM_RESOLVER = {
+  resolve: (fromFile, specifier) =>
+    specifier === '../core/changed' ? 'core/changed.ts' : null,
+  isInternalLooking: (specifier) => specifier.startsWith('.'),
+};
+
 describe('src/graph', () => {
   test('buildGraph', () => {
     const graph = buildGraph({
@@ -264,6 +279,10 @@ describe('src/graph', () => {
         { id: 'apps/cosmos/section-02', count: 1 },
         { id: 'apps/cosmos/section-04', count: 1 },
       ],
+      downstreamFiles: [
+        'apps/cosmos/section-02/dependent.ts',
+        'apps/cosmos/section-04/dependent.ts',
+      ],
       downstreamTotal: 2,
     });
     expect(sectionsById.get('apps/cosmos/section-03')).toMatchObject({
@@ -321,6 +340,7 @@ describe('src/graph', () => {
       additions: 14,
       deletions: 11,
       downstream: [],
+      downstreamFiles: [],
       downstreamTotal: 0,
       status: 'changed',
     });
@@ -358,6 +378,7 @@ describe('src/graph', () => {
       additions: 7,
       deletions: 7,
       downstream: [],
+      downstreamFiles: [],
       downstreamTotal: 0,
     });
     expect(cappedGraph.levels.roots.sections.some((section) => section.id.includes('(other)'))).toBe(false);
@@ -395,6 +416,7 @@ describe('src/graph', () => {
       deletions: 11,
       changedFiles: ['apps/web/entry.ts', 'apps/web/consumer.ts'],
       downstream: [],
+      downstreamFiles: [],
       downstreamTotal: 0,
       status: 'changed',
     });
@@ -418,5 +440,21 @@ describe('src/graph', () => {
       hot: 0,
     });
     expect(graph.levels.groups.links.some((link) => link.kind === 'orbit')).toBe(false);
+  });
+
+  test('buildGraph caps sorted downstream files', () => {
+    const graph = buildGraph({
+      sources: CAPPED_DOWNSTREAM_SOURCES,
+      resolver: CAPPED_DOWNSTREAM_RESOLVER,
+      changedFiles: new Set(['core/changed.ts']),
+    });
+    const changedSection = graph.levels.dirs.sections.find(
+      (section) => section.id === 'core'
+    );
+
+    expect(changedSection.downstreamTotal).toBe(205);
+    expect(changedSection.downstreamFiles).toHaveLength(200);
+    expect(changedSection.downstreamFiles[0]).toBe('consumers/file-000.ts');
+    expect(changedSection.downstreamFiles.at(-1)).toBe('consumers/file-199.ts');
   });
 });

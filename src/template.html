@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>__SLOPMAP_TITLE__</title>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
   <style>
     :root {
       --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
@@ -24,7 +24,7 @@
       min-height: 100vh;
       color: #e8e6df;
       background: radial-gradient(circle at 20% 24%, rgba(110,120,200,.16), transparent 45%), radial-gradient(circle at 74% 70%, rgba(120,70,130,.14), transparent 50%), #12142a;
-      font-family: "Inter Tight", system-ui, -apple-system, sans-serif;
+      font-family: "Inter", system-ui, -apple-system, sans-serif;
       overflow: hidden;
     }
 
@@ -38,7 +38,10 @@
     #graph,
     #graph2d {
       position: fixed;
-      inset: 0;
+      top: 64px;
+      right: 452px;
+      bottom: 0;
+      left: 60px;
       z-index: 1;
     }
 
@@ -51,9 +54,12 @@
     }
 
     #labels {
-      position: absolute;
-      inset: 0;
-      z-index: 1;
+      position: fixed;
+      top: 64px;
+      right: 452px;
+      bottom: 0;
+      left: 60px;
+      z-index: 2;
       overflow: hidden;
       pointer-events: none;
     }
@@ -81,195 +87,16 @@
 
     .section-label-hub {
       color: #fff;
-      font-family: "Inter Tight", system-ui, -apple-system, sans-serif;
+      font-family: "Inter", system-ui, -apple-system, sans-serif;
       font-size: 13px;
       font-weight: 600;
     }
 
     .section-label-subsection {
       color: rgba(255,255,255,.72);
-      font-family: "Inter Tight", system-ui, -apple-system, sans-serif;
+      font-family: "Inter", system-ui, -apple-system, sans-serif;
       font-size: 12px;
       font-weight: 500;
-    }
-
-    #panel,
-    #detail-panel {
-      position: fixed;
-      z-index: 2;
-      color: #e8e6df;
-      background: rgba(18,20,42,.92);
-      border: 1px solid rgba(255,255,255,.10);
-      border-radius: 14px;
-      backdrop-filter: blur(12px);
-    }
-
-    #panel {
-      top: 24px;
-      left: 24px;
-      display: flex;
-      width: 352px;
-      max-width: calc(100vw - 48px);
-      max-height: calc(100vh - 48px);
-      flex-direction: column;
-      gap: 16px;
-      padding: 16px;
-      overflow-y: auto;
-      scrollbar-width: thin;
-    }
-
-    #panel-header {
-      display: flex;
-      align-items: center;
-      min-width: 0;
-      gap: 8px;
-    }
-
-    #brand-dot {
-      width: 9px;
-      height: 9px;
-      flex: 0 0 auto;
-      background: #f08a4b;
-      border-radius: 50%;
-      box-shadow: 0 0 8px rgba(240,138,75,.55);
-    }
-
-    #brand-name {
-      flex: 0 0 auto;
-      color: #e8e6df;
-      font-family: var(--font-mono);
-      font-size: 13px;
-      font-weight: 600;
-    }
-
-    #repo-name {
-      min-width: 0;
-      flex: 1 1 auto;
-      overflow: hidden;
-      color: rgba(232,230,223,.45);
-      font-size: 12px;
-      font-weight: 400;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    #relative-time {
-      flex: 0 0 auto;
-      color: rgba(232,230,223,.4);
-      font-family: var(--font-mono);
-      font-size: 10px;
-      font-weight: 500;
-    }
-
-    #context-card {
-      display: flex;
-      flex-direction: column;
-      gap: 9px;
-      padding: 13px;
-      background: rgba(255,255,255,.035);
-      border: 1px solid rgba(255,255,255,.07);
-      border-radius: 10px;
-    }
-
-    #context-chips {
-      display: flex;
-      align-items: center;
-      min-width: 0;
-      gap: 7px;
-    }
-
-    #context-branch,
-    #context-base {
-      min-width: 0;
-      overflow: hidden;
-      padding: 3px 7px;
-      border-radius: 5px;
-      font-family: var(--font-mono);
-      font-size: 11.5px;
-      font-weight: 500;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    #context-branch {
-      color: #f2b52e;
-      background: rgba(242,181,46,.12);
-    }
-
-    #context-base {
-      color: rgba(232,230,223,.6);
-      background: rgba(255,255,255,.06);
-    }
-
-    #context-arrow {
-      flex: 0 0 auto;
-      color: rgba(232,230,223,.35);
-    }
-
-    #context-pr {
-      display: flex;
-      align-items: center;
-      min-width: 0;
-      gap: 7px;
-      color: inherit;
-      text-decoration: none;
-    }
-
-    #context-pr-number {
-      flex: 0 0 auto;
-      color: #e8e6df;
-      font-family: var(--font-mono);
-      font-size: 12px;
-      font-weight: 600;
-    }
-
-    #context-pr-title {
-      min-width: 0;
-      flex: 1 1 auto;
-      overflow: hidden;
-      color: rgba(232,230,223,.6);
-      font-size: 12px;
-      font-weight: 400;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    #context-pr-state {
-      flex: 0 0 auto;
-      padding: 2px 5px;
-      color: #6fbf8b;
-      border: 1px solid rgba(111,191,139,.4);
-      border-radius: 4px;
-      font-family: var(--font-mono);
-      font-size: 9.5px;
-      font-weight: 500;
-    }
-
-    #context-pr-arrow {
-      flex: 0 0 auto;
-      color: #f08a4b;
-    }
-
-    #context-totals {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    #total-additions,
-    #total-deletions {
-      flex: 0 0 auto;
-      font-family: var(--font-mono);
-      font-size: 11.5px;
-      font-weight: 600;
-    }
-
-    #total-additions {
-      color: #6fbf8b;
-    }
-
-    #total-deletions {
-      color: #e8564a;
     }
 
     .ratio-bar {
@@ -380,55 +207,6 @@
       accent-color: #f08a4b;
     }
 
-    #compactness-levels {
-      display: flex;
-      justify-content: space-between;
-      color: rgba(232,230,223,.45);
-      font-family: var(--font-mono);
-      font-size: 10px;
-    }
-
-    #theme-setting,
-    #dimension-setting {
-      margin: 0;
-    }
-
-    #theme-label,
-    #dimension-label {
-      margin: 0 0 5px;
-      color: rgba(232,230,223,.45);
-      font-size: 11px;
-    }
-
-    #theme-toggle,
-    #dimension-toggle,
-    #view-toggle {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2px;
-      margin: 0;
-      padding: 3px;
-      background: rgba(255,255,255,.05);
-      border-radius: 8px;
-    }
-
-    .view-button {
-      padding: 6px 8px;
-      color: rgba(232,230,223,.45);
-      background: transparent;
-      border: 0;
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: 500;
-      cursor: pointer;
-    }
-
-    .view-button.active {
-      color: #e8e6df;
-      background: rgba(255,255,255,.1);
-      border-radius: 6px;
-    }
-
     #files-controls {
       display: flex;
       flex-direction: column;
@@ -501,26 +279,6 @@
       cursor: pointer;
     }
 
-    #hint {
-      margin: 0;
-      color: rgba(232,230,223,.3);
-      font-size: 11px;
-      line-height: 1.35;
-    }
-
-    #detail-panel {
-      top: 24px;
-      right: 24px;
-      bottom: 24px;
-      display: flex;
-      width: 426px;
-      max-width: calc(100vw - 48px);
-      max-height: none;
-      flex-direction: column;
-      padding: 0;
-      overflow: hidden;
-    }
-
     #detail-header-block {
       flex: 0 0 auto;
       padding: 18px;
@@ -584,43 +342,10 @@
       line-height: 1;
     }
 
-    .detail-stat-additions {
-      color: #6fbf8b;
-    }
-
-    .detail-stat-deletions {
-      color: #e8564a;
-    }
-
-    .detail-stat-downstream {
-      color: #f08a4b;
-    }
-
     .detail-stat-label {
       color: rgba(232,230,223,.4);
       font-size: 10.5px;
       white-space: nowrap;
-    }
-
-    #detail-scroll {
-      min-height: 0;
-      flex: 1 1 auto;
-      overflow-y: auto;
-      scrollbar-width: thin;
-    }
-
-    .detail-section-label {
-      padding: 12px 18px 8px;
-      color: rgba(232,230,223,.35);
-      font-family: var(--font-mono);
-      font-size: 10.5px;
-      font-weight: 500;
-      letter-spacing: .08em;
-    }
-
-    #detail-body {
-      display: block;
-      margin: 0;
     }
 
     .detail-file-row {
@@ -633,10 +358,6 @@
       font-family: var(--font-mono);
       font-size: 12.5px;
       line-height: 1.35;
-    }
-
-    .detail-file-row:nth-child(even) {
-      background: rgba(255,255,255,.02);
     }
 
     .detail-status-badge {
@@ -707,16 +428,6 @@
       color: rgba(232,230,223,.3);
     }
 
-    .detail-ratio {
-      display: flex;
-      width: 44px;
-      height: 5px;
-      flex: 0 0 auto;
-      gap: 1px;
-      overflow: hidden;
-      border-radius: 3px;
-    }
-
     .detail-ratio-additions,
     .detail-ratio-deletions {
       min-width: 1px;
@@ -734,24 +445,6 @@
       padding: 9px 18px 16px;
       color: rgba(232,230,223,.35);
       font-size: 12px;
-    }
-
-    #downstream-chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      padding: 0 18px 16px;
-    }
-
-    .downstream-chip {
-      padding: 4px 8px;
-      color: rgba(232,230,223,.7);
-      background: rgba(240,138,75,.12);
-      border: 1px solid rgba(240,138,75,.25);
-      border-radius: 6px;
-      font-family: var(--font-mono);
-      font-size: 11.5px;
-      font-weight: 400;
     }
 
     #detail-footer {
@@ -791,20 +484,728 @@
       font-weight: 500;
     }
 
-    @media (max-width: 860px) {
-      #panel {
-        top: 12px;
-        left: 12px;
-        max-width: calc(100vw - 24px);
-        max-height: calc(100vh - 24px);
-      }
+    #icon-rail {
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 4;
+      display: flex;
+      width: 60px;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 0;
+      background: rgba(14,16,32,.95);
+      border-right: 1px solid rgba(255,255,255,.07);
+    }
 
-      #detail-panel {
-        top: 12px;
-        right: 12px;
-        bottom: 12px;
-        max-width: calc(100vw - 24px);
-      }
+    #logo-tile {
+      display: flex;
+      width: 30px;
+      height: 30px;
+      flex: 0 0 auto;
+      align-items: center;
+      justify-content: center;
+      color: #14162a;
+      background: #f08a4b;
+      border-radius: 9px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    #rail-top-spacer {
+      height: 10px;
+      flex: 0 0 auto;
+    }
+
+    #rail-flex-spacer,
+    #header-flex-spacer {
+      flex: 1 1 auto;
+    }
+
+    .rail-button {
+      display: inline-flex;
+      width: 34px;
+      height: 34px;
+      flex: 0 0 auto;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      color: rgba(232,230,223,.45);
+      background: transparent;
+      border: 0;
+      border-radius: 9px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .rail-button:hover,
+    .rail-button.active {
+      color: #e8e6df;
+      background: rgba(255,255,255,.1);
+    }
+
+    #help-popover {
+      position: absolute;
+      bottom: 56px;
+      left: 48px;
+      display: flex;
+      width: 230px;
+      flex-direction: column;
+      gap: 7px;
+      padding: 12px 14px;
+      color: rgba(232,230,223,.72);
+      background: rgba(16,18,38,.96);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 10px;
+      box-shadow: 0 12px 34px rgba(0,0,0,.35);
+      font-size: 12px;
+      line-height: 1.3;
+      cursor: pointer;
+    }
+
+    #help-popover[hidden] {
+      display: none;
+    }
+
+    #top-header {
+      position: fixed;
+      top: 0;
+      right: 452px;
+      left: 60px;
+      z-index: 3;
+      display: flex;
+      height: 64px;
+      align-items: center;
+      gap: 14px;
+      padding: 0 22px;
+      background: rgba(14,16,32,.6);
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      backdrop-filter: blur(8px);
+    }
+
+    #header-context {
+      display: flex;
+      min-width: 0;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    #header-repository {
+      display: flex;
+      min-width: 0;
+      align-items: center;
+      gap: 7px;
+      white-space: nowrap;
+    }
+
+    #repo-name {
+      min-width: 0;
+      overflow: hidden;
+      color: #e8e6df;
+      font-family: var(--font-mono);
+      font-size: 13.5px;
+      font-weight: 600;
+      text-overflow: ellipsis;
+    }
+
+    #repo-separator {
+      color: rgba(232,230,223,.28);
+      font-family: var(--font-mono);
+      font-size: 12px;
+    }
+
+    #context-branch {
+      min-width: 0;
+      overflow: hidden;
+      color: #f2b52e;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 500;
+      text-overflow: ellipsis;
+    }
+
+    #context-base-wrap {
+      min-width: 0;
+      overflow: hidden;
+      color: rgba(232,230,223,.3);
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      text-overflow: ellipsis;
+    }
+
+    #context-base-wrap[hidden] {
+      display: none;
+    }
+
+    #meta {
+      color: rgba(232,230,223,.35);
+      font-size: 11px;
+      line-height: 1.2;
+    }
+
+    #context-pr {
+      display: flex;
+      flex: 0 0 auto;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 11px;
+      color: inherit;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 9px;
+      text-decoration: none;
+    }
+
+    #context-pr[hidden] {
+      display: none;
+    }
+
+    #context-pr-number {
+      color: #e8e6df;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    #context-pr-state {
+      padding: 2px 5px;
+      color: #6fbf8b;
+      border: 1px solid rgba(111,191,139,.4);
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 9.5px;
+    }
+
+    #context-pr-arrow {
+      color: #f08a4b;
+    }
+
+    #context-totals {
+      display: flex;
+      flex: 0 0 auto;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px;
+      background: rgba(255,255,255,.05);
+      border-radius: 9px;
+    }
+
+    #context-totals[hidden] {
+      display: none;
+    }
+
+    #total-additions,
+    #total-deletions {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    #total-additions {
+      color: #6fbf8b;
+    }
+
+    #total-deletions {
+      color: #e8564a;
+    }
+
+    #totals-ratio {
+      width: 70px;
+      flex: 0 0 auto;
+    }
+
+    #controls-pill {
+      position: fixed;
+      bottom: 22px;
+      left: 84px;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      background: rgba(16,18,38,.85);
+      border: 1px solid rgba(255,255,255,.09);
+      border-radius: 10px;
+      backdrop-filter: blur(10px);
+    }
+
+    #compactness-setting {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0;
+    }
+
+    #compactness-setting[hidden] {
+      display: none;
+    }
+
+    #compactness-label {
+      display: inline;
+      color: rgba(232,230,223,.4);
+      font-size: 11px;
+    }
+
+    #compactness {
+      width: 150px;
+      margin: 0;
+      accent-color: #f08a4b;
+    }
+
+    #compactness-level {
+      color: rgba(232,230,223,.45);
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+    }
+
+    .controls-divider {
+      width: 1px;
+      height: 18px;
+      flex: 0 0 auto;
+      background: rgba(255,255,255,.09);
+    }
+
+    #theme-toggle {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+      padding: 2px;
+      background: rgba(255,255,255,.05);
+      border-radius: 7px;
+    }
+
+    .theme-button {
+      padding: 4px 7px;
+      color: rgba(232,230,223,.45);
+      background: transparent;
+      border: 0;
+      border-radius: 5px;
+      font-size: 10.5px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .theme-button.active {
+      color: #e8e6df;
+      background: rgba(255,255,255,.1);
+    }
+
+    #files-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #files-controls[hidden] {
+      display: none;
+    }
+
+    #search {
+      width: 160px;
+      padding: 6px 8px;
+    }
+
+    #filters {
+      flex-wrap: nowrap;
+      gap: 10px;
+    }
+
+    .checkbox-label {
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    #impact-option[hidden],
+    #section-filter[hidden] {
+      display: none;
+    }
+
+    #section-filter {
+      align-self: auto;
+      white-space: nowrap;
+    }
+
+    #inspector {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 4;
+      display: flex;
+      width: 452px;
+      flex-direction: column;
+      color: #e8e6df;
+      background: rgba(14,16,32,.97);
+      border-left: 1px solid rgba(255,255,255,.08);
+    }
+
+    #inspector-overview,
+    #inspector-detail {
+      min-height: 0;
+      flex: 1 1 auto;
+    }
+
+    #inspector-overview {
+      display: flex;
+      flex-direction: column;
+    }
+
+    #inspector-overview[hidden],
+    #inspector-detail[hidden] {
+      display: none;
+    }
+
+    #overview-header {
+      flex: 0 0 auto;
+      padding: 18px 20px;
+      color: #e8e6df;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      font-family: var(--font-mono);
+      font-size: 15.5px;
+      font-weight: 600;
+    }
+
+    #overview-body {
+      min-height: 0;
+      flex: 1 1 auto;
+      overflow-y: auto;
+      padding: 18px 20px;
+      scrollbar-width: thin;
+    }
+
+    #distribution {
+      gap: 12px;
+    }
+
+    #distribution-bar[hidden] {
+      display: none;
+    }
+
+    #overview-meta {
+      color: rgba(232,230,223,.35);
+      font-size: 11px;
+      line-height: 1.35;
+    }
+
+    #changed-sections-block {
+      margin-top: 30px;
+    }
+
+    #changed-sections-block[hidden] {
+      display: none;
+    }
+
+    #changed-sections-label {
+      margin-bottom: 8px;
+      color: rgba(232,230,223,.35);
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      letter-spacing: .08em;
+    }
+
+    #changed-sections {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .changed-section-row {
+      display: grid;
+      width: 100%;
+      grid-template-columns: 8px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 8px;
+      color: rgba(232,230,223,.78);
+      background: transparent;
+      border: 0;
+      border-radius: 8px;
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .changed-section-row:hover {
+      color: #e8e6df;
+      background: rgba(255,255,255,.05);
+    }
+
+    .changed-section-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .changed-section-id {
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .changed-section-count {
+      color: #e8e6df;
+      font-size: 12px;
+    }
+
+    #inspector-detail {
+      display: flex;
+      flex-direction: column;
+    }
+
+    #detail-header-block {
+      padding: 18px 20px 16px;
+      border-bottom: 0;
+    }
+
+    #detail-status-dot {
+      width: 11px;
+      height: 11px;
+    }
+
+    #detail-title {
+      font-size: 15.5px;
+    }
+
+    #detail-close {
+      width: 28px;
+      height: 28px;
+      font-size: 18px;
+    }
+
+    #detail-stats {
+      flex-wrap: nowrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .detail-stat {
+      min-width: 0;
+      flex: 1 1 0;
+      gap: 5px;
+      padding: 11px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 9px;
+    }
+
+    .detail-stat-changed {
+      background: rgba(232,86,74,.1);
+      border-color: rgba(232,86,74,.22);
+    }
+
+    .detail-stat-blast {
+      background: rgba(240,138,75,.1);
+      border-color: rgba(240,138,75,.22);
+    }
+
+    .detail-stat-value {
+      font-size: 18px;
+      line-height: 1.1;
+    }
+
+    .detail-stat-changed .detail-stat-value {
+      color: #e8564a;
+    }
+
+    .detail-stat-blast .detail-stat-value {
+      color: #f08a4b;
+    }
+
+    .detail-stat-label {
+      font-size: 10.5px;
+    }
+
+    #inspector-tabs {
+      display: flex;
+      flex: 0 0 auto;
+      gap: 20px;
+      padding: 0 20px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+
+    #inspector-tabs[hidden] {
+      display: none;
+    }
+
+    .inspector-tab {
+      margin: 0 0 -1px;
+      padding: 10px 0 11px;
+      color: rgba(232,230,223,.45);
+      background: transparent;
+      border: 0;
+      border-bottom: 2px solid transparent;
+      font-size: 12.5px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .inspector-tab.active {
+      color: #e8e6df;
+      border-bottom-color: #f08a4b;
+      font-weight: 600;
+    }
+
+    .inspector-tab-count {
+      color: rgba(232,230,223,.35);
+      font-family: var(--font-mono);
+      font-size: 11px;
+    }
+
+    #detail-content {
+      min-height: 0;
+      flex: 1 1 auto;
+      overflow-y: auto;
+      padding: 6px 8px;
+      scrollbar-width: thin;
+    }
+
+    .detail-file-card {
+      padding: 11px 12px;
+      border-radius: 9px;
+    }
+
+    .detail-file-card:first-child,
+    .detail-file-card:hover {
+      background: rgba(255,255,255,.05);
+    }
+
+    .detail-file-primary {
+      display: flex;
+      min-width: 0;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .detail-status-badge {
+      width: 17px;
+      height: 17px;
+    }
+
+    .detail-file-name {
+      font-size: 12.5px;
+      font-weight: 500;
+    }
+
+    .detail-card-ratio {
+      display: flex;
+      height: 5px;
+      gap: 2px;
+      margin: 9px 0 7px 25px;
+      overflow: hidden;
+      border-radius: 3px;
+    }
+
+    .detail-ratio-additions,
+    .detail-ratio-deletions,
+    .detail-ratio-remainder {
+      min-width: 1px;
+    }
+
+    .detail-ratio-remainder {
+      background: rgba(255,255,255,.07);
+    }
+
+    .detail-file-meta {
+      margin-left: 25px;
+      color: rgba(232,230,223,.4);
+      font-size: 11px;
+    }
+
+    .detail-file-warning {
+      color: #e8564a;
+    }
+
+    .path-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      color: rgba(232,230,223,.7);
+      border-radius: 8px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      overflow-wrap: anywhere;
+    }
+
+    .path-row:hover {
+      background: rgba(255,255,255,.04);
+    }
+
+    .path-dot {
+      width: 7px;
+      height: 7px;
+      flex: 0 0 auto;
+      border-radius: 50%;
+    }
+
+    .path-dot-dependent {
+      background: #f08a4b;
+    }
+
+    .path-dot-import {
+      background: #f2b52e;
+    }
+
+    .path-footer,
+    .detail-empty {
+      padding: 11px 12px;
+      color: rgba(232,230,223,.35);
+      font-size: 12px;
+    }
+
+    .detail-file-row {
+      padding: 11px 12px;
+      border-radius: 9px;
+    }
+
+    .detail-file-row:first-child,
+    .detail-file-row:hover {
+      background: rgba(255,255,255,.05);
+    }
+
+    #detail-footer {
+      padding: 14px 18px;
+      border-top: 1px solid rgba(255,255,255,.08);
+    }
+
+    #open-pr,
+    #copy-paths,
+    #open-files {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+      padding: 10px;
+      border-radius: 9px;
+      font-size: 12.5px;
+      line-height: 1.2;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    #open-pr {
+      flex: 1 1 auto;
+      color: #14162a;
+      background: #f08a4b;
+      border: 1px solid #f08a4b;
+      font-weight: 600;
+    }
+
+    #open-pr[hidden] {
+      display: none;
+    }
+
+    #copy-paths,
+    #open-files {
+      flex: 0 0 auto;
+      color: rgba(232,230,223,.75);
+      background: transparent;
+      border: 1px solid rgba(255,255,255,.12);
+      font-weight: 500;
     }
   </style>
 </head>
@@ -813,65 +1214,57 @@
   <div id="graph"></div>
   <div id="graph2d" hidden></div>
   <div id="labels"></div>
-  <section id="panel">
-    <div id="panel-header">
-      <span id="brand-dot"></span>
-      <span id="brand-name">slopmap</span>
-      <span id="repo-name"></span>
-      <span id="relative-time"></span>
+  <nav id="icon-rail" aria-label="Map controls">
+    <div id="logo-tile" aria-label="slopmap">s</div>
+    <div id="rail-top-spacer"></div>
+    <button class="rail-button active" type="button" data-view="compact" aria-label="Compact view">◉</button>
+    <button class="rail-button" type="button" data-view="files" aria-label="Files view">≡</button>
+    <button id="dimension-button" class="rail-button" type="button" title="2D / 3D" aria-label="2D / 3D">⌥</button>
+    <div id="rail-flex-spacer"></div>
+    <div id="help-popover" hidden>
+      <div>drag rotate · scroll zoom</div>
+      <div>click ball = inspector</div>
+      <div>shift-less: click again to deselect</div>
     </div>
-    <div id="context-card" hidden>
-      <div id="context-chips">
-        <span id="context-branch" hidden></span>
-        <span id="context-arrow" hidden>→</span>
-        <span id="context-base" hidden></span>
+    <button id="help-button" class="rail-button" type="button" aria-label="Help">?</button>
+  </nav>
+  <header id="top-header">
+    <div id="header-context">
+      <div id="header-repository">
+        <span id="repo-name"></span>
+        <span id="repo-separator">/</span>
+        <span id="context-branch"></span>
+        <span id="context-base-wrap" hidden>→ <span id="context-base"></span></span>
       </div>
-      <a id="context-pr" target="_blank" rel="noopener" hidden>
-        <span id="context-pr-number"></span>
-        <span id="context-pr-title"></span>
-        <span id="context-pr-state"></span>
-        <span id="context-pr-arrow">↗</span>
-      </a>
-      <div id="context-totals" hidden>
-        <span id="total-additions"></span>
-        <span id="total-deletions"></span>
-        <span class="ratio-bar">
-          <span id="total-additions-bar" class="ratio-additions"></span>
-          <span id="total-deletions-bar" class="ratio-deletions"></span>
-        </span>
-      </div>
-    </div>
-    <div id="distribution">
-      <div id="distribution-bar" hidden></div>
-      <div id="legend"></div>
       <div id="meta"></div>
     </div>
+    <div id="header-flex-spacer"></div>
+    <a id="context-pr" target="_blank" rel="noopener" hidden>
+      <span id="context-pr-number"></span>
+      <span id="context-pr-state"></span>
+      <span id="context-pr-arrow">↗</span>
+    </a>
+    <div id="context-totals" hidden>
+      <span id="total-additions"></span>
+      <span id="total-deletions"></span>
+      <span id="totals-ratio" class="ratio-bar">
+        <span id="total-additions-bar" class="ratio-additions"></span>
+        <span id="total-deletions-bar" class="ratio-deletions"></span>
+      </span>
+    </div>
+  </header>
+  <div id="controls-pill">
     <div id="compactness-setting">
-      <div id="compactness-label">
-        <span>compactness</span>
-        <span id="compactness-level"></span>
-      </div>
+      <span id="compactness-label">compactness</span>
       <input id="compactness" type="range" min="1" max="3" step="1" aria-label="Compactness">
-      <div id="compactness-levels">
-        <span>roots</span>
-        <span>groups</span>
-        <span>dirs</span>
-      </div>
+      <span id="compactness-level"></span>
     </div>
-    <div id="theme-setting">
-      <div id="theme-label">background</div>
-      <div id="theme-toggle" aria-label="Background theme">
-        <button class="view-button" type="button" data-theme="plain">Plain</button>
-        <button class="view-button" type="button" data-theme="galaxy">Galaxy</button>
-      </div>
+    <span class="controls-divider"></span>
+    <div id="theme-toggle" aria-label="Background theme">
+      <button class="theme-button" type="button" data-theme="plain">Plain</button>
+      <button class="theme-button" type="button" data-theme="galaxy">Galaxy</button>
     </div>
-    <div id="dimension-setting">
-      <div id="dimension-label">dimension</div>
-      <div id="dimension-toggle" aria-label="Graph dimension">
-        <button class="view-button" type="button" data-dimension="3d">3D</button>
-        <button class="view-button" type="button" data-dimension="2d">2D</button>
-      </div>
-    </div>
+    <span class="controls-divider"></span>
     <div id="files-controls" hidden>
       <input id="search" type="search" placeholder="filter files…" aria-label="Filter files">
       <div id="filters">
@@ -889,34 +1282,40 @@
         <button id="clear-section-filter" type="button" aria-label="Clear section filter">×</button>
       </div>
     </div>
-    <div id="hint">drag rotate · scroll zoom · click ball = files</div>
-    <div id="view-toggle" aria-label="Graph view">
-      <button class="view-button active" type="button" data-view="compact">Compact</button>
-      <button class="view-button" type="button" data-view="files">Advanced</button>
-    </div>
-  </section>
-  <section id="detail-panel" hidden>
-    <div id="detail-header-block">
-      <div id="detail-header">
-        <span id="detail-status-dot"></span>
-        <div id="detail-title"></div>
-        <button id="detail-close" type="button" aria-label="Close section details">×</button>
-      </div>
-      <div id="detail-stats"></div>
-    </div>
-    <div id="detail-scroll">
-      <div id="files-section-label" class="detail-section-label">FILES</div>
-      <div id="detail-body"></div>
-      <div id="downstream-section" hidden>
-        <div id="downstream-label" class="detail-section-label"></div>
-        <div id="downstream-chips"></div>
+  </div>
+  <aside id="inspector">
+    <div id="inspector-overview">
+      <div id="overview-header">overview</div>
+      <div id="overview-body">
+        <div id="distribution">
+          <div id="distribution-bar" hidden></div>
+          <div id="legend"></div>
+          <div id="overview-meta"></div>
+        </div>
+        <div id="changed-sections-block">
+          <div id="changed-sections-label">CHANGED SECTIONS</div>
+          <div id="changed-sections"></div>
+        </div>
       </div>
     </div>
-    <div id="detail-footer">
-      <a id="open-pr" target="_blank" rel="noopener" hidden></a>
-      <button id="open-files" type="button">Isolate blast</button>
+    <div id="inspector-detail" hidden>
+      <div id="detail-header-block">
+        <div id="detail-header">
+          <span id="detail-status-dot"></span>
+          <div id="detail-title"></div>
+          <button id="detail-close" type="button" aria-label="Deselect section">×</button>
+        </div>
+        <div id="detail-stats"></div>
+      </div>
+      <div id="inspector-tabs"></div>
+      <div id="detail-content"></div>
+      <div id="detail-footer">
+        <a id="open-pr" target="_blank" rel="noopener" hidden></a>
+        <button id="copy-paths" type="button">Copy paths</button>
+        <button id="open-files" type="button">Isolate blast</button>
+      </div>
     </div>
-  </section>
+  </aside>
   <script>__SLOPMAP_LIB__</script>
   <script>__SLOPMAP_LIB_2D__</script>
   <script>
@@ -925,7 +1324,9 @@
     const STATUS_COLORS = { changed: '#e8564a', dependent: '#f08a4b', dependency: '#f2b52e' };
     const GROUP_COLORS = ['#3987e5', '#d95926', '#199e70', '#c98500', '#d55181', '#008300', '#9085e9', '#e66767'];
     const MUTED_COLOR = '#8b8fa3';
+    const AGGREGATE_PUSH_RADIUS = 180;
     const filterState = { searchTerm: '' };
+    const idOf = (endpoint) => typeof endpoint === 'object' ? endpoint.id : endpoint;
     let currentView = 'compact';
     const readStoredViewDimension = () => {
       try {
@@ -948,6 +1349,7 @@
     let aggregateFilter = null;
     let selectedSection = null;
     let selectedNode = null;
+    let selectedInspectorTab = 'files';
     let displacedOriginals = new Map();
     let labelFrameId = null;
     let pendingFitAfterStop = false;
@@ -956,15 +1358,22 @@
         .slice(0, GROUP_COLORS.length)
         .map((group, slotIndex) => [group.name, GROUP_COLORS[slotIndex]])
     );
+    const graphNodesById = new Map(payload.graph.nodes.map((node) => [node.id, node]));
+    const importerCountsByTarget = new Map();
+    const importedTargetsBySource = new Map();
+    for (const link of payload.graph.links) {
+      const sourceId = idOf(link.source);
+      const targetId = idOf(link.target);
+      importerCountsByTarget.set(targetId, (importerCountsByTarget.get(targetId) || 0) + 1);
+      if (!importedTargetsBySource.has(sourceId)) importedTargetsBySource.set(sourceId, new Set());
+      importedTargetsBySource.get(sourceId).add(targetId);
+    }
     const repoNameElement = document.getElementById('repo-name');
-    const relativeTimeElement = document.getElementById('relative-time');
-    const contextCardElement = document.getElementById('context-card');
     const contextBranchElement = document.getElementById('context-branch');
-    const contextArrowElement = document.getElementById('context-arrow');
+    const contextBaseWrapElement = document.getElementById('context-base-wrap');
     const contextBaseElement = document.getElementById('context-base');
     const contextPrElement = document.getElementById('context-pr');
     const contextPrNumberElement = document.getElementById('context-pr-number');
-    const contextPrTitleElement = document.getElementById('context-pr-title');
     const contextPrStateElement = document.getElementById('context-pr-state');
     const contextTotalsElement = document.getElementById('context-totals');
     const totalAdditionsElement = document.getElementById('total-additions');
@@ -973,7 +1382,10 @@
     const totalDeletionsBarElement = document.getElementById('total-deletions-bar');
     const distributionBarElement = document.getElementById('distribution-bar');
     const metaElement = document.getElementById('meta');
+    const overviewMetaElement = document.getElementById('overview-meta');
     const legendElement = document.getElementById('legend');
+    const changedSectionsBlockElement = document.getElementById('changed-sections-block');
+    const changedSectionsElement = document.getElementById('changed-sections');
     const labelsElement = document.getElementById('labels');
     const graphElement = document.getElementById('graph');
     const graph2dElement = document.getElementById('graph2d');
@@ -988,22 +1400,22 @@
     const sectionFilterElement = document.getElementById('section-filter');
     const sectionFilterLabelElement = document.getElementById('section-filter-label');
     const clearSectionFilterButton = document.getElementById('clear-section-filter');
-    const hintElement = document.getElementById('hint');
-    const detailPanelElement = document.getElementById('detail-panel');
+    const helpPopoverElement = document.getElementById('help-popover');
+    const helpButton = document.getElementById('help-button');
+    const dimensionButton = document.getElementById('dimension-button');
+    const inspectorOverviewElement = document.getElementById('inspector-overview');
+    const inspectorDetailElement = document.getElementById('inspector-detail');
     const detailStatusDotElement = document.getElementById('detail-status-dot');
     const detailTitleElement = document.getElementById('detail-title');
     const detailStatsElement = document.getElementById('detail-stats');
-    const detailBodyElement = document.getElementById('detail-body');
-    const filesSectionLabelElement = document.getElementById('files-section-label');
-    const downstreamSectionElement = document.getElementById('downstream-section');
-    const downstreamLabelElement = document.getElementById('downstream-label');
-    const downstreamChipsElement = document.getElementById('downstream-chips');
+    const inspectorTabsElement = document.getElementById('inspector-tabs');
+    const detailContentElement = document.getElementById('detail-content');
     const detailCloseButton = document.getElementById('detail-close');
     const openPrElement = document.getElementById('open-pr');
+    const copyPathsButton = document.getElementById('copy-paths');
     const openFilesButton = document.getElementById('open-files');
-    const viewButtons = [...document.querySelectorAll('#view-toggle .view-button')];
-    const themeButtons = [...document.querySelectorAll('#theme-toggle .view-button')];
-    const dimensionButtons = [...document.querySelectorAll('#dimension-toggle .view-button')];
+    const viewButtons = [...document.querySelectorAll('.rail-button[data-view]')];
+    const themeButtons = [...document.querySelectorAll('#theme-toggle .theme-button')];
     const sectionLabelElements = new Map();
     const isAggregatedView = () => currentView === 'compact';
     const activeAggregate = () => payload.graph.levels[
@@ -1019,30 +1431,25 @@
 
     const renderContext = () => {
       const context = payload.context;
-      if (context === null || context === undefined) return;
-      contextCardElement.hidden = false;
       repoNameElement.textContent = payload.repoName;
-      relativeTimeElement.textContent = context.generatedAt ? relativeTime(context.generatedAt) : '';
+      const analyzedText = context?.generatedAt ? ` · analyzed ${relativeTime(context.generatedAt)}` : '';
+      metaElement.textContent =
+        `${payload.graph.stats.fileCount} files · ${payload.graph.stats.linkCount} imports${analyzedText}`;
+      contextBranchElement.textContent = context?.branch ? String(context.branch) : '';
 
-      const hasBranch = Boolean(context.branch);
-      contextBranchElement.textContent = hasBranch ? String(context.branch) : '';
-      contextBranchElement.hidden = !hasBranch;
-
-      const pullRequest = context.pullRequest;
+      const pullRequest = context?.pullRequest;
       const hasPullRequest = pullRequest !== null && pullRequest !== undefined;
       if (hasPullRequest) {
-        contextPrNumberElement.textContent = `PR #${pullRequest.number}`;
-        contextPrTitleElement.textContent = String(pullRequest.title);
+        contextPrNumberElement.textContent = `#${pullRequest.number}`;
         contextPrStateElement.textContent = String(pullRequest.state || '').toUpperCase();
         contextPrElement.setAttribute('title', String(pullRequest.title));
         contextPrElement.setAttribute('href', String(pullRequest.url));
         contextPrElement.hidden = false;
       }
 
-      if (context.baseRef) {
+      if (context?.baseRef) {
         contextBaseElement.textContent = String(context.baseRef);
-        contextArrowElement.hidden = !hasBranch;
-        contextBaseElement.hidden = false;
+        contextBaseWrapElement.hidden = false;
       }
 
       const totals = payload.changes?.totals ?? null;
@@ -1104,8 +1511,6 @@
         appendLegendRow(MUTED_COLOR, 'other', `(${otherCount})`);
       }
     };
-
-    const idOf = (endpoint) => typeof endpoint === 'object' ? endpoint.id : endpoint;
 
     const blendTowardWhite = (hexColor, blendRatio) => {
       const blendChannel = (channelOffset) => {
@@ -1214,17 +1619,12 @@
       sectionFilterLabelElement.textContent = aggregateFilter === null ? '' : aggregateFilter.value;
     };
 
-    const closeDetailPanel = () => {
-      selectedSection = null;
-      detailPanelElement.hidden = true;
-    };
-
-    const appendDetailStat = (value, label, valueClass = '') => {
+    const appendDetailStat = (value, label, statClass = '') => {
       const statElement = document.createElement('div');
       const valueElement = document.createElement('span');
       const labelElement = document.createElement('span');
-      statElement.className = 'detail-stat';
-      valueElement.className = `detail-stat-value ${valueClass}`;
+      statElement.className = `detail-stat ${statClass}`;
+      valueElement.className = 'detail-stat-value';
       valueElement.textContent = String(value);
       labelElement.className = 'detail-stat-label';
       labelElement.textContent = label;
@@ -1243,16 +1643,47 @@
       return filePath.startsWith(sectionPrefix) ? filePath.slice(sectionPrefix.length) : filePath;
     };
 
+    const nodeMatchesSection = (node, section) => {
+      if (compactnessLevel === 1) return node.rootGroup === section.id;
+      if (compactnessLevel === 2) return node.group === section.id;
+      return node.section === section.id;
+    };
+
+    const changedFilesFor = (section) => payload.changes.files.filter(
+      (changeFile) => changeMatchesSection(changeFile, section)
+    );
+
+    const sectionFilesFor = (section) => payload.graph.nodes.filter(
+      (node) => nodeMatchesSection(node, section)
+    );
+
+    const importedFilesFor = (section) => {
+      const importedIds = new Set();
+      for (const changeFile of changedFilesFor(section)) {
+        for (const targetId of importedTargetsBySource.get(changeFile.path) || []) {
+          const targetNode = graphNodesById.get(targetId);
+          if (targetNode !== undefined && nodeMatchesSection(targetNode, section)) continue;
+          importedIds.add(targetId);
+        }
+      }
+      return [...importedIds].sort((firstId, secondId) => firstId.localeCompare(secondId));
+    };
+
     const appendChangedFile = (changeFile, section) => {
-      const rowElement = document.createElement('div');
+      const cardElement = document.createElement('div');
+      const primaryElement = document.createElement('div');
       const badgeElement = document.createElement('span');
       const fileElement = document.createElement('span');
       const additionsElement = document.createElement('span');
       const deletionsElement = document.createElement('span');
-      const ratioElement = document.createElement('span');
+      const ratioElement = document.createElement('div');
       const additionsBarElement = document.createElement('span');
       const deletionsBarElement = document.createElement('span');
-      rowElement.className = 'detail-file-row';
+      const remainderBarElement = document.createElement('span');
+      const metaElement = document.createElement('div');
+      const importerCount = importerCountsByTarget.get(changeFile.path) || 0;
+      cardElement.className = 'detail-file-card';
+      primaryElement.className = 'detail-file-primary';
       badgeElement.className = `detail-status-badge detail-status-${changeFile.status}`;
       badgeElement.textContent = changeFile.status;
       fileElement.className = 'detail-file-name';
@@ -1266,20 +1697,33 @@
         ? 'detail-change-count detail-change-zero'
         : 'detail-change-count detail-deletions';
       deletionsElement.textContent = `−${changeFile.deletions}`;
-      ratioElement.className = 'detail-ratio';
+      ratioElement.className = 'detail-card-ratio';
       additionsBarElement.className = 'detail-ratio-additions';
       additionsBarElement.style.flex = String(Math.max(changeFile.additions, 1));
       deletionsBarElement.className = 'detail-ratio-deletions';
       deletionsBarElement.style.flex = String(Math.max(changeFile.deletions, 1));
-      ratioElement.append(additionsBarElement, deletionsBarElement);
-      rowElement.append(
+      remainderBarElement.className = 'detail-ratio-remainder';
+      remainderBarElement.style.flex = String(
+        Math.max(changeFile.additions + changeFile.deletions, 1)
+      );
+      ratioElement.append(additionsBarElement, deletionsBarElement, remainderBarElement);
+      metaElement.className = 'detail-file-meta';
+      if (changeFile.status === 'D') {
+        metaElement.textContent = importerCount > 0
+          ? `deleted · ${importerCount} files still import this`
+          : 'deleted';
+        if (importerCount > 0) metaElement.classList.add('detail-file-warning');
+      } else {
+        metaElement.textContent = `imported by ${importerCount} files`;
+      }
+      primaryElement.append(
         badgeElement,
         fileElement,
         additionsElement,
-        deletionsElement,
-        ratioElement
+        deletionsElement
       );
-      detailBodyElement.append(rowElement);
+      cardElement.append(primaryElement, ratioElement, metaElement);
+      detailContentElement.append(cardElement);
     };
 
     const appendSectionFile = (node) => {
@@ -1292,65 +1736,144 @@
       locElement.className = 'detail-loc';
       locElement.textContent = `${node.loc} loc`;
       rowElement.append(fileElement, locElement);
-      detailBodyElement.append(rowElement);
+      detailContentElement.append(rowElement);
     };
 
     const appendDetailEmptyState = (message) => {
       const emptyElement = document.createElement('div');
       emptyElement.className = 'detail-empty';
       emptyElement.textContent = message;
-      detailBodyElement.append(emptyElement);
+      detailContentElement.append(emptyElement);
     };
 
-    const renderDownstream = (section) => {
-      downstreamChipsElement.replaceChildren();
-      const hasDownstreamData = Array.isArray(section.downstream);
-      downstreamSectionElement.hidden = !hasDownstreamData;
-      if (!hasDownstreamData) return;
-      downstreamLabelElement.textContent = `DOWNSTREAM · ${section.downstreamTotal}`;
-      for (const downstream of section.downstream) {
-        const chipElement = document.createElement('span');
-        chipElement.className = 'downstream-chip';
-        chipElement.textContent = `${downstream.id} · ${downstream.count}`;
-        downstreamChipsElement.append(chipElement);
+    const appendPathRow = (filePath, dotClass) => {
+      const rowElement = document.createElement('div');
+      const dotElement = document.createElement('span');
+      const pathElement = document.createElement('span');
+      rowElement.className = 'path-row';
+      dotElement.className = `path-dot ${dotClass}`;
+      pathElement.textContent = filePath;
+      rowElement.append(dotElement, pathElement);
+      detailContentElement.append(rowElement);
+    };
+
+    const renderOverview = () => {
+      inspectorOverviewElement.hidden = false;
+      inspectorDetailElement.hidden = true;
+      changedSectionsElement.replaceChildren();
+      changedSectionsBlockElement.hidden = !diffMode;
+      if (!diffMode) return;
+      const changedSections = activeAggregate().sections
+        .filter((section) => section.changedCount > 0)
+        .sort((firstSection, secondSection) =>
+          secondSection.changedCount - firstSection.changedCount ||
+          firstSection.id.localeCompare(secondSection.id)
+        );
+      for (const section of changedSections) {
+        const rowButton = document.createElement('button');
+        const dotElement = document.createElement('span');
+        const idElement = document.createElement('span');
+        const countElement = document.createElement('span');
+        rowButton.className = 'changed-section-row';
+        rowButton.type = 'button';
+        dotElement.className = 'changed-section-dot';
+        dotElement.style.background = STATUS_COLORS[section.status] || MUTED_COLOR;
+        idElement.className = 'changed-section-id';
+        idElement.textContent = section.id;
+        countElement.className = 'changed-section-count';
+        countElement.textContent = String(section.changedCount);
+        rowButton.append(dotElement, idElement, countElement);
+        rowButton.addEventListener('click', () => selectSection(section));
+        changedSectionsElement.append(rowButton);
       }
     };
 
-    const openSectionDetail = (section) => {
-      selectedSection = section;
-      detailTitleElement.textContent = section.id;
-      const statusColor = STATUS_COLORS[section.status] || MUTED_COLOR;
-      detailStatusDotElement.style.background = statusColor;
-      detailStatusDotElement.style.boxShadow = `0 0 12px 3px ${statusColor}80`;
-      detailStatsElement.replaceChildren();
-      detailBodyElement.replaceChildren();
-      filesSectionLabelElement.textContent = 'FILES';
-      if (diffMode) {
-        appendDetailStat(section.changedCount, 'files changed');
-        appendDetailStat(`+${section.additions}`, 'added', 'detail-stat-additions');
-        appendDetailStat(`−${section.deletions}`, 'removed', 'detail-stat-deletions');
-        appendDetailStat(
-          section.downstreamTotal || 0,
-          'blast',
-          'detail-stat-downstream'
-        );
-        const changedFiles = payload.changes.files.filter(
-          (changeFile) => changeMatchesSection(changeFile, section)
-        );
+    const renderDiffTabContent = (section) => {
+      detailContentElement.replaceChildren();
+      if (selectedInspectorTab === 'files') {
+        const changedFiles = changedFilesFor(section);
         if (changedFiles.length === 0) {
           appendDetailEmptyState('no changed files here');
         } else {
           for (const changeFile of changedFiles) appendChangedFile(changeFile, section);
         }
+        return;
+      }
+      if (selectedInspectorTab === 'dependents') {
+        const downstreamFiles = Array.isArray(section.downstreamFiles)
+          ? section.downstreamFiles
+          : [];
+        if (downstreamFiles.length === 0) {
+          appendDetailEmptyState('no downstream files');
+        } else {
+          for (const filePath of downstreamFiles) {
+            appendPathRow(filePath, 'path-dot-dependent');
+          }
+        }
+        const hiddenCount = Math.max((section.downstreamTotal || 0) - downstreamFiles.length, 0);
+        if (hiddenCount > 0) {
+          const footerElement = document.createElement('div');
+          footerElement.className = 'path-footer';
+          footerElement.textContent = `+ ${hiddenCount} more`;
+          detailContentElement.append(footerElement);
+        }
+        return;
+      }
+      const importedFiles = importedFilesFor(section);
+      if (importedFiles.length === 0) {
+        appendDetailEmptyState('no cross-section imports');
+      } else {
+        for (const filePath of importedFiles) appendPathRow(filePath, 'path-dot-import');
+      }
+    };
+
+    const renderInspectorTabs = (section) => {
+      const tabDefinitions = [
+        { id: 'files', label: 'Files', count: changedFilesFor(section).length },
+        { id: 'dependents', label: 'Dependents', count: section.downstreamTotal || 0 },
+        { id: 'imports', label: 'Imports', count: importedFilesFor(section).length },
+      ];
+      inspectorTabsElement.replaceChildren();
+      inspectorTabsElement.hidden = false;
+      for (const tabDefinition of tabDefinitions) {
+        const tabButton = document.createElement('button');
+        const countElement = document.createElement('span');
+        tabButton.className = 'inspector-tab';
+        tabButton.type = 'button';
+        tabButton.classList.toggle('active', tabDefinition.id === selectedInspectorTab);
+        tabButton.append(`${tabDefinition.label} `);
+        countElement.className = 'inspector-tab-count';
+        countElement.textContent = String(tabDefinition.count);
+        tabButton.append(countElement);
+        tabButton.addEventListener('click', () => {
+          selectedInspectorTab = tabDefinition.id;
+          renderInspector();
+        });
+        inspectorTabsElement.append(tabButton);
+      }
+    };
+
+    const renderInspectorDetail = (section) => {
+      inspectorOverviewElement.hidden = true;
+      inspectorDetailElement.hidden = false;
+      detailTitleElement.textContent = section.id;
+      const statusColor = STATUS_COLORS[section.status] || MUTED_COLOR;
+      detailStatusDotElement.style.background = statusColor;
+      detailStatusDotElement.style.boxShadow = `0 0 12px 3px ${statusColor}80`;
+      detailStatsElement.replaceChildren();
+      if (diffMode) {
+        appendDetailStat(section.changedCount, 'files changed', 'detail-stat-changed');
+        appendDetailStat(section.downstreamTotal || 0, 'blast radius', 'detail-stat-blast');
+        appendDetailStat(section.additions + section.deletions, 'lines touched');
+        renderInspectorTabs(section);
+        renderDiffTabContent(section);
       } else {
         appendDetailStat(section.fileCount, 'files');
         appendDetailStat(section.loc, 'loc');
-        const sectionFiles = payload.graph.nodes
-          .filter((node) => {
-            if (compactnessLevel === 1) return node.rootGroup === section.id;
-            if (compactnessLevel === 2) return node.group === section.id;
-            return node.section === section.id;
-          })
+        inspectorTabsElement.hidden = true;
+        inspectorTabsElement.replaceChildren();
+        detailContentElement.replaceChildren();
+        const sectionFiles = sectionFilesFor(section)
           .sort((firstNode, secondNode) => secondNode.loc - firstNode.loc)
           .slice(0, 10);
         if (sectionFiles.length === 0) {
@@ -1359,16 +1882,22 @@
           for (const node of sectionFiles) appendSectionFile(node);
         }
       }
-      renderDownstream(section);
       const pullRequest = payload.context?.pullRequest;
       if (pullRequest) {
-        openPrElement.textContent = `Open PR #${pullRequest.number} ↗`;
+        openPrElement.textContent = `Review in PR #${pullRequest.number} ↗`;
         openPrElement.setAttribute('href', String(pullRequest.url));
         openPrElement.hidden = false;
       } else {
         openPrElement.hidden = true;
       }
-      detailPanelElement.hidden = false;
+    };
+
+    const renderInspector = () => {
+      if (selectedSection === null) {
+        renderOverview();
+      } else {
+        renderInspectorDetail(selectedSection);
+      }
     };
 
     const rebuildSectionLabels = () => {
@@ -1693,17 +2222,15 @@
     const showView = (view) => {
       currentView = view;
       selectedNode = null;
+      selectedSection = null;
+      selectedInspectorTab = 'files';
       clearSelectionDisplacement();
-      closeDetailPanel();
       for (const viewButton of viewButtons) {
         viewButton.classList.toggle('active', viewButton.dataset.view === view);
       }
       labelsElement.hidden = !isAggregatedView() || viewDimension !== '3d';
       compactnessSettingElement.hidden = !isAggregatedView();
       filesControlsElement.hidden = isAggregatedView();
-      hintElement.textContent = isAggregatedView()
-        ? 'drag rotate · scroll zoom · click ball = files'
-        : 'drag rotate · scroll zoom · click node = focus';
       compactnessLevelElement.textContent = { 1: 'roots', 2: 'groups', 3: 'dirs' }[compactnessLevel];
       if (isAggregatedView()) {
         const aggregate = activeAggregate();
@@ -1726,6 +2253,7 @@
         activeGraph().d3Force('link').distance(35);
       }
       updateSectionLabelLoop();
+      renderInspector();
       activeGraph().zoomToFit(600);
       pendingFitAfterStop = true;
     };
@@ -1748,7 +2276,7 @@
 
     const applySelectionDisplacement = (originNode) => {
       clearSelectionDisplacement();
-      const pushRadius = isAggregatedView() ? 180 : 90;
+      const pushRadius = isAggregatedView() ? AGGREGATE_PUSH_RADIUS : 90;
       const maxPush = 26;
       for (const graphNode of activeGraph().graphData().nodes) {
         if (graphNode === originNode) continue;
@@ -1778,16 +2306,38 @@
       activeGraph().graphData(activeGraph().graphData());
     };
 
+    const deselectSelection = () => {
+      selectedNode = null;
+      selectedSection = null;
+      selectedInspectorTab = 'files';
+      clearSelectionDisplacement();
+      activeGraph().nodeColor(nodeColorFor);
+      renderInspector();
+    };
+
+    const selectSection = (section) => {
+      selectedNode = section;
+      selectedSection = section;
+      selectedInspectorTab = 'files';
+      applySelectionDisplacement(section);
+      activeGraph().nodeColor(nodeColorFor);
+      renderInspector();
+    };
+
     const handleNodeClick = (node) => {
       const isDeselecting = selectedNode === node;
-      selectedNode = isDeselecting ? null : node;
       if (isDeselecting) {
-        clearSelectionDisplacement();
+        deselectSelection();
       } else {
-        applySelectionDisplacement(node);
         if (isAggregatedView()) {
-          openSectionDetail(node);
-        } else if (viewDimension === '2d') {
+          selectSection(node);
+          return;
+        }
+        selectedNode = node;
+        selectedSection = null;
+        applySelectionDisplacement(node);
+        renderInspector();
+        if (viewDimension === '2d') {
           graph2dInstance.centerAt(node.x, node.y, 800);
           graph2dInstance.zoom(Math.max(graph2dInstance.zoom(), 4), 800);
         } else {
@@ -1800,22 +2350,40 @@
             800
           );
         }
+        activeGraph().nodeColor(nodeColorFor);
       }
-      activeGraph().nodeColor(nodeColorFor);
     };
 
     const handleBackgroundClick = () => {
-      if (selectedNode === null) return;
-      selectedNode = null;
-      clearSelectionDisplacement();
-      activeGraph().nodeColor(nodeColorFor);
+      if (selectedNode === null && selectedSection === null) return;
+      deselectSelection();
     };
 
     repoNameElement.textContent = payload.repoName;
-    metaElement.textContent = `${payload.graph.stats.fileCount} files · ${payload.graph.stats.linkCount} imports`;
+    overviewMetaElement.textContent =
+      `${payload.graph.stats.fileCount} files · ${payload.graph.stats.linkCount} imports`;
     renderContext();
     impactOption.hidden = !diffMode;
     renderLegend();
+
+    const drawSpacedCanvasText = (
+      canvasContext,
+      labelText,
+      centerX,
+      baselineY,
+      characterSpacing
+    ) => {
+      const characters = [...labelText];
+      const textWidth = characters.reduce(
+        (totalWidth, character) => totalWidth + canvasContext.measureText(character).width,
+        0
+      ) + characterSpacing * Math.max(characters.length - 1, 0);
+      let cursorX = centerX - textWidth / 2;
+      for (const character of characters) {
+        canvasContext.fillText(character, cursorX, baselineY);
+        cursorX += canvasContext.measureText(character).width + characterSpacing;
+      }
+    };
 
     const graphInstance = ForceGraph3D()(document.getElementById('graph'))
       .backgroundColor('rgba(18,20,42,0)')
@@ -1849,6 +2417,41 @@
       .linkWidth(linkWidthFor)
       .linkDirectionalParticles(particleCountFor)
       .linkDirectionalParticleWidth(1.4)
+      .onRenderFramePre((canvasContext, globalScale) => {
+        if (
+          viewDimension !== '2d' ||
+          !isAggregatedView() ||
+          selectedSection === null ||
+          (selectedSection.downstreamTotal || 0) === 0 ||
+          selectedSection.x === undefined ||
+          selectedSection.y === undefined
+        ) return;
+        canvasContext.save();
+        canvasContext.beginPath();
+        canvasContext.setLineDash([6 / globalScale, 5 / globalScale]);
+        canvasContext.strokeStyle = 'rgba(240,138,75,.35)';
+        canvasContext.lineWidth = 1 / globalScale;
+        canvasContext.arc(
+          selectedSection.x,
+          selectedSection.y,
+          AGGREGATE_PUSH_RADIUS,
+          0,
+          Math.PI * 2
+        );
+        canvasContext.stroke();
+        canvasContext.setLineDash([]);
+        canvasContext.font = `500 ${10.5 / globalScale}px "IBM Plex Mono", monospace`;
+        canvasContext.fillStyle = 'rgba(240,138,75,.6)';
+        canvasContext.textAlign = 'left';
+        drawSpacedCanvasText(
+          canvasContext,
+          `BLAST RADIUS · ${selectedSection.downstreamTotal} files`,
+          selectedSection.x,
+          selectedSection.y + AGGREGATE_PUSH_RADIUS + 18 / globalScale,
+          .6 / globalScale
+        );
+        canvasContext.restore();
+      })
       .nodeCanvasObjectMode(() => 'after')
       .nodeCanvasObject((node, canvasContext, globalScale) => {
         if (node.fileCount === undefined) return;
@@ -1856,7 +2459,7 @@
         const labelText = isHub ? node.id : node.id.split('/').at(-1);
         const fontSize = 12 / globalScale;
         const verticalOffset = Math.sqrt(nodeValueFor(node)) * 4 / globalScale + 12 / globalScale;
-        canvasContext.font = `${isHub ? 600 : 500} ${fontSize}px "Inter Tight", system-ui, sans-serif`;
+        canvasContext.font = `${isHub ? 600 : 500} ${fontSize}px "Inter", system-ui, sans-serif`;
         canvasContext.fillStyle = isHub ? '#ffffff' : 'rgba(255,255,255,.72)';
         canvasContext.textAlign = 'center';
         canvasContext.shadowColor = 'rgba(0,0,0,.9)';
@@ -1881,6 +2484,14 @@
         pan2dY = transformY;
       });
 
+    const resizeGraphArea = () => {
+      const graphAreaWidth = window.innerWidth - 60 - 452;
+      const graphAreaHeight = window.innerHeight - 64;
+      graphInstance.width(graphAreaWidth).height(graphAreaHeight);
+      graph2dInstance.width(graphAreaWidth).height(graphAreaHeight);
+    };
+    resizeGraphArea();
+
     const activeGraph = () => viewDimension === '2d' ? graph2dInstance : graphInstance;
 
     const setViewDimension = (dimension) => {
@@ -1891,12 +2502,7 @@
       } catch (storageError) {}
       graphElement.hidden = viewDimension !== '3d';
       graph2dElement.hidden = viewDimension !== '2d';
-      for (const dimensionButton of dimensionButtons) {
-        dimensionButton.classList.toggle(
-          'active',
-          dimensionButton.dataset.dimension === viewDimension
-        );
-      }
+      dimensionButton.classList.toggle('active', viewDimension === '2d');
       showView(currentView);
       updateSectionLabelLoop();
     };
@@ -1915,12 +2521,15 @@
     for (const themeButton of themeButtons) {
       themeButton.addEventListener('click', () => setBackgroundTheme(themeButton.dataset.theme));
     }
-    for (const dimensionButton of dimensionButtons) {
-      dimensionButton.addEventListener(
-        'click',
-        () => setViewDimension(dimensionButton.dataset.dimension)
-      );
-    }
+    dimensionButton.addEventListener('click', () => {
+      setViewDimension(viewDimension === '2d' ? '3d' : '2d');
+    });
+    helpButton.addEventListener('click', () => {
+      helpPopoverElement.hidden = !helpPopoverElement.hidden;
+    });
+    helpPopoverElement.addEventListener('click', () => {
+      helpPopoverElement.hidden = true;
+    });
     searchInput.addEventListener('input', () => {
       filterState.searchTerm = searchInput.value.toLowerCase();
       activeGraph().nodeColor(nodeColorFor);
@@ -1932,7 +2541,20 @@
       renderAggregateFilter();
       refreshFilesView();
     });
-    detailCloseButton.addEventListener('click', closeDetailPanel);
+    detailCloseButton.addEventListener('click', deselectSelection);
+    copyPathsButton.addEventListener('click', async () => {
+      if (selectedSection === null) return;
+      const sectionPaths = changedFilesFor(selectedSection).map(
+        (changeFile) => changeFile.path
+      );
+      try {
+        await navigator.clipboard.writeText(sectionPaths.join('\n'));
+        copyPathsButton.textContent = 'Copied';
+        window.setTimeout(() => {
+          copyPathsButton.textContent = 'Copy paths';
+        }, 1500);
+      } catch (clipboardError) {}
+    });
     openFilesButton.addEventListener('click', () => {
       if (selectedSection === null) return;
       aggregateFilter = {
@@ -1941,12 +2563,14 @@
       };
       impactOnlyInput.checked = true;
       renderAggregateFilter();
-      closeDetailPanel();
       showView('files');
     });
 
     resizeStarsCanvas();
-    window.addEventListener('resize', resizeStarsCanvas);
+    window.addEventListener('resize', () => {
+      resizeStarsCanvas();
+      resizeGraphArea();
+    });
 
     renderAggregateFilter();
     setBackgroundTheme(backgroundTheme);
