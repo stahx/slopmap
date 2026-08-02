@@ -24,6 +24,7 @@ declare module 'vue' {
     LegendList: typeof import('./../../src/components/LegendList.vue')['default']
     RatioBar: typeof import('./../../src/components/RatioBar.vue')['default']
     SectionLabels: typeof import('./../../src/components/SectionLabels.vue')['default']
+    StarfieldCanvas: typeof import('./../../src/components/StarfieldCanvas.vue')['default']
     ThemeToggle: typeof import('./../../src/components/ThemeToggle.vue')['default']
     TopHeader: typeof import('./../../src/components/TopHeader.vue')['default']
   }

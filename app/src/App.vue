@@ -28,6 +28,7 @@ const handleSectionSelect = (section) => {
     :data-theme="theme"
     data-test="slopmap-app"
   >
+    <StarfieldCanvas />
     <IconRail />
     <TopHeader />
     <GraphStage />

@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import { azimuthDelta, wrapCoordinate } from './starfieldMath.js';
+import { azimuthDelta, wrapCoordinate, wrapPosition } from './starfieldMath.js';
 
 describe('app/src/lib/starfieldMath', () => {
   test('wrapCoordinate', () => {
@@ -8,6 +8,11 @@ describe('app/src/lib/starfieldMath', () => {
     expect(wrapCoordinate(110, 100)).toBe(10);
     expect(wrapCoordinate(-10.4, 100)).toBe(90);
     expect(wrapCoordinate(110.6, 100)).toBe(11);
+  });
+
+  test('wrapPosition', () => {
+    expect(wrapPosition(-10.4, 100)).toBeCloseTo(89.6);
+    expect(wrapPosition(110.6, 100)).toBeCloseTo(10.6);
   });
 
   test('azimuthDelta', () => {
