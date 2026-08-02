@@ -8,7 +8,7 @@
     <div class="overview-body min-h-0 flex-[1_1_auto] overflow-y-auto px-5 py-[18px]">
       <div class="distribution flex flex-col gap-3">
         <DistributionBar v-if="diffMode && stats" :stats="stats" />
-        <LegendList :rows="legendRows" />
+        <InspectorRowList :rows="legendRows" @select="selectLegendRow" />
         <div class="overview-meta text-[11px] leading-[1.35] text-ink/35">
           {{ overviewMeta }}
         </div>
@@ -44,30 +44,40 @@ const legendRows = computed(() => {
   if (diffMode.value) {
     return [
       {
+        key: 'changed',
         color: STATUS_COLORS.changed,
         label: 'Changed',
         count: stats.value?.changedCount ?? 0,
+        selectable: false,
       },
       {
+        key: 'dependent',
         color: STATUS_COLORS.dependent,
         label: 'Blast radius',
         count: stats.value?.dependentCount ?? 0,
+        selectable: false,
       },
       {
+        key: 'dependency',
         color: STATUS_COLORS.dependency,
         label: 'Change depends on',
         count: stats.value?.dependencyCount ?? 0,
+        selectable: false,
       },
       {
+        key: 'normal',
         color: MUTED_COLOR,
         label: 'Untouched',
         count: untouchedCount.value,
+        selectable: false,
+        dimmed: true,
       },
     ];
   }
 
   const groups = payload.value?.graph?.groups ?? [];
   const rows = groups.slice(0, GROUP_COLORS.length).map((group, slotIndex) => ({
+    key: group.name,
     color: GROUP_COLORS[slotIndex],
     label: group.name,
     count: group.count,
@@ -77,9 +87,11 @@ const legendRows = computed(() => {
       .slice(GROUP_COLORS.length)
       .reduce((totalCount, group) => totalCount + group.count, 0);
     rows.push({
+      key: 'other',
       color: MUTED_COLOR,
       label: 'other',
       count: `(${otherCount})`,
+      selectable: false,
     });
   }
   return rows;
@@ -87,4 +99,8 @@ const legendRows = computed(() => {
 const overviewMeta = computed(
   () => `${stats.value?.fileCount ?? 0} files · ${stats.value?.linkCount ?? 0} imports`,
 );
+
+const selectLegendRow = (row) => {
+  emit('select', { sectionId: row.key, level: 2 });
+};
 </script>

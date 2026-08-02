@@ -6,6 +6,7 @@ const endpointId = (endpoint) =>
 export const buildPayloadIndex = (graph) => {
   const importerCountsByTarget = new Map();
   const importedTargetsBySource = new Map();
+  const importerIdsByTarget = new Map();
   const groupColors = new Map(
     graph.groups
       .slice(0, GROUP_COLORS.length)
@@ -20,7 +21,16 @@ export const buildPayloadIndex = (graph) => {
       importedTargetsBySource.set(sourceId, new Set());
     }
     importedTargetsBySource.get(sourceId).add(targetId);
+    if (!importerIdsByTarget.has(targetId)) {
+      importerIdsByTarget.set(targetId, new Set());
+    }
+    importerIdsByTarget.get(targetId).add(sourceId);
   }
 
-  return { importerCountsByTarget, importedTargetsBySource, groupColors };
+  return {
+    importerCountsByTarget,
+    importedTargetsBySource,
+    importerIdsByTarget,
+    groupColors,
+  };
 };

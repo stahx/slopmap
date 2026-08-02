@@ -42,6 +42,7 @@ const {
   hideIsolated,
   isAggregatedView,
   activeAggregate,
+  showView,
 } = useViewState();
 const { selectedNode, selectedSection, toggleNode, deselect, setGraphHooks } = useSelection();
 const { mapWidth, mapHeight, disconnect } = useMapArea();
@@ -51,6 +52,8 @@ let graph2dInstance = null;
 let cameraBounds = null;
 let groupColors = new Map();
 let pendingFitAfterStop = false;
+let pendingSectionClickId = null;
+let pendingSectionClickDimension = null;
 let snappingBack = false;
 let snapBackTimeoutId = null;
 let graphFrameId = null;
@@ -331,6 +334,19 @@ const restartLabelLoop = () => {
   labelLoopVersion.value += 1;
 };
 
+const consumePendingSectionClickAfterStop = (stoppedDimension) => {
+  if (pendingSectionClickId === null || pendingSectionClickDimension !== stoppedDimension) {
+    return;
+  }
+  const sectionId = pendingSectionClickId;
+  pendingSectionClickId = null;
+  pendingSectionClickDimension = null;
+  const section = activeAggregate.value?.sections.find(
+    (aggregateSection) => aggregateSection.id === sectionId,
+  );
+  if (section !== undefined && Number.isFinite(section.x)) handleNodeClick(section);
+};
+
 const pin3dNodes = () => {
   if (graph3dInstance === null) return;
   for (const node of graph3dInstance.graphData().nodes) {
@@ -343,6 +359,7 @@ const pin3dNodes = () => {
     pendingFitAfterStop = false;
     graph3dInstance.zoomToFit(600);
   }
+  consumePendingSectionClickAfterStop('3d');
 };
 
 const pin2dNodes = () => {
@@ -356,6 +373,7 @@ const pin2dNodes = () => {
     pendingFitAfterStop = false;
     graph2dInstance.zoomToFit(600);
   }
+  consumePendingSectionClickAfterStop('2d');
 };
 
 const drawSpacedCanvasText = (canvasContext, labelText, centerX, baselineY, characterSpacing) => {
@@ -544,6 +562,10 @@ const refreshFilesGraph = () => {
 };
 
 const applyView = () => {
+  const requestedSectionClickId =
+    pendingSectionClickDimension === null ? pendingSectionClickId : null;
+  pendingSectionClickId = null;
+  pendingSectionClickDimension = null;
   clearGraph3dSelectionEffects();
   deselect();
   const graph = activeGraph();
@@ -574,6 +596,17 @@ const applyView = () => {
   const hasSettledCoordinates = graph.graphData().nodes.some((node) => Number.isFinite(node.x));
   if (hasSettledCoordinates) graph.zoomToFit(600);
   pendingFitAfterStop = true;
+  if (requestedSectionClickId === null) return;
+  const section = activeAggregate.value?.sections.find(
+    (aggregateSection) => aggregateSection.id === requestedSectionClickId,
+  );
+  if (section === undefined) return;
+  if (Number.isFinite(section.x)) {
+    handleNodeClick(section);
+    return;
+  }
+  pendingSectionClickId = requestedSectionClickId;
+  pendingSectionClickDimension = dimension.value;
 };
 
 const registerWatchers = () => {
@@ -647,6 +680,8 @@ const destroyGraphInstances = () => {
   graph2dInstance = null;
   graph3dHostElement = null;
   cameraBounds = null;
+  pendingSectionClickId = null;
+  pendingSectionClickDimension = null;
   snappingBack = false;
   if (snapBackTimeoutId !== null) {
     globalThis.clearTimeout(snapBackTimeoutId);
@@ -663,6 +698,22 @@ const destroyGraphInstances = () => {
 
 export const getGraph3dInstance = () => graph3dInstance;
 export const graphLabelLoopVersion = labelLoopVersion;
+export const triggerSectionClick = (sectionId, level) => {
+  pendingSectionClickId = null;
+  pendingSectionClickDimension = null;
+  const viewChanged = currentView.value !== 'compact';
+  const levelChanged = compactnessLevel.value !== level;
+  if (viewChanged) showView('compact');
+  if (levelChanged) compactnessLevel.value = level;
+  if (viewChanged || levelChanged) {
+    pendingSectionClickId = sectionId;
+    return;
+  }
+  const section = activeAggregate.value?.sections.find(
+    (aggregateSection) => aggregateSection.id === sectionId,
+  );
+  if (section !== undefined) handleNodeClick(section);
+};
 export const registerGraphFrameCallback = (graphFrameCallback) => {
   graphFrameCallbacks.add(graphFrameCallback);
   return () => graphFrameCallbacks.delete(graphFrameCallback);
@@ -674,6 +725,7 @@ export const useGraphInstances = () => {
     createGraphInstances,
     applyView,
     getGraph3dInstance,
+    triggerSectionClick,
     labelLoopVersion,
     parallaxSource,
   };

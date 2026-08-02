@@ -22,6 +22,14 @@
       </div>
       <DetailStatTiles :section="activeSection" :diff-mode="diffMode" />
     </div>
+    <div v-if="childSections.length > 0" class="detail-directories flex-[0_0_auto] px-3 pb-4">
+      <div
+        class="detail-directories-label mb-2 px-2 font-mono text-[10.5px] tracking-[0.08em] text-ink/35"
+      >
+        DIRECTORIES
+      </div>
+      <InspectorRowList :rows="childSectionRows" @select="selectChildSection" />
+    </div>
     <InspectorTabs v-if="diffMode" v-model:tab="selectedTab" :counts="tabCounts" />
     <div class="detail-content min-h-0 flex-[1_1_auto] overflow-y-auto px-2 py-1.5">
       <template v-if="diffMode && selectedTab === 'files'">
@@ -41,6 +49,7 @@
           :key="filePath"
           :path="filePath"
           variant="dependents"
+          @select="openFile"
         />
         <EmptyState v-if="dependentFiles.length === 0" message="no downstream files" />
         <PathRow
@@ -55,15 +64,12 @@
           :key="filePath"
           :path="filePath"
           variant="imports"
+          @select="openFile"
         />
         <EmptyState v-if="importedFiles.length === 0" message="no cross-section imports" />
       </template>
       <template v-else>
-        <SectionFileRow
-          v-for="sectionFile in sectionFiles"
-          :key="sectionFile.id"
-          :node="sectionFile"
-        />
+        <InspectorRowList :rows="sectionFileRows" @select="selectFileRow" />
         <EmptyState v-if="sectionFiles.length === 0" message="no files here" />
       </template>
     </div>
@@ -74,35 +80,52 @@
       @isolate="isolateBlast"
     />
   </div>
-  <DiffModal v-if="diffFile" :change-file="diffFile" @close="closeDiff" />
+  <DiffModal
+    v-if="openedFile?.kind === 'diff'"
+    :change-file="openedFile.changeFile"
+    @close="closeFile"
+  />
+  <FileInfoModal
+    v-else-if="openedFile?.kind === 'info'"
+    :node="openedFile.node"
+    @close="closeFile"
+  />
 </template>
 
 <script setup>
-import { computed, shallowRef } from 'vue';
+import { computed } from 'vue';
 
+import { triggerSectionClick } from '../../composables/useGraphInstances.js';
 import { useInspector } from '../../composables/useInspector.js';
 import { usePayload } from '../../composables/usePayload.js';
 import { useSelection } from '../../composables/useSelection.js';
+import { useSettings } from '../../composables/useSettings.js';
 import { MUTED_COLOR, STATUS_COLORS } from '../../lib/graphTokens.js';
+import { displayPathFor } from '../../lib/sections.js';
 
 const { context, diffMode } = usePayload();
 const { deselect } = useSelection();
+const { compactnessLevel } = useSettings();
 const {
   activeSection,
   selectedTab,
   copied,
   changedFiles,
+  childSections,
   dependentFiles,
   dependentHiddenCount,
   importedFiles,
   sectionFiles,
   tabCounts,
   importerCountsByTarget,
+  groupColors,
+  openedFile,
+  openFile,
+  openDiff,
+  closeFile,
   copyPaths,
   isolateBlast,
 } = useInspector();
-
-const diffFile = shallowRef(null);
 
 const statusStyle = computed(() => {
   const statusColor = STATUS_COLORS[activeSection.value?.status] ?? MUTED_COLOR;
@@ -111,12 +134,28 @@ const statusStyle = computed(() => {
     boxShadow: `0 0 12px 3px ${statusColor}80`,
   };
 });
+const childSectionRows = computed(() =>
+  childSections.value.map((section) => ({
+    key: section.id,
+    label: displayPathFor(section.id, activeSection.value.id),
+    color: MUTED_COLOR,
+    count: section.fileCount,
+  })),
+);
+const sectionFileRows = computed(() =>
+  sectionFiles.value.map((node) => ({
+    key: node.id,
+    label: node.id,
+    color: groupColors.value.get(node.group) ?? MUTED_COLOR,
+    meta: `${node.loc} loc`,
+  })),
+);
 
 const importerCountFor = (path) => importerCountsByTarget.value.get(path) ?? 0;
-const openDiff = (changeFile) => {
-  diffFile.value = changeFile;
+const selectChildSection = (row) => {
+  triggerSectionClick(row.key, compactnessLevel.value + 1);
 };
-const closeDiff = () => {
-  diffFile.value = null;
+const selectFileRow = (row) => {
+  openFile(row.key);
 };
 </script>

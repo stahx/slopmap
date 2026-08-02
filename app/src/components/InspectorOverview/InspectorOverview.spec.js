@@ -35,7 +35,7 @@ describe('app/src/components/InspectorOverview', () => {
         stubs: {
           ChangedSectionsList: true,
           DistributionBar: true,
-          LegendList: true,
+          InspectorRowList: true,
         },
       },
     });
@@ -43,5 +43,21 @@ describe('app/src/components/InspectorOverview', () => {
     expect(wrapper.exists()).toBe(true);
     expect(wrapper.text()).toContain('overview');
     expect(wrapper.text()).toContain('1 files · 0 imports');
+  });
+
+  test('emits level-two selection for a group row', () => {
+    const wrapper = shallowMount(InspectorOverview, {
+      global: {
+        stubs: {
+          ChangedSectionsList: true,
+          DistributionBar: true,
+          InspectorRowList: true,
+        },
+      },
+    });
+
+    wrapper.findComponent({ name: 'InspectorRowList' }).vm.$emit('select', { key: 'src' });
+
+    expect(wrapper.emitted('select')).toEqual([[{ sectionId: 'src', level: 2 }]]);
   });
 });

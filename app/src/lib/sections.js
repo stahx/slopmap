@@ -29,6 +29,19 @@ export const sectionFilesFor = (nodes, section, level) =>
     .sort((firstNode, secondNode) => secondNode.loc - firstNode.loc)
     .slice(0, 10);
 
+export const childSectionsFor = (childLevelSections, parentSection) => {
+  if (parentSection === null || parentSection === undefined) return [];
+  const childPrefix = `${parentSection.id}/`;
+  return childLevelSections
+    .filter((section) => section.id.startsWith(childPrefix))
+    .slice()
+    .sort(
+      (firstSection, secondSection) =>
+        secondSection.fileCount - firstSection.fileCount ||
+        firstSection.id.localeCompare(secondSection.id),
+    );
+};
+
 export const importedFilesFor = (links, changedFileIds, section, level, nodeMatcher) => {
   const changedIds = new Set(changedFileIds);
   const importedIds = new Set();
