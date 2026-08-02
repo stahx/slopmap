@@ -1,5 +1,16 @@
 import ForceGraph3D from '3d-force-graph';
 import ForceGraph from 'force-graph';
+import {
+  BackSide,
+  BufferGeometry,
+  Group,
+  LineDashedMaterial,
+  LineLoop,
+  Mesh,
+  MeshBasicMaterial,
+  SphereGeometry,
+  Vector3,
+} from 'three';
 import { isProxy, onBeforeUnmount, ref, watch } from 'vue';
 
 import { clampToBounds, computeBounds, expandBounds } from '../lib/cameraBounds.js';
@@ -42,14 +53,25 @@ let groupColors = new Map();
 let pendingFitAfterStop = false;
 let snappingBack = false;
 let snapBackTimeoutId = null;
-let parallaxFrameId = null;
+let graphFrameId = null;
 let previousAzimuth = null;
 let accumulatedPan3dX = 0;
 let pan3dY = 0;
 let pan2dX = 0;
 let pan2dY = 0;
 let stopWatchers = [];
+let graph3dHostElement = null;
+let blastRingGroup = null;
+let blastRingLine = null;
+let blastLabelElement = null;
+let selectedNodeOutline = null;
+let outlinedNode = null;
+const graphFrameCallbacks = new Set();
 const labelLoopVersion = ref(0);
+
+const BLAST_LABEL_CLASSES =
+  'pointer-events-none absolute top-0 left-0 z-[3] whitespace-nowrap font-mono text-[10.5px] font-medium tracking-[0.06em] text-accent/60 [text-shadow:0_1px_3px_rgba(0,0,0,0.9)] [will-change:transform]';
+const BLAST_RING_SEGMENTS = 128;
 
 export const parallaxSource = {
   get pan3dX() {
@@ -87,6 +109,141 @@ const nodeLabelAccessor = (node) => nodeLabelFor(node, styleContext());
 const nodeValueAccessor = (node) => nodeValueFor(node, styleContext());
 
 const activeGraph = () => (dimension.value === '2d' ? graph2dInstance : graph3dInstance);
+
+const clearBlastRing = () => {
+  if (blastRingLine !== null) {
+    blastRingLine.geometry.dispose();
+    blastRingLine.material.dispose();
+    blastRingLine.parent?.remove(blastRingLine);
+    blastRingLine = null;
+  }
+  blastRingGroup?.parent?.remove(blastRingGroup);
+  blastRingGroup = null;
+  blastLabelElement?.remove();
+  blastLabelElement = null;
+};
+
+const clearSelectedNodeOutline = () => {
+  if (selectedNodeOutline !== null) {
+    selectedNodeOutline.geometry.dispose();
+    selectedNodeOutline.material.dispose();
+    selectedNodeOutline.parent?.remove(selectedNodeOutline);
+    selectedNodeOutline = null;
+  }
+  outlinedNode = null;
+};
+
+const clearGraph3dSelectionEffects = () => {
+  clearBlastRing();
+  clearSelectedNodeOutline();
+};
+
+const createBlastRing = () => {
+  if (graph3dInstance === null || graph3dHostElement === null) return;
+  const ringPoints = [];
+  for (let pointIndex = 0; pointIndex < BLAST_RING_SEGMENTS; pointIndex += 1) {
+    const angle = (pointIndex / BLAST_RING_SEGMENTS) * Math.PI * 2;
+    ringPoints.push(
+      new Vector3(
+        Math.cos(angle) * AGGREGATE_PUSH_RADIUS,
+        Math.sin(angle) * AGGREGATE_PUSH_RADIUS,
+        0,
+      ),
+    );
+  }
+  const ringGeometry = new BufferGeometry().setFromPoints(ringPoints);
+  const ringMaterial = new LineDashedMaterial({
+    color: 0xf08a4b,
+    dashSize: 8,
+    gapSize: 6,
+    opacity: 0.35,
+    transparent: true,
+    depthWrite: false,
+  });
+  blastRingLine = new LineLoop(ringGeometry, ringMaterial);
+  blastRingLine.computeLineDistances();
+  blastRingGroup = new Group();
+  blastRingGroup.add(blastRingLine);
+  graph3dInstance.scene().add(blastRingGroup);
+
+  blastLabelElement = globalThis.document.createElement('div');
+  blastLabelElement.className = BLAST_LABEL_CLASSES;
+  blastLabelElement.setAttribute('aria-hidden', 'true');
+  blastLabelElement.style.visibility = 'hidden';
+  const labelHostElement = graph3dHostElement.parentElement ?? graph3dHostElement;
+  labelHostElement.append(blastLabelElement);
+};
+
+const createSelectedNodeOutline = (node) => {
+  if (graph3dInstance === null) return;
+  const nodeRadius = Math.cbrt(nodeValueAccessor(node)) * 4;
+  selectedNodeOutline = new Mesh(
+    new SphereGeometry(nodeRadius * 1.25, 32, 20),
+    new MeshBasicMaterial({
+      color: 0xffffff,
+      opacity: 0.35,
+      side: BackSide,
+      transparent: true,
+      depthWrite: false,
+    }),
+  );
+  outlinedNode = node;
+  graph3dInstance.scene().add(selectedNodeOutline);
+};
+
+const has3dCoordinates = (node) =>
+  Number.isFinite(node.x) && Number.isFinite(node.y) && Number.isFinite(node.z);
+
+const syncGraph3dSelectionEffects = () => {
+  const node = selectedNode.value;
+  if (dimension.value !== '3d' || graph3dInstance === null || node === null) {
+    clearGraph3dSelectionEffects();
+    return;
+  }
+
+  if (outlinedNode !== node || selectedNodeOutline === null) {
+    clearSelectedNodeOutline();
+    createSelectedNodeOutline(node);
+  }
+  const coordinatesAreReady = has3dCoordinates(node);
+  if (selectedNodeOutline !== null) {
+    selectedNodeOutline.visible = coordinatesAreReady;
+    if (coordinatesAreReady) selectedNodeOutline.position.set(node.x, node.y, node.z);
+  }
+
+  const section = selectedSection.value;
+  if (
+    !isAggregatedView.value ||
+    section !== node ||
+    section === null ||
+    (section.downstreamTotal || 0) <= 0
+  ) {
+    clearBlastRing();
+    return;
+  }
+  if (blastRingGroup === null || blastLabelElement === null) createBlastRing();
+  if (blastRingGroup !== null) {
+    blastRingGroup.visible = coordinatesAreReady;
+    if (coordinatesAreReady) {
+      blastRingGroup.position.set(node.x, node.y, node.z);
+      blastRingGroup.quaternion.copy(graph3dInstance.camera().quaternion);
+    }
+  }
+  if (blastLabelElement === null) return;
+  if (!coordinatesAreReady) {
+    blastLabelElement.style.visibility = 'hidden';
+    return;
+  }
+  const labelText = `BLAST RADIUS · ${section.downstreamTotal} files`;
+  if (blastLabelElement.textContent !== labelText) blastLabelElement.textContent = labelText;
+  const screenCoordinates = graph3dInstance.graph2ScreenCoords(
+    node.x,
+    node.y - AGGREGATE_PUSH_RADIUS,
+    node.z,
+  );
+  blastLabelElement.style.visibility = 'visible';
+  blastLabelElement.style.transform = `translate(-50%, -100%) translate(${screenCoordinates.x}px, ${screenCoordinates.y}px)`;
+};
 
 const refreshCameraBounds = () => {
   const graph = activeGraph();
@@ -249,7 +406,25 @@ const renderBlastRing = (canvasContext, globalScale) => {
   canvasContext.restore();
 };
 
+const render2dSelectedNodeOutline = (node, canvasContext, globalScale) => {
+  if (node !== selectedNode.value) return;
+  canvasContext.save();
+  canvasContext.beginPath();
+  canvasContext.lineWidth = 2 / globalScale;
+  canvasContext.strokeStyle = 'rgba(255,255,255,.85)';
+  canvasContext.arc(
+    node.x,
+    node.y,
+    Math.sqrt(nodeValueAccessor(node)) * 4 + 3 / globalScale,
+    0,
+    Math.PI * 2,
+  );
+  canvasContext.stroke();
+  canvasContext.restore();
+};
+
 const render2dNodeLabel = (node, canvasContext, globalScale) => {
+  render2dSelectedNodeOutline(node, canvasContext, globalScale);
   if (node.fileCount === undefined) return;
   const isHub = compactnessLevel.value !== 3 || node.id === node.group;
   const labelText = isHub ? node.id : node.id.split('/').at(-1);
@@ -286,6 +461,7 @@ const focusFileNode = (node) => {
 const handleNodeClick = (node) => {
   const isDeselecting = selectedNode.value === node;
   toggleNode(node);
+  syncGraph3dSelectionEffects();
   if (isDeselecting || isAggregatedView.value) return;
   focusFileNode(node);
 };
@@ -293,9 +469,10 @@ const handleNodeClick = (node) => {
 const handleBackgroundClick = () => {
   if (selectedNode.value === null && selectedSection.value === null) return;
   deselect();
+  clearGraph3dSelectionEffects();
 };
 
-const captureParallax = () => {
+const renderGraphFrame = () => {
   if (dimension.value === '3d' && graph3dInstance?.camera()) {
     const cameraPosition = graph3dInstance.camera().position;
     const nextAzimuth = Math.atan2(cameraPosition.x, cameraPosition.z);
@@ -311,7 +488,9 @@ const captureParallax = () => {
     const fieldHeight = globalThis.innerHeight || mapHeight.value;
     pan3dY = (elevation / (Math.PI / 2)) * fieldHeight * 0.5;
   }
-  parallaxFrameId = globalThis.requestAnimationFrame(captureParallax);
+  syncGraph3dSelectionEffects();
+  for (const graphFrameCallback of graphFrameCallbacks) graphFrameCallback();
+  graphFrameId = globalThis.requestAnimationFrame(renderGraphFrame);
 };
 
 const clamp3dTarget = (controls) => {
@@ -365,6 +544,7 @@ const refreshFilesGraph = () => {
 };
 
 const applyView = () => {
+  clearGraph3dSelectionEffects();
   deselect();
   const graph = activeGraph();
   if (graph === null) return;
@@ -401,7 +581,10 @@ const registerWatchers = () => {
     watch(dimension, () => applyView()),
     watch([currentView, compactnessLevel], () => applyView()),
     watch([impactOnly, hideIsolated, aggregateFilter], () => refreshFilesGraph()),
-    watch([searchTerm, selectedNode], () => recolor()),
+    watch([searchTerm, selectedNode], () => {
+      recolor();
+      syncGraph3dSelectionEffects();
+    }),
     watch([mapWidth, mapHeight], ([width, height]) => resizeGraphs(width, height), {
       flush: 'post',
     }),
@@ -409,6 +592,7 @@ const registerWatchers = () => {
 };
 
 const createGraphInstances = (host3dElement, host2dElement) => {
+  graph3dHostElement = host3dElement;
   groupColors = buildPayloadIndex(payload.value.graph).groupColors;
   graph3dInstance = ForceGraph3D()(host3dElement)
     .backgroundColor('rgba(18,20,42,0)')
@@ -450,16 +634,18 @@ const createGraphInstances = (host3dElement, host2dElement) => {
     resizeGraphs(mapWidth.value, mapHeight.value);
   }
   registerWatchers();
-  parallaxFrameId = globalThis.requestAnimationFrame(captureParallax);
+  graphFrameId = globalThis.requestAnimationFrame(renderGraphFrame);
 };
 
 const destroyGraphInstances = () => {
   for (const stopWatcher of stopWatchers) stopWatcher();
   stopWatchers = [];
+  clearGraph3dSelectionEffects();
   graph3dInstance?._destructor?.();
   graph2dInstance?._destructor?.();
   graph3dInstance = null;
   graph2dInstance = null;
+  graph3dHostElement = null;
   cameraBounds = null;
   snappingBack = false;
   if (snapBackTimeoutId !== null) {
@@ -467,15 +653,20 @@ const destroyGraphInstances = () => {
     snapBackTimeoutId = null;
   }
   disconnect();
-  if (parallaxFrameId !== null) {
-    globalThis.cancelAnimationFrame(parallaxFrameId);
-    parallaxFrameId = null;
+  if (graphFrameId !== null) {
+    globalThis.cancelAnimationFrame(graphFrameId);
+    graphFrameId = null;
   }
+  graphFrameCallbacks.clear();
   setGraphHooks({ recolor: () => {}, repaint: () => {} });
 };
 
 export const getGraph3dInstance = () => graph3dInstance;
 export const graphLabelLoopVersion = labelLoopVersion;
+export const registerGraphFrameCallback = (graphFrameCallback) => {
+  graphFrameCallbacks.add(graphFrameCallback);
+  return () => graphFrameCallbacks.delete(graphFrameCallback);
+};
 
 export const useGraphInstances = () => {
   onBeforeUnmount(destroyGraphInstances);

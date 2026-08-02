@@ -54,6 +54,9 @@ importers:
       tailwindcss:
         specifier: ^4.3.3
         version: 4.3.3
+      three:
+        specifier: ^0.185.1
+        version: 0.185.1
       unplugin-auto-import:
         specifier: ^21.0.0
         version: 21.0.0
