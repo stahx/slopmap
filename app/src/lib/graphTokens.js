@@ -16,3 +16,5 @@ export const GROUP_COLORS = [
 ];
 
 export const MUTED_COLOR = '#8b8fa3';
+
+export const AGGREGATE_PUSH_RADIUS = 180;

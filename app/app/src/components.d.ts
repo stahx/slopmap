@@ -23,6 +23,7 @@ declare module 'vue' {
     InspectorPanel: typeof import('./../../src/components/InspectorPanel.vue')['default']
     LegendList: typeof import('./../../src/components/LegendList.vue')['default']
     RatioBar: typeof import('./../../src/components/RatioBar.vue')['default']
+    SectionLabels: typeof import('./../../src/components/SectionLabels.vue')['default']
     ThemeToggle: typeof import('./../../src/components/ThemeToggle.vue')['default']
     TopHeader: typeof import('./../../src/components/TopHeader.vue')['default']
   }

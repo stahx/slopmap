@@ -1,14 +1,13 @@
 import { computed, markRaw, shallowRef } from 'vue';
 
+import diffFixture from '../../fixtures/payload.diff.json';
+import fullFixture from '../../fixtures/payload.full.json';
+
 const payload = shallowRef(null);
 
-const loadDevelopmentFixture = async () => {
+const loadDevelopmentFixture = () => {
   const fixtureName = new URLSearchParams(location.search).get('fixture');
-  const fixtureModule =
-    fixtureName === 'diff'
-      ? await import('../../fixtures/payload.diff.json')
-      : await import('../../fixtures/payload.full.json');
-  return fixtureModule.default;
+  return fixtureName === 'diff' ? diffFixture : fullFixture;
 };
 
 export const loadPayload = async () => {
@@ -22,7 +21,7 @@ export const loadPayload = async () => {
     parsedPayload = JSON.parse(payloadElement.textContent);
   } catch (parseError) {
     if (!import.meta.env.DEV) throw parseError;
-    parsedPayload = await loadDevelopmentFixture();
+    parsedPayload = loadDevelopmentFixture();
   }
 
   payload.value = markRaw(parsedPayload);
