@@ -1,3 +1,25 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-panel: #0e1020;
+  --color-panel-raised: #101226;
+  --color-canvas: #12142a;
+  --color-on-accent: #14162a;
+  --color-ink: #e8e6df;
+  --color-accent: #f08a4b;
+  --color-accent-yellow: #f2b52e;
+  --color-danger-red: #e8564a;
+  --color-success-green: #6fbf8b;
+  --color-muted: #8b8fa3;
+  --color-renamed: #8b93dc;
+  --font-sans: 'Inter Tight', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+  --font-label: 'Inter', system-ui, -apple-system, sans-serif;
+  --spacing-rail: 60px;
+  --spacing-header: 64px;
+  --spacing-inspector: 452px;
+}
+
 :root {
   --font-sans: 'Inter Tight', 'Inter', system-ui, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
@@ -24,6 +46,7 @@ body {
   margin: 0;
   min-height: 100vh;
   overflow: hidden;
+  line-height: normal;
   color: #e8e6df;
   background:
     radial-gradient(circle at 20% 24%, rgba(110, 120, 200, 0.16), transparent 45%),

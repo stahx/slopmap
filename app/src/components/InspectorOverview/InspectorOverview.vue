@@ -1,3 +1,30 @@
+<template>
+  <div class="inspector-overview flex min-h-0 flex-[1_1_auto] flex-col">
+    <div
+      class="overview-header flex-[0_0_auto] border-b border-white/8 px-5 py-[18px] font-mono text-[15.5px] font-semibold text-ink"
+    >
+      overview
+    </div>
+    <div class="overview-body min-h-0 flex-[1_1_auto] overflow-y-auto px-5 py-[18px]">
+      <div class="distribution flex flex-col gap-3">
+        <DistributionBar v-if="diffMode && stats" :stats="stats" />
+        <LegendList :rows="legendRows" />
+        <div class="overview-meta text-[11px] leading-[1.35] text-ink/35">
+          {{ overviewMeta }}
+        </div>
+      </div>
+      <div v-if="diffMode" class="changed-sections-block mt-[30px]">
+        <div
+          class="changed-sections-label mb-2 font-mono text-[10.5px] tracking-[0.08em] text-ink/35"
+        >
+          CHANGED SECTIONS
+        </div>
+        <ChangedSectionsList :active-aggregate="activeAggregate" @select="emit('select', $event)" />
+      </div>
+    </div>
+  </div>
+</template>
+
 <script setup>
 import { computed } from 'vue';
 
@@ -61,78 +88,3 @@ const overviewMeta = computed(
   () => `${stats.value?.fileCount ?? 0} files · ${stats.value?.linkCount ?? 0} imports`,
 );
 </script>
-
-<template>
-  <div class="inspector-overview">
-    <div class="overview-header">overview</div>
-    <div class="overview-body">
-      <div class="distribution">
-        <DistributionBar v-if="diffMode && stats" :stats="stats" />
-        <LegendList :rows="legendRows" />
-        <div class="overview-meta">{{ overviewMeta }}</div>
-      </div>
-      <div v-if="diffMode" class="changed-sections-block">
-        <div class="changed-sections-label">CHANGED SECTIONS</div>
-        <ChangedSectionsList :active-aggregate="activeAggregate" @select="emit('select', $event)" />
-      </div>
-    </div>
-  </div>
-</template>
-
-<style scoped>
-.inspector-overview {
-  display: flex;
-  min-height: 0;
-  flex: 1 1 auto;
-  flex-direction: column;
-}
-
-.inspector-overview[hidden] {
-  display: none;
-}
-
-.overview-header {
-  flex: 0 0 auto;
-  padding: 18px 20px;
-  color: #e8e6df;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  font-family: var(--font-mono);
-  font-size: 15.5px;
-  font-weight: 600;
-}
-
-.overview-body {
-  min-height: 0;
-  flex: 1 1 auto;
-  overflow-y: auto;
-  padding: 18px 20px;
-}
-
-.distribution {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.distribution[hidden] {
-  display: none;
-}
-
-.overview-meta {
-  color: rgba(232, 230, 223, 0.35);
-  font-size: 11px;
-  line-height: 1.35;
-}
-
-.changed-sections-block {
-  margin-top: 30px;
-}
-
-.changed-sections-label {
-  margin-bottom: 8px;
-  color: rgba(232, 230, 223, 0.35);
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  letter-spacing: 0.08em;
-}
-</style>

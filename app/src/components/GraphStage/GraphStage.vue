@@ -1,3 +1,25 @@
+<template>
+  <div
+    ref="stageElement"
+    class="graph-stage fixed top-[var(--spacing-header)] right-[var(--spacing-inspector)] bottom-0 left-[var(--spacing-rail)] z-[1]"
+    aria-hidden="true"
+  >
+    <div
+      v-show="dimension === '3d'"
+      id="graph"
+      ref="host3dElement"
+      class="graph-host graph-host-3d absolute inset-0 z-[1]"
+    ></div>
+    <div
+      v-show="dimension === '2d'"
+      id="graph2d"
+      ref="host2dElement"
+      class="graph-host graph-host-2d absolute inset-0 z-[1]"
+    ></div>
+    <SectionLabels v-if="isAggregatedView && dimension === '3d'" />
+  </div>
+</template>
+
 <script setup>
 import { onMounted, ref } from 'vue';
 
@@ -24,38 +46,3 @@ onMounted(() => {
   applyView();
 });
 </script>
-
-<template>
-  <div ref="stageElement" class="graph-stage" aria-hidden="true">
-    <div
-      v-show="dimension === '3d'"
-      id="graph"
-      ref="host3dElement"
-      class="graph-host graph-host-3d"
-    ></div>
-    <div
-      v-show="dimension === '2d'"
-      id="graph2d"
-      ref="host2dElement"
-      class="graph-host graph-host-2d"
-    ></div>
-    <SectionLabels v-if="isAggregatedView && dimension === '3d'" />
-  </div>
-</template>
-
-<style scoped>
-.graph-stage {
-  position: fixed;
-  top: var(--header-h);
-  right: var(--inspector-w);
-  bottom: 0;
-  left: var(--rail-w);
-  z-index: 1;
-}
-
-.graph-host {
-  position: absolute;
-  z-index: 1;
-  inset: 0;
-}
-</style>

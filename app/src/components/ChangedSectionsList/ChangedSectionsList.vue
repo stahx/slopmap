@@ -1,3 +1,22 @@
+<template>
+  <div class="changed-sections flex flex-col gap-0.5">
+    <button
+      v-for="section in changedSections"
+      :key="section.id"
+      class="changed-section-row grid w-full cursor-pointer grid-cols-[8px_minmax(0,1fr)_auto] items-center gap-2.5 rounded-[8px] border-0 bg-transparent px-2 py-2.5 text-left font-mono text-[12.5px] text-ink/78 hover:bg-white/5 hover:text-ink"
+      type="button"
+      @click="emit('select', section)"
+    >
+      <span
+        class="changed-section-dot size-2 rounded-full"
+        :style="{ background: statusColor(section.status) }"
+      ></span>
+      <span class="changed-section-id min-w-0 [overflow-wrap:anywhere]">{{ section.id }}</span>
+      <span class="changed-section-count text-[12px] text-ink">{{ section.changedCount }}</span>
+    </button>
+  </div>
+</template>
+
 <script setup>
 import { computed } from 'vue';
 
@@ -17,73 +36,3 @@ const changedSections = computed(() => sortChangedSections(props.activeAggregate
 
 const statusColor = (status) => STATUS_COLORS[status] ?? MUTED_COLOR;
 </script>
-
-<template>
-  <div class="changed-sections">
-    <button
-      v-for="section in changedSections"
-      :key="section.id"
-      class="changed-section-row"
-      type="button"
-      @click="emit('select', section)"
-    >
-      <span class="changed-section-dot" :style="{ background: statusColor(section.status) }"></span>
-      <span class="changed-section-id">{{ section.id }}</span>
-      <span class="changed-section-count">{{ section.changedCount }}</span>
-    </button>
-  </div>
-</template>
-
-<style scoped>
-.changed-sections {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.changed-sections[hidden] {
-  display: none;
-}
-
-.changed-section-row {
-  display: grid;
-  width: 100%;
-  grid-template-columns: 8px minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 8px;
-  color: rgba(232, 230, 223, 0.78);
-  background: transparent;
-  border: 0;
-  border-radius: 8px;
-  font-family: var(--font-mono);
-  font-size: 12.5px;
-  text-align: left;
-  cursor: pointer;
-}
-
-.changed-section-row[hidden] {
-  display: none;
-}
-
-.changed-section-row:hover {
-  color: #e8e6df;
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.changed-section-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-}
-
-.changed-section-id {
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-
-.changed-section-count {
-  color: #e8e6df;
-  font-size: 12px;
-}
-</style>

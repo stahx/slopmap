@@ -1,22 +1,19 @@
-<script setup>
-import { useSettings } from '../../composables/useSettings.js';
-
-const { theme } = useSettings();
-</script>
-
 <template>
-  <div class="theme-toggle" aria-label="Background theme">
+  <div
+    class="theme-toggle grid grid-cols-2 gap-0.5 rounded-[7px] bg-white/5 p-0.5"
+    aria-label="Background theme"
+  >
     <button
-      class="theme-button"
-      :class="{ active: theme === 'plain' }"
+      class="theme-button cursor-pointer rounded-[5px] border-0 px-[7px] py-1 text-[10.5px] font-medium"
+      :class="theme === 'plain' ? 'active bg-white/10 text-ink' : 'bg-transparent text-ink/45'"
       type="button"
       @click="theme = 'plain'"
     >
       Plain
     </button>
     <button
-      class="theme-button"
-      :class="{ active: theme === 'galaxy' }"
+      class="theme-button cursor-pointer rounded-[5px] border-0 px-[7px] py-1 text-[10.5px] font-medium"
+      :class="theme === 'galaxy' ? 'active bg-white/10 text-ink' : 'bg-transparent text-ink/45'"
       type="button"
       @click="theme = 'galaxy'"
     >
@@ -25,33 +22,8 @@ const { theme } = useSettings();
   </div>
 </template>
 
-<style scoped>
-.theme-toggle {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2px;
-  padding: 2px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 7px;
-}
+<script setup>
+import { useSettings } from '../../composables/useSettings.js';
 
-.theme-toggle[hidden] {
-  display: none;
-}
-
-.theme-button {
-  padding: 4px 7px;
-  color: rgba(232, 230, 223, 0.45);
-  background: transparent;
-  border: 0;
-  border-radius: 5px;
-  font-size: 10.5px;
-  font-weight: 500;
-  cursor: pointer;
-}
-
-.theme-button.active {
-  color: #e8e6df;
-  background: rgba(255, 255, 255, 0.1);
-}
-</style>
+const { theme } = useSettings();
+</script>

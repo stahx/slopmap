@@ -1,3 +1,18 @@
+<template>
+  <div
+    class="distribution-bar flex h-[7px] gap-0.5 overflow-hidden rounded-[4px]"
+    aria-hidden="true"
+  >
+    <span
+      v-for="segment in segments"
+      :key="segment.key"
+      class="distribution-segment min-w-0.5"
+      :class="{ 'distribution-untouched opacity-45': segment.key === 'untouched' }"
+      :style="{ background: segment.color, flex: segment.count }"
+    ></span>
+  </div>
+</template>
+
 <script setup>
 import { computed } from 'vue';
 
@@ -42,37 +57,3 @@ const segments = computed(() => {
   ];
 });
 </script>
-
-<template>
-  <div class="distribution-bar" aria-hidden="true">
-    <span
-      v-for="segment in segments"
-      :key="segment.key"
-      class="distribution-segment"
-      :class="{ 'distribution-untouched': segment.key === 'untouched' }"
-      :style="{ background: segment.color, flex: segment.count }"
-    ></span>
-  </div>
-</template>
-
-<style scoped>
-.distribution-bar {
-  display: flex;
-  height: 7px;
-  gap: 2px;
-  overflow: hidden;
-  border-radius: 4px;
-}
-
-.distribution-bar[hidden] {
-  display: none;
-}
-
-.distribution-segment {
-  min-width: 2px;
-}
-
-.distribution-untouched {
-  opacity: 0.45;
-}
-</style>

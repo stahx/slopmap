@@ -391,9 +391,7 @@ const applyView = () => {
   }
   relaxCameraLimits();
   restartLabelLoop();
-  const hasSettledCoordinates = graph
-    .graphData()
-    .nodes.some((node) => Number.isFinite(node.x));
+  const hasSettledCoordinates = graph.graphData().nodes.some((node) => Number.isFinite(node.x));
   if (hasSettledCoordinates) graph.zoomToFit(600);
   pendingFitAfterStop = true;
 };

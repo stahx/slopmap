@@ -1,3 +1,31 @@
+<template>
+  <div
+    class="inspector-tabs flex flex-[0_0_auto] gap-5 border-b border-white/8 px-5"
+    role="tablist"
+    aria-label="Section details"
+  >
+    <button
+      v-for="tabDefinition in tabDefinitions"
+      :key="tabDefinition.id"
+      class="inspector-tab mt-0 mr-0 mb-[-1px] ml-0 cursor-pointer border-0 border-b-2 bg-transparent pt-2.5 pb-[11px] text-[12.5px]"
+      :class="
+        tabDefinition.id === props.tab
+          ? 'active border-b-accent font-semibold text-ink'
+          : 'border-transparent font-medium text-ink/45'
+      "
+      type="button"
+      role="tab"
+      :aria-selected="tabDefinition.id === props.tab"
+      @click="emit('update:tab', tabDefinition.id)"
+    >
+      {{ tabDefinition.label }}
+      <span class="inspector-tab-count font-mono text-[11px] text-ink/35">{{
+        props.counts[tabDefinition.id]
+      }}</span>
+    </button>
+  </div>
+</template>
+
 <script setup>
 const props = defineProps({
   tab: {
@@ -18,59 +46,3 @@ const tabDefinitions = [
   { id: 'imports', label: 'Imports' },
 ];
 </script>
-
-<template>
-  <div class="inspector-tabs" role="tablist" aria-label="Section details">
-    <button
-      v-for="tabDefinition in tabDefinitions"
-      :key="tabDefinition.id"
-      class="inspector-tab"
-      :class="{ active: tabDefinition.id === props.tab }"
-      type="button"
-      role="tab"
-      :aria-selected="tabDefinition.id === props.tab"
-      @click="emit('update:tab', tabDefinition.id)"
-    >
-      {{ tabDefinition.label }}
-      <span class="inspector-tab-count">{{ props.counts[tabDefinition.id] }}</span>
-    </button>
-  </div>
-</template>
-
-<style scoped>
-.inspector-tabs {
-  display: flex;
-  flex: 0 0 auto;
-  gap: 20px;
-  padding: 0 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.inspector-tabs[hidden] {
-  display: none;
-}
-
-.inspector-tab {
-  margin: 0 0 -1px;
-  padding: 10px 0 11px;
-  color: rgba(232, 230, 223, 0.45);
-  background: transparent;
-  border: 0;
-  border-bottom: 2px solid transparent;
-  font-size: 12.5px;
-  font-weight: 500;
-  cursor: pointer;
-}
-
-.inspector-tab.active {
-  color: #e8e6df;
-  border-bottom-color: #f08a4b;
-  font-weight: 600;
-}
-
-.inspector-tab-count {
-  color: rgba(232, 230, 223, 0.35);
-  font-family: var(--font-mono);
-  font-size: 11px;
-}
-</style>

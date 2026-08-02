@@ -1,3 +1,31 @@
+<template>
+  <div class="detail-stats mt-[18px] flex flex-nowrap gap-2.5">
+    <div
+      v-for="statTile in statTiles"
+      :key="statTile.label"
+      class="detail-stat flex min-w-0 flex-[1_1_0] flex-col gap-[5px] rounded-[9px] border p-[11px]"
+      :class="{
+        'detail-stat-changed border-danger-red/22 bg-danger-red/10': statTile.variant === 'changed',
+        'detail-stat-blast border-accent/22 bg-accent/10': statTile.variant === 'blast',
+        'border-white/8 bg-white/4': !statTile.variant,
+      }"
+    >
+      <span
+        class="detail-stat-value font-mono text-[18px] leading-[1.1] font-semibold"
+        :class="{
+          'text-danger-red': statTile.variant === 'changed',
+          'text-accent': statTile.variant === 'blast',
+          'text-ink': !statTile.variant,
+        }"
+        >{{ statTile.value }}</span
+      >
+      <span class="detail-stat-label whitespace-nowrap text-[10.5px] text-ink/40">{{
+        statTile.label
+      }}</span>
+    </div>
+  </div>
+</template>
+
 <script setup>
 import { computed } from 'vue';
 
@@ -38,78 +66,3 @@ const statTiles = computed(() => {
   ];
 });
 </script>
-
-<template>
-  <div class="detail-stats">
-    <div
-      v-for="statTile in statTiles"
-      :key="statTile.label"
-      class="detail-stat"
-      :class="statTile.variant && `detail-stat-${statTile.variant}`"
-    >
-      <span class="detail-stat-value">{{ statTile.value }}</span>
-      <span class="detail-stat-label">{{ statTile.label }}</span>
-    </div>
-  </div>
-</template>
-
-<style scoped>
-.detail-stats {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 10px;
-  margin-top: 18px;
-}
-
-.detail-stats[hidden] {
-  display: none;
-}
-
-.detail-stat {
-  display: flex;
-  min-width: 0;
-  flex: 1 1 0;
-  flex-direction: column;
-  gap: 5px;
-  padding: 11px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 9px;
-}
-
-.detail-stat[hidden] {
-  display: none;
-}
-
-.detail-stat-changed {
-  background: rgba(232, 86, 74, 0.1);
-  border-color: rgba(232, 86, 74, 0.22);
-}
-
-.detail-stat-blast {
-  background: rgba(240, 138, 75, 0.1);
-  border-color: rgba(240, 138, 75, 0.22);
-}
-
-.detail-stat-value {
-  color: #e8e6df;
-  font-family: var(--font-mono);
-  font-size: 18px;
-  font-weight: 600;
-  line-height: 1.1;
-}
-
-.detail-stat-changed .detail-stat-value {
-  color: #e8564a;
-}
-
-.detail-stat-blast .detail-stat-value {
-  color: #f08a4b;
-}
-
-.detail-stat-label {
-  color: rgba(232, 230, 223, 0.4);
-  font-size: 10.5px;
-  white-space: nowrap;
-}
-</style>
