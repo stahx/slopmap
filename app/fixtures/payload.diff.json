@@ -1,0 +1,1012 @@
+{
+  "sentinel": "SLOPMAP_DEV_FIXTURE_SENTINEL",
+  "graph": {
+    "nodes": [
+      {
+        "id": "bin/slopmap.js",
+        "group": "bin",
+        "loc": 5,
+        "status": "dependent",
+        "inDegree": 0,
+        "outDegree": 1,
+        "section": "bin",
+        "rootGroup": "bin"
+      },
+      {
+        "id": "src/cli.js",
+        "group": "src",
+        "loc": 274,
+        "status": "changed",
+        "inDegree": 2,
+        "outDegree": 4,
+        "section": "src",
+        "rootGroup": "src"
+      },
+      {
+        "id": "src/graph.js",
+        "group": "src",
+        "loc": 338,
+        "status": "changed",
+        "inDegree": 3,
+        "outDegree": 0,
+        "section": "src",
+        "rootGroup": "src"
+      },
+      {
+        "id": "src/graph.spec.js",
+        "group": "src",
+        "loc": 461,
+        "status": "changed",
+        "inDegree": 0,
+        "outDegree": 1,
+        "section": "src",
+        "rootGroup": "src"
+      },
+      {
+        "id": "src/render.js",
+        "group": "src",
+        "loc": 48,
+        "status": "changed",
+        "inDegree": 2,
+        "outDegree": 0,
+        "section": "src",
+        "rootGroup": "src"
+      },
+      {
+        "id": "src/resolve.js",
+        "group": "src",
+        "loc": 102,
+        "status": "dependency",
+        "inDegree": 3,
+        "outDegree": 0,
+        "section": "src",
+        "rootGroup": "src"
+      },
+      {
+        "id": "src/resolve.spec.js",
+        "group": "src",
+        "loc": 69,
+        "status": "normal",
+        "inDegree": 0,
+        "outDegree": 1,
+        "section": "src",
+        "rootGroup": "src"
+      },
+      {
+        "id": "src/scan.js",
+        "group": "src",
+        "loc": 87,
+        "status": "dependency",
+        "inDegree": 3,
+        "outDegree": 0,
+        "section": "src",
+        "rootGroup": "src"
+      },
+      {
+        "id": "src/scan.spec.js",
+        "group": "src",
+        "loc": 45,
+        "status": "normal",
+        "inDegree": 0,
+        "outDegree": 1,
+        "section": "src",
+        "rootGroup": "src"
+      },
+      {
+        "id": "app/app/src/auto-imports.d.ts",
+        "group": "app",
+        "loc": 74,
+        "status": "normal",
+        "inDegree": 0,
+        "outDegree": 0,
+        "section": "app/app",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/plugins/assert-single-file.js",
+        "group": "app",
+        "loc": 56,
+        "status": "dependency",
+        "inDegree": 1,
+        "outDegree": 0,
+        "section": "app/plugins",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/App.vue",
+        "group": "app",
+        "loc": 65,
+        "status": "normal",
+        "inDegree": 1,
+        "outDegree": 1,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/composables/usePayload.js",
+        "group": "app",
+        "loc": 48,
+        "status": "normal",
+        "inDegree": 2,
+        "outDegree": 0,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/main.js",
+        "group": "app",
+        "loc": 10,
+        "status": "normal",
+        "inDegree": 0,
+        "outDegree": 2,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "scripts/make-fixture.js",
+        "group": "scripts",
+        "loc": 100,
+        "status": "dependent",
+        "inDegree": 0,
+        "outDegree": 4,
+        "section": "scripts",
+        "rootGroup": "scripts"
+      },
+      {
+        "id": "src/render.spec.js",
+        "group": "src",
+        "loc": 104,
+        "status": "changed",
+        "inDegree": 0,
+        "outDegree": 1,
+        "section": "src",
+        "rootGroup": "src"
+      },
+      {
+        "id": "vite.config.js",
+        "group": "(root)",
+        "loc": 45,
+        "status": "changed",
+        "inDegree": 0,
+        "outDegree": 1,
+        "section": "(root)",
+        "rootGroup": "(root)"
+      },
+      {
+        "id": "vitest.config.js",
+        "group": "(root)",
+        "loc": 25,
+        "status": "changed",
+        "inDegree": 0,
+        "outDegree": 0,
+        "section": "(root)",
+        "rootGroup": "(root)"
+      }
+    ],
+    "links": [
+      {
+        "source": "bin/slopmap.js",
+        "target": "src/cli.js",
+        "hot": 1
+      },
+      {
+        "source": "src/cli.js",
+        "target": "src/scan.js",
+        "hot": 1
+      },
+      {
+        "source": "src/cli.js",
+        "target": "src/resolve.js",
+        "hot": 1
+      },
+      {
+        "source": "src/cli.js",
+        "target": "src/graph.js",
+        "hot": 1
+      },
+      {
+        "source": "src/cli.js",
+        "target": "src/render.js",
+        "hot": 1
+      },
+      {
+        "source": "src/graph.spec.js",
+        "target": "src/graph.js",
+        "hot": 1
+      },
+      {
+        "source": "src/resolve.spec.js",
+        "target": "src/resolve.js",
+        "hot": 0
+      },
+      {
+        "source": "src/scan.spec.js",
+        "target": "src/scan.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/App.vue",
+        "target": "app/src/composables/usePayload.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/main.js",
+        "target": "app/src/App.vue",
+        "hot": 0
+      },
+      {
+        "source": "app/src/main.js",
+        "target": "app/src/composables/usePayload.js",
+        "hot": 0
+      },
+      {
+        "source": "scripts/make-fixture.js",
+        "target": "src/cli.js",
+        "hot": 1
+      },
+      {
+        "source": "scripts/make-fixture.js",
+        "target": "src/graph.js",
+        "hot": 1
+      },
+      {
+        "source": "scripts/make-fixture.js",
+        "target": "src/resolve.js",
+        "hot": 1
+      },
+      {
+        "source": "scripts/make-fixture.js",
+        "target": "src/scan.js",
+        "hot": 1
+      },
+      {
+        "source": "src/render.spec.js",
+        "target": "src/render.js",
+        "hot": 1
+      },
+      {
+        "source": "vite.config.js",
+        "target": "app/plugins/assert-single-file.js",
+        "hot": 1
+      }
+    ],
+    "groups": [
+      {
+        "name": "src",
+        "count": 9
+      },
+      {
+        "name": "app",
+        "count": 5
+      },
+      {
+        "name": "(root)",
+        "count": 2
+      },
+      {
+        "name": "bin",
+        "count": 1
+      },
+      {
+        "name": "scripts",
+        "count": 1
+      }
+    ],
+    "levels": {
+      "roots": {
+        "sections": [
+          {
+            "id": "bin",
+            "group": "bin",
+            "fileCount": 1,
+            "loc": 5,
+            "changedCount": 0,
+            "dependentCount": 1,
+            "dependencyCount": 0,
+            "additions": 0,
+            "deletions": 0,
+            "changedFiles": [],
+            "status": "dependent"
+          },
+          {
+            "id": "src",
+            "group": "src",
+            "fileCount": 9,
+            "loc": 1528,
+            "changedCount": 5,
+            "dependentCount": 0,
+            "dependencyCount": 2,
+            "additions": 2277,
+            "deletions": 489,
+            "changedFiles": [
+              "src/cli.js",
+              "src/graph.js",
+              "src/graph.spec.js",
+              "src/render.js",
+              "src/render.spec.js"
+            ],
+            "status": "changed",
+            "downstreamFiles": [
+              "bin/slopmap.js",
+              "scripts/make-fixture.js"
+            ],
+            "downstream": [
+              {
+                "id": "bin",
+                "count": 1
+              },
+              {
+                "id": "scripts",
+                "count": 1
+              }
+            ],
+            "downstreamTotal": 2
+          },
+          {
+            "id": "app",
+            "group": "app",
+            "fileCount": 5,
+            "loc": 253,
+            "changedCount": 0,
+            "dependentCount": 0,
+            "dependencyCount": 1,
+            "additions": 1942,
+            "deletions": 0,
+            "changedFiles": [],
+            "status": "dependency"
+          },
+          {
+            "id": "scripts",
+            "group": "scripts",
+            "fileCount": 1,
+            "loc": 100,
+            "changedCount": 0,
+            "dependentCount": 1,
+            "dependencyCount": 0,
+            "additions": 99,
+            "deletions": 0,
+            "changedFiles": [],
+            "status": "dependent"
+          },
+          {
+            "id": "(root)",
+            "group": "(root)",
+            "fileCount": 2,
+            "loc": 70,
+            "changedCount": 2,
+            "dependentCount": 0,
+            "dependencyCount": 0,
+            "additions": 2157,
+            "deletions": 41,
+            "changedFiles": [
+              "vite.config.js",
+              "vitest.config.js"
+            ],
+            "status": "changed",
+            "downstreamFiles": [],
+            "downstream": [],
+            "downstreamTotal": 0
+          }
+        ],
+        "links": [
+          {
+            "source": "bin",
+            "target": "src",
+            "kind": "imports",
+            "weight": 1,
+            "hot": 1
+          },
+          {
+            "source": "scripts",
+            "target": "src",
+            "kind": "imports",
+            "weight": 4,
+            "hot": 1
+          },
+          {
+            "source": "(root)",
+            "target": "app",
+            "kind": "imports",
+            "weight": 1,
+            "hot": 1
+          }
+        ]
+      },
+      "groups": {
+        "sections": [
+          {
+            "id": "bin",
+            "group": "bin",
+            "fileCount": 1,
+            "loc": 5,
+            "changedCount": 0,
+            "dependentCount": 1,
+            "dependencyCount": 0,
+            "additions": 0,
+            "deletions": 0,
+            "changedFiles": [],
+            "status": "dependent"
+          },
+          {
+            "id": "src",
+            "group": "src",
+            "fileCount": 9,
+            "loc": 1528,
+            "changedCount": 5,
+            "dependentCount": 0,
+            "dependencyCount": 2,
+            "additions": 2277,
+            "deletions": 489,
+            "changedFiles": [
+              "src/cli.js",
+              "src/graph.js",
+              "src/graph.spec.js",
+              "src/render.js",
+              "src/render.spec.js"
+            ],
+            "status": "changed",
+            "downstreamFiles": [
+              "bin/slopmap.js",
+              "scripts/make-fixture.js"
+            ],
+            "downstream": [
+              {
+                "id": "bin",
+                "count": 1
+              },
+              {
+                "id": "scripts",
+                "count": 1
+              }
+            ],
+            "downstreamTotal": 2
+          },
+          {
+            "id": "app",
+            "group": "app",
+            "fileCount": 5,
+            "loc": 253,
+            "changedCount": 0,
+            "dependentCount": 0,
+            "dependencyCount": 1,
+            "additions": 1942,
+            "deletions": 0,
+            "changedFiles": [],
+            "status": "dependency"
+          },
+          {
+            "id": "scripts",
+            "group": "scripts",
+            "fileCount": 1,
+            "loc": 100,
+            "changedCount": 0,
+            "dependentCount": 1,
+            "dependencyCount": 0,
+            "additions": 99,
+            "deletions": 0,
+            "changedFiles": [],
+            "status": "dependent"
+          },
+          {
+            "id": "(root)",
+            "group": "(root)",
+            "fileCount": 2,
+            "loc": 70,
+            "changedCount": 2,
+            "dependentCount": 0,
+            "dependencyCount": 0,
+            "additions": 2157,
+            "deletions": 41,
+            "changedFiles": [
+              "vite.config.js",
+              "vitest.config.js"
+            ],
+            "status": "changed",
+            "downstreamFiles": [],
+            "downstream": [],
+            "downstreamTotal": 0
+          }
+        ],
+        "links": [
+          {
+            "source": "bin",
+            "target": "src",
+            "kind": "imports",
+            "weight": 1,
+            "hot": 1
+          },
+          {
+            "source": "scripts",
+            "target": "src",
+            "kind": "imports",
+            "weight": 4,
+            "hot": 1
+          },
+          {
+            "source": "(root)",
+            "target": "app",
+            "kind": "imports",
+            "weight": 1,
+            "hot": 1
+          }
+        ]
+      },
+      "dirs": {
+        "sections": [
+          {
+            "id": "bin",
+            "group": "bin",
+            "fileCount": 1,
+            "loc": 5,
+            "changedCount": 0,
+            "dependentCount": 1,
+            "dependencyCount": 0,
+            "additions": 0,
+            "deletions": 0,
+            "changedFiles": [],
+            "status": "dependent"
+          },
+          {
+            "id": "src",
+            "group": "src",
+            "fileCount": 9,
+            "loc": 1528,
+            "changedCount": 5,
+            "dependentCount": 0,
+            "dependencyCount": 2,
+            "additions": 2277,
+            "deletions": 489,
+            "changedFiles": [
+              "src/cli.js",
+              "src/graph.js",
+              "src/graph.spec.js",
+              "src/render.js",
+              "src/render.spec.js"
+            ],
+            "status": "changed",
+            "downstreamFiles": [
+              "bin/slopmap.js",
+              "scripts/make-fixture.js"
+            ],
+            "downstream": [
+              {
+                "id": "bin",
+                "count": 1
+              },
+              {
+                "id": "scripts",
+                "count": 1
+              }
+            ],
+            "downstreamTotal": 2
+          },
+          {
+            "id": "app/app",
+            "group": "app",
+            "fileCount": 1,
+            "loc": 74,
+            "changedCount": 0,
+            "dependentCount": 0,
+            "dependencyCount": 0,
+            "additions": 73,
+            "deletions": 0,
+            "changedFiles": [],
+            "status": "normal"
+          },
+          {
+            "id": "app/plugins",
+            "group": "app",
+            "fileCount": 1,
+            "loc": 56,
+            "changedCount": 0,
+            "dependentCount": 0,
+            "dependencyCount": 1,
+            "additions": 55,
+            "deletions": 0,
+            "changedFiles": [],
+            "status": "dependency"
+          },
+          {
+            "id": "app/src",
+            "group": "app",
+            "fileCount": 3,
+            "loc": 123,
+            "changedCount": 0,
+            "dependentCount": 0,
+            "dependencyCount": 0,
+            "additions": 134,
+            "deletions": 0,
+            "changedFiles": [],
+            "status": "normal"
+          },
+          {
+            "id": "scripts",
+            "group": "scripts",
+            "fileCount": 1,
+            "loc": 100,
+            "changedCount": 0,
+            "dependentCount": 1,
+            "dependencyCount": 0,
+            "additions": 99,
+            "deletions": 0,
+            "changedFiles": [],
+            "status": "dependent"
+          },
+          {
+            "id": "(root)",
+            "group": "(root)",
+            "fileCount": 2,
+            "loc": 70,
+            "changedCount": 2,
+            "dependentCount": 0,
+            "dependencyCount": 0,
+            "additions": 2157,
+            "deletions": 41,
+            "changedFiles": [
+              "vite.config.js",
+              "vitest.config.js"
+            ],
+            "status": "changed",
+            "downstreamFiles": [],
+            "downstream": [],
+            "downstreamTotal": 0
+          },
+          {
+            "id": "app",
+            "group": "app",
+            "fileCount": 0,
+            "loc": 0,
+            "changedCount": 0,
+            "dependentCount": 0,
+            "dependencyCount": 0,
+            "additions": 93,
+            "deletions": 0,
+            "changedFiles": [],
+            "status": "normal"
+          }
+        ],
+        "links": [
+          {
+            "source": "app",
+            "target": "app/app",
+            "kind": "orbit"
+          },
+          {
+            "source": "app",
+            "target": "app/plugins",
+            "kind": "orbit"
+          },
+          {
+            "source": "app",
+            "target": "app/src",
+            "kind": "orbit"
+          },
+          {
+            "source": "bin",
+            "target": "src",
+            "kind": "imports",
+            "weight": 1,
+            "hot": 1
+          },
+          {
+            "source": "scripts",
+            "target": "src",
+            "kind": "imports",
+            "weight": 4,
+            "hot": 1
+          },
+          {
+            "source": "(root)",
+            "target": "app/plugins",
+            "kind": "imports",
+            "weight": 1,
+            "hot": 1
+          }
+        ]
+      }
+    },
+    "stats": {
+      "fileCount": 18,
+      "linkCount": 17,
+      "unresolvedCount": 11,
+      "changedCount": 7,
+      "dependentCount": 2,
+      "dependencyCount": 3
+    }
+  },
+  "changes": {
+    "files": [
+      {
+        "path": ".claude/rules/naming-conventions.md",
+        "status": "A",
+        "additions": 15,
+        "deletions": 0,
+        "section": ".claude/rules",
+        "group": ".claude",
+        "rootGroup": ".claude"
+      },
+      {
+        "path": ".claude/rules/testing.md",
+        "status": "A",
+        "additions": 38,
+        "deletions": 0,
+        "section": ".claude/rules",
+        "group": ".claude",
+        "rootGroup": ".claude"
+      },
+      {
+        "path": ".claude/rules/viewer-architecture.md",
+        "status": "A",
+        "additions": 27,
+        "deletions": 0,
+        "section": ".claude/rules",
+        "group": ".claude",
+        "rootGroup": ".claude"
+      },
+      {
+        "path": ".claude/rules/vue-components.md",
+        "status": "A",
+        "additions": 28,
+        "deletions": 0,
+        "section": ".claude/rules",
+        "group": ".claude",
+        "rootGroup": ".claude"
+      },
+      {
+        "path": "README.md",
+        "status": "M",
+        "additions": 5,
+        "deletions": 3,
+        "section": "(root)",
+        "group": "(root)",
+        "rootGroup": "(root)"
+      },
+      {
+        "path": "package.json",
+        "status": "M",
+        "additions": 33,
+        "deletions": 5,
+        "section": "(root)",
+        "group": "(root)",
+        "rootGroup": "(root)"
+      },
+      {
+        "path": "pnpm-lock.yaml",
+        "status": "M",
+        "additions": 2051,
+        "deletions": 33,
+        "section": "(root)",
+        "group": "(root)",
+        "rootGroup": "(root)"
+      },
+      {
+        "path": "src/cli.js",
+        "status": "M",
+        "additions": 109,
+        "deletions": 7,
+        "section": "src",
+        "group": "src",
+        "rootGroup": "src"
+      },
+      {
+        "path": "src/graph.js",
+        "status": "M",
+        "additions": 96,
+        "deletions": 1,
+        "section": "src",
+        "group": "src",
+        "rootGroup": "src"
+      },
+      {
+        "path": "src/graph.spec.js",
+        "status": "M",
+        "additions": 141,
+        "deletions": 3,
+        "section": "src",
+        "group": "src",
+        "rootGroup": "src"
+      },
+      {
+        "path": "src/render.js",
+        "status": "M",
+        "additions": 52,
+        "deletions": 48,
+        "section": "src",
+        "group": "src",
+        "rootGroup": "src"
+      },
+      {
+        "path": "src/template.html",
+        "status": "M",
+        "additions": 1776,
+        "deletions": 430,
+        "section": "src",
+        "group": "src",
+        "rootGroup": "src"
+      },
+      {
+        "path": "app/.eslintrc-auto-import.json",
+        "status": "A",
+        "additions": 79,
+        "deletions": 0,
+        "section": "app",
+        "group": "app",
+        "rootGroup": "app"
+      },
+      {
+        "path": "app/app/src/auto-imports.d.ts",
+        "status": "A",
+        "additions": 73,
+        "deletions": 0,
+        "section": "app/app",
+        "group": "app",
+        "rootGroup": "app"
+      },
+      {
+        "path": "app/fixtures/payload.diff.json",
+        "status": "A",
+        "additions": 939,
+        "deletions": 0,
+        "section": "app/fixtures",
+        "group": "app",
+        "rootGroup": "app"
+      },
+      {
+        "path": "app/fixtures/payload.full.json",
+        "status": "A",
+        "additions": 648,
+        "deletions": 0,
+        "section": "app/fixtures",
+        "group": "app",
+        "rootGroup": "app"
+      },
+      {
+        "path": "app/index.html",
+        "status": "A",
+        "additions": 14,
+        "deletions": 0,
+        "section": "app",
+        "group": "app",
+        "rootGroup": "app"
+      },
+      {
+        "path": "app/plugins/assert-single-file.js",
+        "status": "A",
+        "additions": 55,
+        "deletions": 0,
+        "section": "app/plugins",
+        "group": "app",
+        "rootGroup": "app"
+      },
+      {
+        "path": "app/src/App.vue",
+        "status": "A",
+        "additions": 64,
+        "deletions": 0,
+        "section": "app/src",
+        "group": "app",
+        "rootGroup": "app"
+      },
+      {
+        "path": "app/src/composables/usePayload.js",
+        "status": "A",
+        "additions": 47,
+        "deletions": 0,
+        "section": "app/src",
+        "group": "app",
+        "rootGroup": "app"
+      },
+      {
+        "path": "app/src/main.js",
+        "status": "A",
+        "additions": 9,
+        "deletions": 0,
+        "section": "app/src",
+        "group": "app",
+        "rootGroup": "app"
+      },
+      {
+        "path": "app/src/styles/base.css",
+        "status": "A",
+        "additions": 14,
+        "deletions": 0,
+        "section": "app/src",
+        "group": "app",
+        "rootGroup": "app"
+      },
+      {
+        "path": "dist/index.html",
+        "status": "A",
+        "additions": 16,
+        "deletions": 0,
+        "section": "dist",
+        "group": "dist",
+        "rootGroup": "dist"
+      },
+      {
+        "path": "scripts/make-fixture.js",
+        "status": "A",
+        "additions": 99,
+        "deletions": 0,
+        "section": "scripts",
+        "group": "scripts",
+        "rootGroup": "scripts"
+      },
+      {
+        "path": "src/render.spec.js",
+        "status": "A",
+        "additions": 103,
+        "deletions": 0,
+        "section": "src",
+        "group": "src",
+        "rootGroup": "src"
+      },
+      {
+        "path": "vite.config.js",
+        "status": "A",
+        "additions": 44,
+        "deletions": 0,
+        "section": "(root)",
+        "group": "(root)",
+        "rootGroup": "(root)"
+      },
+      {
+        "path": "vitest.config.js",
+        "status": "A",
+        "additions": 24,
+        "deletions": 0,
+        "section": "(root)",
+        "group": "(root)",
+        "rootGroup": "(root)"
+      },
+      {
+        "path": "ackage.json",
+        "status": "M",
+        "additions": 0,
+        "deletions": 0,
+        "section": "(root)",
+        "group": "(root)",
+        "rootGroup": "(root)"
+      },
+      {
+        "path": "app/",
+        "status": "M",
+        "additions": 0,
+        "deletions": 0,
+        "section": "app",
+        "group": "app",
+        "rootGroup": "app"
+      },
+      {
+        "path": "dist/",
+        "status": "M",
+        "additions": 0,
+        "deletions": 0,
+        "section": "dist",
+        "group": "dist",
+        "rootGroup": "dist"
+      },
+      {
+        "path": "scripts/",
+        "status": "M",
+        "additions": 0,
+        "deletions": 0,
+        "section": "scripts",
+        "group": "scripts",
+        "rootGroup": "scripts"
+      }
+    ],
+    "totals": {
+      "additions": 6599,
+      "deletions": 530
+    }
+  },
+  "repoName": "slopmap",
+  "modeLabel": "vs master",
+  "context": {
+    "branch": "sb/vue-viewer",
+    "baseRef": "master",
+    "pullRequest": null,
+    "generatedAt": "2026-08-02T00:23:10.195Z"
+  }
+}

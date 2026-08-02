@@ -1,54 +1,31 @@
 import fs from 'node:fs';
-import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const toolRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const toolRoot = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  '..'
+);
+const defaultTemplatePath = path.join(toolRoot, 'dist', 'index.html');
 
-const locateLibrary = () => {
-  const directPath = path.join(toolRoot, 'node_modules', '3d-force-graph', 'dist', '3d-force-graph.min.js');
-  if (fs.existsSync(directPath)) return directPath;
-
-  let resolvedEntry = null;
-  try {
-    const packageRequire = createRequire(import.meta.url);
-    resolvedEntry = packageRequire.resolve('3d-force-graph');
-  } catch {
-    resolvedEntry = null;
+export const renderHtml = ({
+  graph,
+  repoName,
+  modeLabel,
+  context,
+  templatePath = defaultTemplatePath,
+}) => {
+  if (!fs.existsSync(templatePath)) {
+    throw new Error(
+      'slopmap: viewer bundle not found at dist/index.html — run pnpm build'
+    );
   }
-
-  if (resolvedEntry !== null) {
-    const fallbackPath = path.join(path.dirname(resolvedEntry), '3d-force-graph.min.js');
-    if (fs.existsSync(fallbackPath)) return fallbackPath;
+  const template = fs.readFileSync(templatePath, 'utf8');
+  if (!template.includes('__SLOPMAP_DATA__')) {
+    throw new Error(
+      'slopmap: viewer bundle is missing the payload marker — run pnpm build'
+    );
   }
-
-  throw new Error('slopmap: cannot locate 3d-force-graph UMD bundle');
-};
-
-const locate2dLibrary = () => {
-  const directPath = path.join(toolRoot, 'node_modules', 'force-graph', 'dist', 'force-graph.min.js');
-  if (fs.existsSync(directPath)) return directPath;
-
-  let resolvedEntry = null;
-  try {
-    const packageRequire = createRequire(import.meta.url);
-    resolvedEntry = packageRequire.resolve('force-graph');
-  } catch {
-    resolvedEntry = null;
-  }
-
-  if (resolvedEntry !== null) {
-    const fallbackPath = path.join(path.dirname(resolvedEntry), 'force-graph.min.js');
-    if (fs.existsSync(fallbackPath)) return fallbackPath;
-  }
-
-  throw new Error('slopmap: cannot locate force-graph UMD bundle');
-};
-
-export const renderHtml = ({ graph, repoName, modeLabel, context }) => {
-  const librarySource = fs.readFileSync(locateLibrary(), 'utf8');
-  const library2dSource = fs.readFileSync(locate2dLibrary(), 'utf8');
-  const template = fs.readFileSync(path.join(toolRoot, 'src', 'template.html'), 'utf8');
   const { changes, ...graphPayload } = graph;
   const serializedData = JSON.stringify({
     graph: graphPayload,
@@ -61,8 +38,6 @@ export const renderHtml = ({ graph, repoName, modeLabel, context }) => {
 
   return template
     .replaceAll('__SLOPMAP_TITLE__', () => title)
-    .replaceAll('__SLOPMAP_LIB__', () => librarySource)
-    .replaceAll('__SLOPMAP_LIB_2D__', () => library2dSource)
     .replaceAll('__SLOPMAP_DATA__', () => serializedData);
 };
 

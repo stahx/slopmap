@@ -1,0 +1,14 @@
+:root {
+  --font-sans: "Inter Tight", "Inter", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+body {
+  margin: 0;
+  background: #12142a;
+  font-family: var(--font-sans);
+}

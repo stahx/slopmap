@@ -1,0 +1,648 @@
+{
+  "sentinel": "SLOPMAP_DEV_FIXTURE_SENTINEL",
+  "graph": {
+    "nodes": [
+      {
+        "id": "bin/slopmap.js",
+        "group": "bin",
+        "loc": 5,
+        "status": "normal",
+        "inDegree": 0,
+        "outDegree": 1,
+        "section": "bin",
+        "rootGroup": "bin"
+      },
+      {
+        "id": "src/cli.js",
+        "group": "src",
+        "loc": 274,
+        "status": "normal",
+        "inDegree": 2,
+        "outDegree": 4,
+        "section": "src",
+        "rootGroup": "src"
+      },
+      {
+        "id": "src/graph.js",
+        "group": "src",
+        "loc": 338,
+        "status": "normal",
+        "inDegree": 3,
+        "outDegree": 0,
+        "section": "src",
+        "rootGroup": "src"
+      },
+      {
+        "id": "src/graph.spec.js",
+        "group": "src",
+        "loc": 461,
+        "status": "normal",
+        "inDegree": 0,
+        "outDegree": 1,
+        "section": "src",
+        "rootGroup": "src"
+      },
+      {
+        "id": "src/render.js",
+        "group": "src",
+        "loc": 48,
+        "status": "normal",
+        "inDegree": 2,
+        "outDegree": 0,
+        "section": "src",
+        "rootGroup": "src"
+      },
+      {
+        "id": "src/resolve.js",
+        "group": "src",
+        "loc": 102,
+        "status": "normal",
+        "inDegree": 3,
+        "outDegree": 0,
+        "section": "src",
+        "rootGroup": "src"
+      },
+      {
+        "id": "src/resolve.spec.js",
+        "group": "src",
+        "loc": 69,
+        "status": "normal",
+        "inDegree": 0,
+        "outDegree": 1,
+        "section": "src",
+        "rootGroup": "src"
+      },
+      {
+        "id": "src/scan.js",
+        "group": "src",
+        "loc": 87,
+        "status": "normal",
+        "inDegree": 3,
+        "outDegree": 0,
+        "section": "src",
+        "rootGroup": "src"
+      },
+      {
+        "id": "src/scan.spec.js",
+        "group": "src",
+        "loc": 45,
+        "status": "normal",
+        "inDegree": 0,
+        "outDegree": 1,
+        "section": "src",
+        "rootGroup": "src"
+      },
+      {
+        "id": "app/app/src/auto-imports.d.ts",
+        "group": "app",
+        "loc": 74,
+        "status": "normal",
+        "inDegree": 0,
+        "outDegree": 0,
+        "section": "app/app",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/plugins/assert-single-file.js",
+        "group": "app",
+        "loc": 56,
+        "status": "normal",
+        "inDegree": 1,
+        "outDegree": 0,
+        "section": "app/plugins",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/App.vue",
+        "group": "app",
+        "loc": 65,
+        "status": "normal",
+        "inDegree": 1,
+        "outDegree": 1,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/composables/usePayload.js",
+        "group": "app",
+        "loc": 48,
+        "status": "normal",
+        "inDegree": 2,
+        "outDegree": 0,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "app/src/main.js",
+        "group": "app",
+        "loc": 10,
+        "status": "normal",
+        "inDegree": 0,
+        "outDegree": 2,
+        "section": "app/src",
+        "rootGroup": "app"
+      },
+      {
+        "id": "scripts/make-fixture.js",
+        "group": "scripts",
+        "loc": 100,
+        "status": "normal",
+        "inDegree": 0,
+        "outDegree": 4,
+        "section": "scripts",
+        "rootGroup": "scripts"
+      },
+      {
+        "id": "src/render.spec.js",
+        "group": "src",
+        "loc": 104,
+        "status": "normal",
+        "inDegree": 0,
+        "outDegree": 1,
+        "section": "src",
+        "rootGroup": "src"
+      },
+      {
+        "id": "vite.config.js",
+        "group": "(root)",
+        "loc": 45,
+        "status": "normal",
+        "inDegree": 0,
+        "outDegree": 1,
+        "section": "(root)",
+        "rootGroup": "(root)"
+      },
+      {
+        "id": "vitest.config.js",
+        "group": "(root)",
+        "loc": 25,
+        "status": "normal",
+        "inDegree": 0,
+        "outDegree": 0,
+        "section": "(root)",
+        "rootGroup": "(root)"
+      }
+    ],
+    "links": [
+      {
+        "source": "bin/slopmap.js",
+        "target": "src/cli.js",
+        "hot": 0
+      },
+      {
+        "source": "src/cli.js",
+        "target": "src/scan.js",
+        "hot": 0
+      },
+      {
+        "source": "src/cli.js",
+        "target": "src/resolve.js",
+        "hot": 0
+      },
+      {
+        "source": "src/cli.js",
+        "target": "src/graph.js",
+        "hot": 0
+      },
+      {
+        "source": "src/cli.js",
+        "target": "src/render.js",
+        "hot": 0
+      },
+      {
+        "source": "src/graph.spec.js",
+        "target": "src/graph.js",
+        "hot": 0
+      },
+      {
+        "source": "src/resolve.spec.js",
+        "target": "src/resolve.js",
+        "hot": 0
+      },
+      {
+        "source": "src/scan.spec.js",
+        "target": "src/scan.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/App.vue",
+        "target": "app/src/composables/usePayload.js",
+        "hot": 0
+      },
+      {
+        "source": "app/src/main.js",
+        "target": "app/src/App.vue",
+        "hot": 0
+      },
+      {
+        "source": "app/src/main.js",
+        "target": "app/src/composables/usePayload.js",
+        "hot": 0
+      },
+      {
+        "source": "scripts/make-fixture.js",
+        "target": "src/cli.js",
+        "hot": 0
+      },
+      {
+        "source": "scripts/make-fixture.js",
+        "target": "src/graph.js",
+        "hot": 0
+      },
+      {
+        "source": "scripts/make-fixture.js",
+        "target": "src/resolve.js",
+        "hot": 0
+      },
+      {
+        "source": "scripts/make-fixture.js",
+        "target": "src/scan.js",
+        "hot": 0
+      },
+      {
+        "source": "src/render.spec.js",
+        "target": "src/render.js",
+        "hot": 0
+      },
+      {
+        "source": "vite.config.js",
+        "target": "app/plugins/assert-single-file.js",
+        "hot": 0
+      }
+    ],
+    "groups": [
+      {
+        "name": "src",
+        "count": 9
+      },
+      {
+        "name": "app",
+        "count": 5
+      },
+      {
+        "name": "(root)",
+        "count": 2
+      },
+      {
+        "name": "bin",
+        "count": 1
+      },
+      {
+        "name": "scripts",
+        "count": 1
+      }
+    ],
+    "levels": {
+      "roots": {
+        "sections": [
+          {
+            "id": "bin",
+            "group": "bin",
+            "fileCount": 1,
+            "loc": 5,
+            "changedCount": 0,
+            "dependentCount": 0,
+            "dependencyCount": 0,
+            "additions": 0,
+            "deletions": 0,
+            "changedFiles": [],
+            "status": "normal"
+          },
+          {
+            "id": "src",
+            "group": "src",
+            "fileCount": 9,
+            "loc": 1528,
+            "changedCount": 0,
+            "dependentCount": 0,
+            "dependencyCount": 0,
+            "additions": 0,
+            "deletions": 0,
+            "changedFiles": [],
+            "status": "normal"
+          },
+          {
+            "id": "app",
+            "group": "app",
+            "fileCount": 5,
+            "loc": 253,
+            "changedCount": 0,
+            "dependentCount": 0,
+            "dependencyCount": 0,
+            "additions": 0,
+            "deletions": 0,
+            "changedFiles": [],
+            "status": "normal"
+          },
+          {
+            "id": "scripts",
+            "group": "scripts",
+            "fileCount": 1,
+            "loc": 100,
+            "changedCount": 0,
+            "dependentCount": 0,
+            "dependencyCount": 0,
+            "additions": 0,
+            "deletions": 0,
+            "changedFiles": [],
+            "status": "normal"
+          },
+          {
+            "id": "(root)",
+            "group": "(root)",
+            "fileCount": 2,
+            "loc": 70,
+            "changedCount": 0,
+            "dependentCount": 0,
+            "dependencyCount": 0,
+            "additions": 0,
+            "deletions": 0,
+            "changedFiles": [],
+            "status": "normal"
+          }
+        ],
+        "links": [
+          {
+            "source": "bin",
+            "target": "src",
+            "kind": "imports",
+            "weight": 1,
+            "hot": 0
+          },
+          {
+            "source": "scripts",
+            "target": "src",
+            "kind": "imports",
+            "weight": 4,
+            "hot": 0
+          },
+          {
+            "source": "(root)",
+            "target": "app",
+            "kind": "imports",
+            "weight": 1,
+            "hot": 0
+          }
+        ]
+      },
+      "groups": {
+        "sections": [
+          {
+            "id": "bin",
+            "group": "bin",
+            "fileCount": 1,
+            "loc": 5,
+            "changedCount": 0,
+            "dependentCount": 0,
+            "dependencyCount": 0,
+            "additions": 0,
+            "deletions": 0,
+            "changedFiles": [],
+            "status": "normal"
+          },
+          {
+            "id": "src",
+            "group": "src",
+            "fileCount": 9,
+            "loc": 1528,
+            "changedCount": 0,
+            "dependentCount": 0,
+            "dependencyCount": 0,
+            "additions": 0,
+            "deletions": 0,
+            "changedFiles": [],
+            "status": "normal"
+          },
+          {
+            "id": "app",
+            "group": "app",
+            "fileCount": 5,
+            "loc": 253,
+            "changedCount": 0,
+            "dependentCount": 0,
+            "dependencyCount": 0,
+            "additions": 0,
+            "deletions": 0,
+            "changedFiles": [],
+            "status": "normal"
+          },
+          {
+            "id": "scripts",
+            "group": "scripts",
+            "fileCount": 1,
+            "loc": 100,
+            "changedCount": 0,
+            "dependentCount": 0,
+            "dependencyCount": 0,
+            "additions": 0,
+            "deletions": 0,
+            "changedFiles": [],
+            "status": "normal"
+          },
+          {
+            "id": "(root)",
+            "group": "(root)",
+            "fileCount": 2,
+            "loc": 70,
+            "changedCount": 0,
+            "dependentCount": 0,
+            "dependencyCount": 0,
+            "additions": 0,
+            "deletions": 0,
+            "changedFiles": [],
+            "status": "normal"
+          }
+        ],
+        "links": [
+          {
+            "source": "bin",
+            "target": "src",
+            "kind": "imports",
+            "weight": 1,
+            "hot": 0
+          },
+          {
+            "source": "scripts",
+            "target": "src",
+            "kind": "imports",
+            "weight": 4,
+            "hot": 0
+          },
+          {
+            "source": "(root)",
+            "target": "app",
+            "kind": "imports",
+            "weight": 1,
+            "hot": 0
+          }
+        ]
+      },
+      "dirs": {
+        "sections": [
+          {
+            "id": "bin",
+            "group": "bin",
+            "fileCount": 1,
+            "loc": 5,
+            "changedCount": 0,
+            "dependentCount": 0,
+            "dependencyCount": 0,
+            "additions": 0,
+            "deletions": 0,
+            "changedFiles": [],
+            "status": "normal"
+          },
+          {
+            "id": "src",
+            "group": "src",
+            "fileCount": 9,
+            "loc": 1528,
+            "changedCount": 0,
+            "dependentCount": 0,
+            "dependencyCount": 0,
+            "additions": 0,
+            "deletions": 0,
+            "changedFiles": [],
+            "status": "normal"
+          },
+          {
+            "id": "app/app",
+            "group": "app",
+            "fileCount": 1,
+            "loc": 74,
+            "changedCount": 0,
+            "dependentCount": 0,
+            "dependencyCount": 0,
+            "additions": 0,
+            "deletions": 0,
+            "changedFiles": [],
+            "status": "normal"
+          },
+          {
+            "id": "app/plugins",
+            "group": "app",
+            "fileCount": 1,
+            "loc": 56,
+            "changedCount": 0,
+            "dependentCount": 0,
+            "dependencyCount": 0,
+            "additions": 0,
+            "deletions": 0,
+            "changedFiles": [],
+            "status": "normal"
+          },
+          {
+            "id": "app/src",
+            "group": "app",
+            "fileCount": 3,
+            "loc": 123,
+            "changedCount": 0,
+            "dependentCount": 0,
+            "dependencyCount": 0,
+            "additions": 0,
+            "deletions": 0,
+            "changedFiles": [],
+            "status": "normal"
+          },
+          {
+            "id": "scripts",
+            "group": "scripts",
+            "fileCount": 1,
+            "loc": 100,
+            "changedCount": 0,
+            "dependentCount": 0,
+            "dependencyCount": 0,
+            "additions": 0,
+            "deletions": 0,
+            "changedFiles": [],
+            "status": "normal"
+          },
+          {
+            "id": "(root)",
+            "group": "(root)",
+            "fileCount": 2,
+            "loc": 70,
+            "changedCount": 0,
+            "dependentCount": 0,
+            "dependencyCount": 0,
+            "additions": 0,
+            "deletions": 0,
+            "changedFiles": [],
+            "status": "normal"
+          },
+          {
+            "id": "app",
+            "group": "app",
+            "fileCount": 0,
+            "loc": 0,
+            "changedCount": 0,
+            "dependentCount": 0,
+            "dependencyCount": 0,
+            "additions": 0,
+            "deletions": 0,
+            "changedFiles": [],
+            "status": "normal"
+          }
+        ],
+        "links": [
+          {
+            "source": "app",
+            "target": "app/app",
+            "kind": "orbit"
+          },
+          {
+            "source": "app",
+            "target": "app/plugins",
+            "kind": "orbit"
+          },
+          {
+            "source": "app",
+            "target": "app/src",
+            "kind": "orbit"
+          },
+          {
+            "source": "bin",
+            "target": "src",
+            "kind": "imports",
+            "weight": 1,
+            "hot": 0
+          },
+          {
+            "source": "scripts",
+            "target": "src",
+            "kind": "imports",
+            "weight": 4,
+            "hot": 0
+          },
+          {
+            "source": "(root)",
+            "target": "app/plugins",
+            "kind": "imports",
+            "weight": 1,
+            "hot": 0
+          }
+        ]
+      }
+    },
+    "stats": {
+      "fileCount": 18,
+      "linkCount": 17,
+      "unresolvedCount": 11,
+      "changedCount": 0,
+      "dependentCount": 0,
+      "dependencyCount": 0
+    }
+  },
+  "changes": {
+    "files": [],
+    "totals": null
+  },
+  "repoName": "slopmap",
+  "modeLabel": "full map",
+  "context": {
+    "branch": "sb/vue-viewer",
+    "baseRef": null,
+    "pullRequest": null,
+    "generatedAt": "2026-08-02T00:23:06.759Z"
+  }
+}
