@@ -38,6 +38,12 @@ describe('app/src/lib/payloadIndex', () => {
         ['delta/d.js', new Set(['beta/b.js'])],
       ]),
     );
+    expect(result.importerIdsByTarget).toEqual(
+      new Map([
+        ['beta/b.js', new Set(['alpha/a.js', 'delta/d.js'])],
+        ['gamma/c.js', new Set(['alpha/a.js'])],
+      ]),
+    );
     expect(result.groupColors).toEqual(
       new Map(
         GRAPH_FIXTURE.groups

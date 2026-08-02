@@ -1,7 +1,9 @@
 <template>
-  <div
+  <button
     v-if="path"
-    class="path-row flex items-center gap-2.5 rounded-[8px] px-3 py-2.5 font-mono text-[12px] text-ink/70 [overflow-wrap:anywhere] hover:bg-white/4"
+    class="path-row m-0 flex w-full cursor-pointer items-center gap-2.5 rounded-[8px] border-0 bg-transparent px-3 py-2.5 text-left font-mono text-[12px] text-ink/70 [overflow-wrap:anywhere] hover:bg-white/4"
+    type="button"
+    @click="emit('select', path)"
   >
     <span
       class="path-dot size-[7px] flex-[0_0_auto] rounded-full"
@@ -12,7 +14,7 @@
       "
     ></span>
     <span>{{ path }}</span>
-  </div>
+  </button>
   <div v-if="moreCount > 0" class="path-footer px-3 py-[11px] text-[12px] text-ink/35">
     + {{ moreCount }} more
   </div>
@@ -34,4 +36,6 @@ defineProps({
     default: 0,
   },
 });
+
+const emit = defineEmits(['select']);
 </script>

@@ -3,6 +3,7 @@ import { describe, expect, test } from 'vitest';
 import {
   changeMatchesSection,
   changedFilesFor,
+  childSectionsFor,
   displayPathFor,
   importedFilesFor,
   nodeMatchesSection,
@@ -91,6 +92,23 @@ describe('app/src/lib/sections', () => {
     expect(result).toHaveLength(10);
     expect(result[0]).toBe(NODES_FIXTURE[1]);
     expect(result.at(-1).loc).toBe(92);
+  });
+
+  test('childSectionsFor', () => {
+    const childSections = [
+      { id: 'apps/web/components', fileCount: 3 },
+      { id: 'apps/web/src', fileCount: 8 },
+      { id: 'apps/web/tests', fileCount: 3 },
+      { id: 'apps/web', fileCount: 20 },
+      { id: 'apps/website/src', fileCount: 12 },
+    ];
+
+    expect(childSectionsFor(childSections, SECTION_FIXTURE)).toEqual([
+      childSections[1],
+      childSections[0],
+      childSections[2],
+    ]);
+    expect(childSectionsFor(childSections, null)).toEqual([]);
   });
 
   test('importedFilesFor', () => {

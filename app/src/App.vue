@@ -1,10 +1,5 @@
 <template>
-  <div
-    class="slopmap-app min-h-screen"
-    :style="layoutStyle"
-    :data-theme="theme"
-    data-test="slopmap-app"
-  >
+  <div class="slopmap-app min-h-screen" :data-theme="theme" data-test="slopmap-app">
     <StarfieldCanvas />
     <IconRail />
     <TopHeader />
@@ -15,20 +10,12 @@
 </template>
 
 <script setup>
-import { useSelection } from './composables/useSelection.js';
+import { triggerSectionClick } from './composables/useGraphInstances.js';
 import { useSettings } from './composables/useSettings.js';
-import { HEADER_HEIGHT, INSPECTOR_WIDTH, RAIL_WIDTH } from './lib/layout.js';
 
 const { theme } = useSettings();
-const { selectSection } = useSelection();
 
-const layoutStyle = {
-  '--rail-w': `${RAIL_WIDTH}px`,
-  '--header-h': `${HEADER_HEIGHT}px`,
-  '--inspector-w': `${INSPECTOR_WIDTH}px`,
-};
-
-const handleSectionSelect = (section) => {
-  selectSection(section);
+const handleSectionSelect = (sectionSelection) => {
+  triggerSectionClick(sectionSelection.sectionId, sectionSelection.level);
 };
 </script>
