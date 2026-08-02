@@ -20,13 +20,8 @@ const props = defineProps({
   },
 });
 
-const hasChangedLines = computed(() => props.additions !== 0 || props.deletions !== 0);
-const additionsFlex = computed(() =>
-  props.detail || hasChangedLines.value ? Math.max(props.additions, 1) : 0,
-);
-const deletionsFlex = computed(() =>
-  props.detail || hasChangedLines.value ? Math.max(props.deletions, 1) : 0,
-);
+const additionsFlex = computed(() => props.additions);
+const deletionsFlex = computed(() => props.deletions);
 const remainderFlex = computed(() =>
   props.remainder === null ? null : Math.max(props.remainder, 1),
 );
@@ -34,8 +29,16 @@ const remainderFlex = computed(() =>
 
 <template>
   <span class="ratio-bar" :class="{ 'ratio-bar-detail': detail }" aria-hidden="true">
-    <span class="ratio-additions" :style="{ flex: additionsFlex }"></span>
-    <span class="ratio-deletions" :style="{ flex: deletionsFlex }"></span>
+    <span
+      v-if="additionsFlex > 0"
+      class="ratio-additions"
+      :style="{ flex: additionsFlex }"
+    ></span>
+    <span
+      v-if="deletionsFlex > 0"
+      class="ratio-deletions"
+      :style="{ flex: deletionsFlex }"
+    ></span>
     <span
       v-if="remainderFlex !== null"
       class="ratio-remainder"
