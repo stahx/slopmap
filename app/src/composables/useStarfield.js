@@ -141,12 +141,7 @@ export const useStarfield = (canvasElement) => {
     secondaryBandGradient.addColorStop(0.5, 'rgba(201,215,255,0.03)');
     secondaryBandGradient.addColorStop(1, 'rgba(201,215,255,0)');
     deepContext.fillStyle = secondaryBandGradient;
-    deepContext.fillRect(
-      0,
-      secondaryBandTop,
-      starFieldWidth,
-      secondaryBandHeight,
-    );
+    deepContext.fillRect(0, secondaryBandTop, starFieldWidth, secondaryBandHeight);
     const nebulaBlobs = [
       {
         colorChannels: '144,133,233',
@@ -189,10 +184,7 @@ export const useStarfield = (canvasElement) => {
           blob.blobRadius,
         );
         gradient.addColorStop(0, `rgba(${blob.colorChannels},${blob.alpha})`);
-        gradient.addColorStop(
-          0.45,
-          `rgba(${blob.colorChannels},${blob.alpha})`,
-        );
+        gradient.addColorStop(0.45, `rgba(${blob.colorChannels},${blob.alpha})`);
         gradient.addColorStop(1, `rgba(${blob.colorChannels},0)`);
         deepContext.fillStyle = gradient;
         deepContext.fillRect(0, 0, starFieldWidth, deepHeight);
@@ -241,27 +233,15 @@ export const useStarfield = (canvasElement) => {
       return;
     }
     const parallaxPanX =
-      dimension.value === '2d'
-        ? parallaxSource.pan2dX * 0.6
-        : parallaxSource.pan3dX;
+      dimension.value === '2d' ? parallaxSource.pan2dX * 0.6 : parallaxSource.pan3dX;
     const parallaxPanY =
-      dimension.value === '2d'
-        ? parallaxSource.pan2dY * 0.6
-        : parallaxSource.pan3dY;
+      dimension.value === '2d' ? parallaxSource.pan2dY * 0.6 : parallaxSource.pan3dY;
     starsContext.clearRect(0, 0, starFieldWidth, starFieldHeight);
     starsContext.drawImage(baseCanvas, 0, 0, starFieldWidth, starFieldHeight);
     const deepHeight = starFieldHeight * 1.6;
     const deepOffsetX = wrapCoordinate(parallaxPanX * 0.25, starFieldWidth);
-    const deepOffsetY = Math.round(
-      -0.3 * starFieldHeight + parallaxPanY * 0.25,
-    );
-    starsContext.drawImage(
-      deepCanvas,
-      deepOffsetX,
-      deepOffsetY,
-      starFieldWidth,
-      deepHeight,
-    );
+    const deepOffsetY = Math.round(-0.3 * starFieldHeight + parallaxPanY * 0.25);
+    starsContext.drawImage(deepCanvas, deepOffsetX, deepOffsetY, starFieldWidth, deepHeight);
     starsContext.drawImage(
       deepCanvas,
       deepOffsetX - starFieldWidth,
@@ -285,11 +265,7 @@ export const useStarfield = (canvasElement) => {
         starFieldHeight,
       );
       starsContext.globalAlpha =
-        0.25 +
-        0.55 *
-          Math.abs(
-            Math.sin(star.twinklePhase + timestamp * 0.001 * star.twinkleSpeed),
-          );
+        0.25 + 0.55 * Math.abs(Math.sin(star.twinklePhase + timestamp * 0.001 * star.twinkleSpeed));
       starsContext.fillStyle = star.color;
       if (star.isBright) {
         starsContext.shadowBlur = 9;
@@ -301,13 +277,7 @@ export const useStarfield = (canvasElement) => {
       if (star.isBright) starsContext.shadowBlur = 0;
     }
     starsContext.globalAlpha = 1;
-    starsContext.drawImage(
-      vignetteCanvas,
-      0,
-      0,
-      starFieldWidth,
-      starFieldHeight,
-    );
+    starsContext.drawImage(vignetteCanvas, 0, 0, starFieldWidth, starFieldHeight);
     starsFrameId = globalThis.requestAnimationFrame(renderStars);
   };
 

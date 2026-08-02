@@ -35,13 +35,13 @@ Every map has two views on the rail: Compact rolls files up with a compactness s
 
 Use the rail's dimension button for a 3D orbit or flat 2D canvas; the choice is remembered between visits. In 2D, a selected changed section also shows its blast-radius ring.
 
-| Option | Description |
-| --- | --- |
-| `--base <ref>` | Git ref to diff against, such as `master` or `origin/main` |
-| `--pr <number>` | GitHub PR number; uses `gh` to fetch changed files |
-| `--out <file>` | Output HTML path; defaults to a temporary file |
-| `--no-open` | Do not open the result in a browser |
-| `--help` | Show command help |
+| Option          | Description                                                |
+| --------------- | ---------------------------------------------------------- |
+| `--base <ref>`  | Git ref to diff against, such as `master` or `origin/main` |
+| `--pr <number>` | GitHub PR number; uses `gh` to fetch changed files         |
+| `--out <file>`  | Output HTML path; defaults to a temporary file             |
+| `--no-open`     | Do not open the result in a browser                        |
+| `--help`        | Show command help                                          |
 
 ## How it works
 
@@ -56,6 +56,26 @@ Use the rail's dimension button for a 3D orbit or flat 2D canvas; the choice is 
 - `--pr` highlights file paths against the current checkout. Run `gh pr checkout N` first for an exact graph.
 - Import extraction uses regular expressions, not an AST.
 - Internal-looking specifiers that cannot be resolved are reported in the stats.
+
+## Development
+
+The command-line implementation lives in `src/`, while the Vue viewer lives in `app/`. The viewer build is committed at `dist/index.html` so the CLI can generate a fully self-contained map without a separate build step.
+
+Run the viewer locally with:
+
+```sh
+pnpm dev
+```
+
+Open the development URL with `?fixture=diff` to load the diff fixture instead of the default full-repository fixture.
+
+Build the committed viewer artifact with `pnpm build`. Run `pnpm check:dist` to rebuild it and verify that `dist/index.html` is already in sync with the viewer source.
+
+The pre-commit hook runs lint-staged, which fixes ESLint issues and formats staged source files without rebuilding the viewer. If a merge conflict affects `dist/index.html`, resolve it from source and regenerate the artifact:
+
+```sh
+pnpm build && git add dist
+```
 
 ## Roadmap
 

@@ -20,14 +20,9 @@ const aggregateLevelNames = {
 
 const isAggregatedView = computed(() => currentView.value === 'compact');
 const activeAggregate = computed(
-  () =>
-    payload.value?.graph?.levels?.[
-      aggregateLevelNames[compactnessLevel.value]
-    ] ?? null
+  () => payload.value?.graph?.levels?.[aggregateLevelNames[compactnessLevel.value]] ?? null,
 );
-const compactnessLabel = computed(
-  () => aggregateLevelNames[compactnessLevel.value]
-);
+const compactnessLabel = computed(() => aggregateLevelNames[compactnessLevel.value]);
 
 const showView = (view) => {
   currentView.value = view === 'files' ? 'files' : 'compact';

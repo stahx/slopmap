@@ -31,13 +31,7 @@ const {
   isAggregatedView,
   activeAggregate,
 } = useViewState();
-const {
-  selectedNode,
-  selectedSection,
-  toggleNode,
-  deselect,
-  setGraphHooks,
-} = useSelection();
+const { selectedNode, selectedSection, toggleNode, deselect, setGraphHooks } = useSelection();
 const { mapWidth, mapHeight, disconnect } = useMapArea();
 
 let graph3dInstance = null;
@@ -88,8 +82,7 @@ const nodeColorAccessor = (node) => nodeColorFor(node, styleContext());
 const nodeLabelAccessor = (node) => nodeLabelFor(node, styleContext());
 const nodeValueAccessor = (node) => nodeValueFor(node, styleContext());
 
-const activeGraph = () =>
-  dimension.value === '2d' ? graph2dInstance : graph3dInstance;
+const activeGraph = () => (dimension.value === '2d' ? graph2dInstance : graph3dInstance);
 
 const assertRawGraphData = (graphData) => {
   if (!import.meta.env.DEV) return;
@@ -161,20 +154,14 @@ const pin2dNodes = () => {
   graph2dInstance.zoomToFit(600);
 };
 
-const drawSpacedCanvasText = (
-  canvasContext,
-  labelText,
-  centerX,
-  baselineY,
-  characterSpacing
-) => {
+const drawSpacedCanvasText = (canvasContext, labelText, centerX, baselineY, characterSpacing) => {
   const characters = [...labelText];
   const textWidth =
     characters.reduce(
-      (totalWidth, character) =>
-        totalWidth + canvasContext.measureText(character).width,
-      0
-    ) + characterSpacing * Math.max(characters.length - 1, 0);
+      (totalWidth, character) => totalWidth + canvasContext.measureText(character).width,
+      0,
+    ) +
+    characterSpacing * Math.max(characters.length - 1, 0);
   let cursorX = centerX - textWidth / 2;
   for (const character of characters) {
     canvasContext.fillText(character, cursorX, baselineY);
@@ -199,13 +186,7 @@ const renderBlastRing = (canvasContext, globalScale) => {
   canvasContext.setLineDash([6 / globalScale, 5 / globalScale]);
   canvasContext.strokeStyle = 'rgba(240,138,75,.35)';
   canvasContext.lineWidth = 1 / globalScale;
-  canvasContext.arc(
-    section.x,
-    section.y,
-    AGGREGATE_PUSH_RADIUS,
-    0,
-    Math.PI * 2
-  );
+  canvasContext.arc(section.x, section.y, AGGREGATE_PUSH_RADIUS, 0, Math.PI * 2);
   canvasContext.stroke();
   canvasContext.setLineDash([]);
   canvasContext.font = `500 ${10.5 / globalScale}px "IBM Plex Mono", monospace`;
@@ -216,7 +197,7 @@ const renderBlastRing = (canvasContext, globalScale) => {
     `BLAST RADIUS · ${section.downstreamTotal} files`,
     section.x,
     section.y + AGGREGATE_PUSH_RADIUS + 18 / globalScale,
-    0.6 / globalScale
+    0.6 / globalScale,
   );
   canvasContext.restore();
 };
@@ -226,8 +207,7 @@ const render2dNodeLabel = (node, canvasContext, globalScale) => {
   const isHub = compactnessLevel.value !== 3 || node.id === node.group;
   const labelText = isHub ? node.id : node.id.split('/').at(-1);
   const fontSize = 12 / globalScale;
-  const verticalOffset =
-    (Math.sqrt(nodeValueAccessor(node)) * 4) / globalScale + 12 / globalScale;
+  const verticalOffset = (Math.sqrt(nodeValueAccessor(node)) * 4) / globalScale + 12 / globalScale;
   canvasContext.font = `${isHub ? 600 : 500} ${fontSize}px "Inter", system-ui, sans-serif`;
   canvasContext.fillStyle = isHub ? '#ffffff' : 'rgba(255,255,255,.72)';
   canvasContext.textAlign = 'center';
@@ -252,7 +232,7 @@ const focusFileNode = (node) => {
   graph3dInstance.cameraPosition(
     { x: node.x * ratio, y: node.y * ratio, z: node.z * ratio },
     node,
-    800
+    800,
   );
 };
 
@@ -272,10 +252,7 @@ const captureParallax = () => {
   if (dimension.value === '3d' && graph3dInstance?.camera()) {
     const cameraPosition = graph3dInstance.camera().position;
     const nextAzimuth = Math.atan2(cameraPosition.x, cameraPosition.z);
-    const elevation = Math.atan2(
-      cameraPosition.y,
-      Math.hypot(cameraPosition.x, cameraPosition.z)
-    );
+    const elevation = Math.atan2(cameraPosition.y, Math.hypot(cameraPosition.x, cameraPosition.z));
     if (previousAzimuth === null) {
       previousAzimuth = nextAzimuth;
     } else {
@@ -311,13 +288,15 @@ const applyView = () => {
       links: aggregate?.links ?? [],
     });
     graph.d3Force('charge').strength(-160);
-    graph.d3Force('link').distance(
-      compactnessLevel.value === 1
-        ? 120
-        : compactnessLevel.value === 2
-          ? 100
-          : (link) => (link.kind === 'orbit' ? 70 : 110)
-    );
+    graph
+      .d3Force('link')
+      .distance(
+        compactnessLevel.value === 1
+          ? 120
+          : compactnessLevel.value === 2
+            ? 100
+            : (link) => (link.kind === 'orbit' ? 70 : 110),
+      );
   } else {
     feedGraph(graph, filteredFilesGraph());
     graph.d3Force('charge').strength(-45);
@@ -332,15 +311,11 @@ const registerWatchers = () => {
   stopWatchers = [
     watch(dimension, () => applyView()),
     watch([currentView, compactnessLevel], () => applyView()),
-    watch([impactOnly, hideIsolated, aggregateFilter], () =>
-      refreshFilesGraph()
-    ),
+    watch([impactOnly, hideIsolated, aggregateFilter], () => refreshFilesGraph()),
     watch([searchTerm, selectedNode], () => recolor()),
-    watch(
-      [mapWidth, mapHeight],
-      ([width, height]) => resizeGraphs(width, height),
-      { flush: 'post' }
-    ),
+    watch([mapWidth, mapHeight], ([width, height]) => resizeGraphs(width, height), {
+      flush: 'post',
+    }),
   ];
 };
 

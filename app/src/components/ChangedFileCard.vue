@@ -18,9 +18,7 @@ const props = defineProps({
   },
 });
 
-const displayPath = computed(() =>
-  displayPathFor(props.changeFile.path, props.sectionId)
-);
+const displayPath = computed(() => displayPathFor(props.changeFile.path, props.sectionId));
 const isDeleted = computed(() => props.changeFile.status === 'D');
 const metaText = computed(() => {
   if (!isDeleted.value) return `imported by ${props.importerCount} files`;
@@ -34,9 +32,7 @@ const metaText = computed(() => {
   <div class="detail-file-card">
     <div class="detail-file-primary">
       <StatusBadge :status="changeFile.status" />
-      <span class="detail-file-name" :class="{ deleted: isDeleted }">{{
-        displayPath
-      }}</span>
+      <span class="detail-file-name" :class="{ deleted: isDeleted }">{{ displayPath }}</span>
       <span
         class="detail-change-count"
         :class="changeFile.additions === 0 ? 'change-zero' : 'additions'"
@@ -55,10 +51,7 @@ const metaText = computed(() => {
       :remainder="changeFile.additions + changeFile.deletions"
       detail
     />
-    <div
-      class="detail-file-meta"
-      :class="{ warning: isDeleted && importerCount > 0 }"
-    >
+    <div class="detail-file-meta" :class="{ warning: isDeleted && importerCount > 0 }">
       {{ metaText }}
     </div>
   </div>

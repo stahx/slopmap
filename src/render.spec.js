@@ -79,10 +79,8 @@ describe('src/render', () => {
         modeLabel: 'full map',
         context: {},
         templatePath: path.join(tempDirectory, 'missing.html'),
-      })
-    ).toThrow(
-      'slopmap: viewer bundle not found at dist/index.html — run pnpm build'
-    );
+      }),
+    ).toThrow('slopmap: viewer bundle not found at dist/index.html — run pnpm build');
   });
 
   test('renderHtml reports a missing payload marker', () => {
@@ -95,9 +93,7 @@ describe('src/render', () => {
         modeLabel: 'full map',
         context: {},
         templatePath,
-      })
-    ).toThrow(
-      'slopmap: viewer bundle is missing the payload marker — run pnpm build'
-    );
+      }),
+    ).toThrow('slopmap: viewer bundle is missing the payload marker — run pnpm build');
   });
 });

@@ -40,45 +40,45 @@ describe('app/src/lib/graphStyle', () => {
         ...BASE_CONTEXT,
         aggregated: true,
         diffMode: true,
-      })
+      }),
     ).toBe('#e8564a');
     expect(
       nodeColorFor(normalSection, {
         ...BASE_CONTEXT,
         aggregated: true,
         diffMode: true,
-      })
+      }),
     ).toBe('rgba(139,143,163,.5)');
     expect(
       nodeColorFor(changedSection, {
         ...BASE_CONTEXT,
         aggregated: true,
-      })
+      }),
     ).toBe('#3987e5');
     expect(
       nodeColorFor(normalSection, {
         ...BASE_CONTEXT,
         aggregated: true,
-      })
+      }),
     ).toBe('#8b8fa3');
     expect(
       nodeColorFor(normalFile, {
         ...BASE_CONTEXT,
         diffMode: true,
-      })
+      }),
     ).toBe('rgba(139,143,163,.35)');
     expect(
       nodeColorFor(normalFile, {
         ...BASE_CONTEXT,
         searchTerm: 'alpha',
         selectedNode: normalFile,
-      })
+      }),
     ).toBe('#ffffff');
     expect(
       nodeColorFor(changedSection, {
         ...BASE_CONTEXT,
         selectedNode: changedSection,
-      })
+      }),
     ).toBe('#f19a92');
     expect(
       nodeColorFor(normalSection, {
@@ -86,7 +86,7 @@ describe('app/src/lib/graphStyle', () => {
         aggregated: true,
         diffMode: true,
         selectedNode: normalSection,
-      })
+      }),
     ).toBe('#b9bcc8');
   });
 
@@ -94,55 +94,34 @@ describe('app/src/lib/graphStyle', () => {
     expect(
       nodeLabelFor(
         { id: 'alpha', fileCount: 4, changedCount: 2 },
-        { ...BASE_CONTEXT, aggregated: true }
-      )
+        { ...BASE_CONTEXT, aggregated: true },
+      ),
     ).toBe('alpha · 4 files · 2 changed');
-    expect(
-      nodeLabelFor(
-        { id: 'src/a.js', loc: 120, status: 'dependent' },
-        BASE_CONTEXT
-      )
-    ).toBe('src/a.js · 120 loc · dependent');
+    expect(nodeLabelFor({ id: 'src/a.js', loc: 120, status: 'dependent' }, BASE_CONTEXT)).toBe(
+      'src/a.js · 120 loc · dependent',
+    );
   });
 
   test('nodeValueFor', () => {
     expect(nodeValueFor({ loc: 0 }, BASE_CONTEXT)).toBe(1);
     expect(nodeValueFor({ loc: 1200 }, BASE_CONTEXT)).toBe(14);
     expect(
-      nodeValueFor(
-        { fileCount: 1 },
-        { ...BASE_CONTEXT, aggregated: true, compactnessLevel: 1 }
-      )
+      nodeValueFor({ fileCount: 1 }, { ...BASE_CONTEXT, aggregated: true, compactnessLevel: 1 }),
     ).toBe(10);
     expect(
-      nodeValueFor(
-        { fileCount: 2000 },
-        { ...BASE_CONTEXT, aggregated: true, compactnessLevel: 1 }
-      )
+      nodeValueFor({ fileCount: 2000 }, { ...BASE_CONTEXT, aggregated: true, compactnessLevel: 1 }),
     ).toBe(90);
     expect(
-      nodeValueFor(
-        { fileCount: 1 },
-        { ...BASE_CONTEXT, aggregated: true, compactnessLevel: 2 }
-      )
+      nodeValueFor({ fileCount: 1 }, { ...BASE_CONTEXT, aggregated: true, compactnessLevel: 2 }),
     ).toBe(8);
     expect(
-      nodeValueFor(
-        { fileCount: 2000 },
-        { ...BASE_CONTEXT, aggregated: true, compactnessLevel: 2 }
-      )
+      nodeValueFor({ fileCount: 2000 }, { ...BASE_CONTEXT, aggregated: true, compactnessLevel: 2 }),
     ).toBe(70);
     expect(
-      nodeValueFor(
-        { fileCount: 1 },
-        { ...BASE_CONTEXT, aggregated: true, compactnessLevel: 3 }
-      )
+      nodeValueFor({ fileCount: 1 }, { ...BASE_CONTEXT, aggregated: true, compactnessLevel: 3 }),
     ).toBe(4);
     expect(
-      nodeValueFor(
-        { fileCount: 50 },
-        { ...BASE_CONTEXT, aggregated: true, compactnessLevel: 3 }
-      )
+      nodeValueFor({ fileCount: 50 }, { ...BASE_CONTEXT, aggregated: true, compactnessLevel: 3 }),
     ).toBe(40);
   });
 

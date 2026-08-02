@@ -16,11 +16,7 @@ const host3dElement = ref(null);
 const host2dElement = ref(null);
 
 onMounted(() => {
-  if (
-    stageElement.value === null ||
-    host3dElement.value === null ||
-    host2dElement.value === null
-  ) {
+  if (stageElement.value === null || host3dElement.value === null || host2dElement.value === null) {
     return;
   }
   observe(stageElement.value);
@@ -32,15 +28,15 @@ onMounted(() => {
 <template>
   <div ref="stageElement" class="graph-stage" aria-hidden="true">
     <div
+      v-show="dimension === '3d'"
       id="graph"
       ref="host3dElement"
-      v-show="dimension === '3d'"
       class="graph-host graph-host-3d"
     ></div>
     <div
+      v-show="dimension === '2d'"
       id="graph2d"
       ref="host2dElement"
-      v-show="dimension === '2d'"
       class="graph-host graph-host-2d"
     ></div>
     <SectionLabels v-if="isAggregatedView && dimension === '3d'" />

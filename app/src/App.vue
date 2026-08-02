@@ -1,11 +1,7 @@
 <script setup>
 import { useSelection } from './composables/useSelection.js';
 import { useSettings } from './composables/useSettings.js';
-import {
-  HEADER_HEIGHT,
-  INSPECTOR_WIDTH,
-  RAIL_WIDTH,
-} from './lib/layout.js';
+import { HEADER_HEIGHT, INSPECTOR_WIDTH, RAIL_WIDTH } from './lib/layout.js';
 
 const { theme } = useSettings();
 const { selectSection } = useSelection();
@@ -22,12 +18,7 @@ const handleSectionSelect = (section) => {
 </script>
 
 <template>
-  <div
-    class="slopmap-app"
-    :style="layoutStyle"
-    :data-theme="theme"
-    data-test="slopmap-app"
-  >
+  <div class="slopmap-app" :style="layoutStyle" :data-theme="theme" data-test="slopmap-app">
     <StarfieldCanvas />
     <IconRail />
     <TopHeader />

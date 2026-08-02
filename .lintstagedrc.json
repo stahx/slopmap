@@ -1,0 +1,8 @@
+{
+  "app/**/*.{js,vue,css}": ["eslint --fix", "prettier --write"],
+  "src/**/*.js": ["eslint --fix", "prettier --write"],
+  "bin/**/*.js": ["eslint --fix", "prettier --write"],
+  "scripts/**/*.js": ["eslint --fix", "prettier --write"],
+  "app/index.html": "prettier --write",
+  "*.{json,md}": "prettier --write"
+}

@@ -19,7 +19,7 @@ describe('app/src/lib/displacement', () => {
       [originNode, boundaryNode, nearbyNode, twoDimensionalNode],
       originNode,
       180,
-      26
+      26,
     );
 
     expect(results).toHaveLength(2);

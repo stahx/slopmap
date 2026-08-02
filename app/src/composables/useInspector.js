@@ -28,30 +28,20 @@ const payloadIndex = computed(() =>
         importedTargetsBySource: new Map(),
         groupColors: new Map(),
       }
-    : buildPayloadIndex(payload.value.graph)
+    : buildPayloadIndex(payload.value.graph),
 );
 const nodesById = computed(
-  () =>
-    new Map((payload.value?.graph?.nodes ?? []).map((node) => [node.id, node]))
+  () => new Map((payload.value?.graph?.nodes ?? []).map((node) => [node.id, node])),
 );
 const changedFiles = computed(() => {
   if (activeSection.value === null) return [];
-  return changedFilesFor(
-    changes.value,
-    activeSection.value,
-    compactnessLevel.value
-  );
+  return changedFilesFor(changes.value, activeSection.value, compactnessLevel.value);
 });
 const dependentFiles = computed(() =>
-  Array.isArray(activeSection.value?.downstreamFiles)
-    ? activeSection.value.downstreamFiles
-    : []
+  Array.isArray(activeSection.value?.downstreamFiles) ? activeSection.value.downstreamFiles : [],
 );
 const dependentHiddenCount = computed(() =>
-  Math.max(
-    (activeSection.value?.downstreamTotal ?? 0) - dependentFiles.value.length,
-    0
-  )
+  Math.max((activeSection.value?.downstreamTotal ?? 0) - dependentFiles.value.length, 0),
 );
 const importedFiles = computed(() => {
   if (activeSection.value === null) return [];
@@ -59,14 +49,14 @@ const importedFiles = computed(() => {
     nodeMatchesSection(
       typeof nodeOrId === 'object' ? nodeOrId : nodesById.value.get(nodeOrId),
       section,
-      level
+      level,
     );
   return importedFilesFor(
     payload.value?.graph?.links ?? [],
     changedFiles.value.map((changeFile) => changeFile.path),
     activeSection.value,
     compactnessLevel.value,
-    matchesActiveSection
+    matchesActiveSection,
   );
 });
 const sectionFiles = computed(() => {
@@ -74,7 +64,7 @@ const sectionFiles = computed(() => {
   return sectionFilesFor(
     payload.value?.graph?.nodes ?? [],
     activeSection.value,
-    compactnessLevel.value
+    compactnessLevel.value,
   );
 });
 const tabCounts = computed(() => ({
@@ -82,15 +72,13 @@ const tabCounts = computed(() => ({
   dependents: activeSection.value?.downstreamTotal ?? 0,
   imports: importedFiles.value.length,
 }));
-const importerCountsByTarget = computed(
-  () => payloadIndex.value.importerCountsByTarget
-);
+const importerCountsByTarget = computed(() => payloadIndex.value.importerCountsByTarget);
 
 const copyPaths = async () => {
   if (activeSection.value === null) return;
   try {
     await globalThis.navigator.clipboard.writeText(
-      changedFiles.value.map((changeFile) => changeFile.path).join('\n')
+      changedFiles.value.map((changeFile) => changeFile.path).join('\n'),
     );
     copied.value = true;
     if (copiedTimeoutId !== null) globalThis.clearTimeout(copiedTimeoutId);
@@ -98,18 +86,16 @@ const copyPaths = async () => {
       copied.value = false;
       copiedTimeoutId = null;
     }, 1500);
-  } catch (clipboardError) {}
+  } catch {
+    return;
+  }
 };
 
 const isolateBlast = () => {
   if (activeSection.value === null) return;
   aggregateFilter.value = {
     mode:
-      compactnessLevel.value === 1
-        ? 'root'
-        : compactnessLevel.value === 2
-          ? 'group'
-          : 'section',
+      compactnessLevel.value === 1 ? 'root' : compactnessLevel.value === 2 ? 'group' : 'section',
     value: activeSection.value.id,
   };
   impactOnly.value = true;

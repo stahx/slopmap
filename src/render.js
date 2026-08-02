@@ -2,10 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const toolRoot = path.resolve(
-  path.dirname(fileURLToPath(import.meta.url)),
-  '..'
-);
+const toolRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const defaultTemplatePath = path.join(toolRoot, 'dist', 'index.html');
 
 export const renderHtml = ({
@@ -16,15 +13,11 @@ export const renderHtml = ({
   templatePath = defaultTemplatePath,
 }) => {
   if (!fs.existsSync(templatePath)) {
-    throw new Error(
-      'slopmap: viewer bundle not found at dist/index.html — run pnpm build'
-    );
+    throw new Error('slopmap: viewer bundle not found at dist/index.html — run pnpm build');
   }
   const template = fs.readFileSync(templatePath, 'utf8');
   if (!template.includes('__SLOPMAP_DATA__')) {
-    throw new Error(
-      'slopmap: viewer bundle is missing the payload marker — run pnpm build'
-    );
+    throw new Error('slopmap: viewer bundle is missing the payload marker — run pnpm build');
   }
   const { changes, ...graphPayload } = graph;
   const serializedData = JSON.stringify({

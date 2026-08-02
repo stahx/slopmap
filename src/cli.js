@@ -34,7 +34,7 @@ const resolvedRenamePath = (filePath) => {
   return renameSeparator === -1 ? filePath : filePath.slice(renameSeparator + 4);
 };
 
-const numericStat = (value) => value === '-' ? 0 : Number(value) || 0;
+const numericStat = (value) => (value === '-' ? 0 : Number(value) || 0);
 
 const lineCount = (content) => {
   if (content.length === 0) return 0;
@@ -96,7 +96,7 @@ const parseArgs = (argv) => {
     }
   }
   const hasMissingValue = [options.base, options.pr, options.out].some(
-    (value) => value === undefined || (value !== null && value.startsWith('--'))
+    (value) => value === undefined || (value !== null && value.startsWith('--')),
   );
   if (hasMissingValue) {
     process.stderr.write(`slopmap: missing value for option\n\n${HELP_TEXT}`);
@@ -148,7 +148,9 @@ export const collectChanges = (repoRoot, options, changedFiles) => {
   for (const line of outputLines(git(repoRoot, ['diff', '--numstat', `${options.base}...HEAD`]))) {
     addNumstat(line);
   }
-  for (const line of outputLines(git(repoRoot, ['diff', '--name-status', `${options.base}...HEAD`]))) {
+  for (const line of outputLines(
+    git(repoRoot, ['diff', '--name-status', `${options.base}...HEAD`]),
+  )) {
     const [statusValue, firstPath, secondPath] = line.split('\t');
     const status = statusValue.startsWith('R') ? 'R' : statusValue[0];
     const filePath = status === 'R' ? secondPath : firstPath;
@@ -158,7 +160,9 @@ export const collectChanges = (repoRoot, options, changedFiles) => {
   for (const line of outputLines(git(repoRoot, ['diff', '--numstat', 'HEAD']))) {
     addNumstat(line);
   }
-  for (const filePath of outputLines(git(repoRoot, ['ls-files', '--others', '--exclude-standard']))) {
+  for (const filePath of outputLines(
+    git(repoRoot, ['ls-files', '--others', '--exclude-standard']),
+  )) {
     let additions = 0;
     try {
       additions = lineCount(fs.readFileSync(path.join(repoRoot, filePath), 'utf8'));
@@ -175,7 +179,7 @@ export const collectChanges = (repoRoot, options, changedFiles) => {
       additions: summary.additions + file.additions,
       deletions: summary.deletions + file.deletions,
     }),
-    { additions: 0, deletions: 0 }
+    { additions: 0, deletions: 0 },
   );
   return { files, totals };
 };
@@ -184,8 +188,14 @@ export const resolveChangedFiles = (repoRoot, options) => {
   if (options.pr) {
     const output = execFileSync(
       'gh',
-      ['pr', 'view', String(options.pr), '--json', 'number,title,url,state,additions,deletions,files'],
-      { cwd: repoRoot, encoding: 'utf8', stdio: ['ignore', 'pipe', 'inherit'] }
+      [
+        'pr',
+        'view',
+        String(options.pr),
+        '--json',
+        'number,title,url,state,additions,deletions,files',
+      ],
+      { cwd: repoRoot, encoding: 'utf8', stdio: ['ignore', 'pipe', 'inherit'] },
     );
     const pullRequest = JSON.parse(output);
     return {
@@ -227,12 +237,14 @@ export const runCli = async (argv) => {
   const changes = collectChanges(
     repoRoot,
     { ...options, pullRequestData: changed.pullRequestData },
-    changed.files
+    changed.files,
   );
   const branch = detectBranch(repoRoot);
   const pullRequest = options.pr
     ? changed.pullRequest
-    : (options.base ? detectPullRequest(repoRoot) : null);
+    : options.base
+      ? detectPullRequest(repoRoot)
+      : null;
   const context = {
     branch,
     baseRef: options.base || null,
@@ -254,16 +266,14 @@ export const runCli = async (argv) => {
   process.stdout.write(
     `slopmap: ${repoName} (${changed.modeLabel})\n` +
       `  files: ${stats.fileCount}   imports: ${stats.linkCount}   unresolved: ${stats.unresolvedCount}` +
-      (changes.totals
-        ? `   +${changes.totals.additions} −${changes.totals.deletions}\n`
-        : '\n') +
+      (changes.totals ? `   +${changes.totals.additions} −${changes.totals.deletions}\n` : '\n') +
       (stats.changedCount > 0
         ? `  changed: ${stats.changedCount}   blast radius: ${stats.dependentCount}   depends on: ${stats.dependencyCount}\n`
         : '') +
       (context.pullRequest
         ? `  PR #${context.pullRequest.number}: ${context.pullRequest.url}\n`
         : '') +
-      `  -> ${outPath}\n`
+      `  -> ${outPath}\n`,
   );
 
   if (options.open) {

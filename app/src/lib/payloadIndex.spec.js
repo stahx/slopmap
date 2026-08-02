@@ -30,20 +30,20 @@ describe('app/src/lib/payloadIndex', () => {
       new Map([
         ['beta/b.js', 2],
         ['gamma/c.js', 1],
-      ])
+      ]),
     );
     expect(result.importedTargetsBySource).toEqual(
       new Map([
         ['alpha/a.js', new Set(['beta/b.js', 'gamma/c.js'])],
         ['delta/d.js', new Set(['beta/b.js'])],
-      ])
+      ]),
     );
     expect(result.groupColors).toEqual(
       new Map(
         GRAPH_FIXTURE.groups
           .slice(0, 8)
-          .map((group, slotIndex) => [group.name, GROUP_COLORS[slotIndex]])
-      )
+          .map((group, slotIndex) => [group.name, GROUP_COLORS[slotIndex]]),
+      ),
     );
     expect(result.groupColors.has('iota')).toBe(false);
   });

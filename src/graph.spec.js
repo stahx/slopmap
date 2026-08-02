@@ -56,13 +56,26 @@ const COSMOS_SOURCES = [
   {
     filePath: 'apps/cosmos/section-01/changed.ts',
     loc: 100,
-    specifiers: ['./local-dependent', '../../section-03/dependency', '../../section-03/normal', '../../section-04/dependency'],
+    specifiers: [
+      './local-dependent',
+      '../../section-03/dependency',
+      '../../section-03/normal',
+      '../../section-04/dependency',
+    ],
   },
   { filePath: 'apps/cosmos/section-01/local-dependent.ts', loc: 50, specifiers: ['./changed'] },
-  { filePath: 'apps/cosmos/section-02/dependent.ts', loc: 30, specifiers: ['../../section-01/changed'] },
+  {
+    filePath: 'apps/cosmos/section-02/dependent.ts',
+    loc: 30,
+    specifiers: ['../../section-01/changed'],
+  },
   { filePath: 'apps/cosmos/section-03/dependency.ts', loc: 20, specifiers: [] },
   { filePath: 'apps/cosmos/section-03/normal.ts', loc: 10, specifiers: [] },
-  { filePath: 'apps/cosmos/section-04/dependent.ts', loc: 40, specifiers: ['../../section-01/changed'] },
+  {
+    filePath: 'apps/cosmos/section-04/dependent.ts',
+    loc: 40,
+    specifiers: ['../../section-01/changed'],
+  },
   { filePath: 'apps/cosmos/section-04/dependency.ts', loc: 60, specifiers: [] },
   { filePath: 'apps/cosmos/section-05/file.ts', loc: 5, specifiers: [] },
   { filePath: 'apps/cosmos/section-06/file.ts', loc: 6, specifiers: [] },
@@ -81,13 +94,31 @@ const COSMOS_SOURCES = [
 ];
 
 const COSMOS_RESOLUTIONS = new Map([
-  ['apps/cosmos/section-01/changed.ts\0./local-dependent', 'apps/cosmos/section-01/local-dependent.ts'],
-  ['apps/cosmos/section-01/changed.ts\0../../section-03/dependency', 'apps/cosmos/section-03/dependency.ts'],
-  ['apps/cosmos/section-01/changed.ts\0../../section-03/normal', 'apps/cosmos/section-03/normal.ts'],
-  ['apps/cosmos/section-01/changed.ts\0../../section-04/dependency', 'apps/cosmos/section-04/dependency.ts'],
+  [
+    'apps/cosmos/section-01/changed.ts\0./local-dependent',
+    'apps/cosmos/section-01/local-dependent.ts',
+  ],
+  [
+    'apps/cosmos/section-01/changed.ts\0../../section-03/dependency',
+    'apps/cosmos/section-03/dependency.ts',
+  ],
+  [
+    'apps/cosmos/section-01/changed.ts\0../../section-03/normal',
+    'apps/cosmos/section-03/normal.ts',
+  ],
+  [
+    'apps/cosmos/section-01/changed.ts\0../../section-04/dependency',
+    'apps/cosmos/section-04/dependency.ts',
+  ],
   ['apps/cosmos/section-01/local-dependent.ts\0./changed', 'apps/cosmos/section-01/changed.ts'],
-  ['apps/cosmos/section-02/dependent.ts\0../../section-01/changed', 'apps/cosmos/section-01/changed.ts'],
-  ['apps/cosmos/section-04/dependent.ts\0../../section-01/changed', 'apps/cosmos/section-01/changed.ts'],
+  [
+    'apps/cosmos/section-02/dependent.ts\0../../section-01/changed',
+    'apps/cosmos/section-01/changed.ts',
+  ],
+  [
+    'apps/cosmos/section-04/dependent.ts\0../../section-01/changed',
+    'apps/cosmos/section-01/changed.ts',
+  ],
   ['e2e/cypress/support.ts\0../run', 'e2e/run.ts'],
 ]);
 
@@ -116,8 +147,7 @@ const CAPPED_DOWNSTREAM_SOURCES = [
 ];
 
 const CAPPED_DOWNSTREAM_RESOLVER = {
-  resolve: (fromFile, specifier) =>
-    specifier === '../core/changed' ? 'core/changed.ts' : null,
+  resolve: (fromFile, specifier) => (specifier === '../core/changed' ? 'core/changed.ts' : null),
   isInternalLooking: (specifier) => specifier.startsWith('.'),
 };
 
@@ -201,9 +231,13 @@ describe('src/graph', () => {
       changes: COSMOS_CHANGES,
     });
     const nodesById = new Map(graph.nodes.map((node) => [node.id, node]));
-    const sectionsById = new Map(graph.levels.dirs.sections.map((section) => [section.id, section]));
+    const sectionsById = new Map(
+      graph.levels.dirs.sections.map((section) => [section.id, section]),
+    );
 
-    expect(nodesById.get('apps/cosmos/section-01/changed.ts').section).toBe('apps/cosmos/section-01');
+    expect(nodesById.get('apps/cosmos/section-01/changed.ts').section).toBe(
+      'apps/cosmos/section-01',
+    );
     expect(nodesById.get('apps/cosmos/hub.ts').section).toBe('apps/cosmos');
     expect(nodesById.get('e2e/cypress/support.ts').section).toBe('e2e/cypress');
     expect(nodesById.get('e2e/run.ts').section).toBe('e2e');
@@ -212,8 +246,8 @@ describe('src/graph', () => {
     expect(nodesById.get('apps/cosmos/section-13/file.ts').section).toBe('apps/cosmos/(other)');
     expect(
       graph.levels.dirs.sections.filter(
-        (section) => section.group === 'apps/cosmos' && section.id !== 'apps/cosmos'
-      )
+        (section) => section.group === 'apps/cosmos' && section.id !== 'apps/cosmos',
+      ),
     ).toHaveLength(12);
     expect(sectionsById.has('apps/cosmos/section-12')).toBe(false);
     expect(sectionsById.has('apps/cosmos/section-13')).toBe(false);
@@ -262,8 +296,8 @@ describe('src/graph', () => {
     });
     expect(
       graph.levels.dirs.links.some(
-        (link) => link.kind === 'imports' && link.source === link.target
-      )
+        (link) => link.kind === 'imports' && link.source === link.target,
+      ),
     ).toBe(false);
     expect(sectionsById.get('apps/cosmos/section-01')).toMatchObject({
       fileCount: 2,
@@ -372,7 +406,9 @@ describe('src/graph', () => {
       '(root)',
       'packages',
     ]);
-    expect(cappedGraph.levels.roots.sections.find((section) => section.id === 'apps')).toMatchObject({
+    expect(
+      cappedGraph.levels.roots.sections.find((section) => section.id === 'apps'),
+    ).toMatchObject({
       group: 'apps',
       fileCount: 17,
       additions: 7,
@@ -381,7 +417,9 @@ describe('src/graph', () => {
       downstreamFiles: [],
       downstreamTotal: 0,
     });
-    expect(cappedGraph.levels.roots.sections.some((section) => section.id.includes('(other)'))).toBe(false);
+    expect(
+      cappedGraph.levels.roots.sections.some((section) => section.id.includes('(other)')),
+    ).toBe(false);
   });
 
   test('buildGraph levels groups', () => {
@@ -448,9 +486,7 @@ describe('src/graph', () => {
       resolver: CAPPED_DOWNSTREAM_RESOLVER,
       changedFiles: new Set(['core/changed.ts']),
     });
-    const changedSection = graph.levels.dirs.sections.find(
-      (section) => section.id === 'core'
-    );
+    const changedSection = graph.levels.dirs.sections.find((section) => section.id === 'core');
 
     expect(changedSection.downstreamTotal).toBe(205);
     expect(changedSection.downstreamFiles).toHaveLength(200);

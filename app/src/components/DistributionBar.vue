@@ -16,7 +16,7 @@ const segments = computed(() => {
       props.stats.changedCount -
       props.stats.dependentCount -
       props.stats.dependencyCount,
-    0
+    0,
   );
   return [
     {

@@ -14,7 +14,7 @@ export const parseDimension = (storedValue) =>
 const readSetting = (storageKey, parser) => {
   try {
     return parser(globalThis.localStorage.getItem(storageKey));
-  } catch (storageError) {
+  } catch {
     return parser(null);
   }
 };
@@ -22,21 +22,19 @@ const readSetting = (storageKey, parser) => {
 const persistSetting = (storageKey, value) => {
   try {
     globalThis.localStorage.setItem(storageKey, String(value));
-  } catch (storageError) {}
+  } catch {
+    return;
+  }
 };
 
 const theme = ref(readSetting('slopmap-theme', parseTheme));
-const compactnessLevel = ref(
-  readSetting('slopmap-compactness', parseCompactness)
-);
+const compactnessLevel = ref(readSetting('slopmap-compactness', parseCompactness));
 const dimension = ref(readSetting('slopmap-dimension', parseDimension));
 
 watch(theme, (themeValue) => persistSetting('slopmap-theme', themeValue));
 watch(compactnessLevel, (compactnessValue) =>
-  persistSetting('slopmap-compactness', compactnessValue)
+  persistSetting('slopmap-compactness', compactnessValue),
 );
-watch(dimension, (dimensionValue) =>
-  persistSetting('slopmap-dimension', dimensionValue)
-);
+watch(dimension, (dimensionValue) => persistSetting('slopmap-dimension', dimensionValue));
 
 export const useSettings = () => ({ theme, compactnessLevel, dimension });

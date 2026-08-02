@@ -40,22 +40,13 @@ const importerCountFor = (path) => importerCountsByTarget.value.get(path) ?? 0;
       <div class="detail-header">
         <span class="detail-status-dot" :style="statusStyle"></span>
         <div class="detail-title">{{ activeSection.id }}</div>
-        <button
-          class="detail-close"
-          type="button"
-          aria-label="Deselect section"
-          @click="deselect"
-        >
+        <button class="detail-close" type="button" aria-label="Deselect section" @click="deselect">
           ×
         </button>
       </div>
       <DetailStatTiles :section="activeSection" :diff-mode="diffMode" />
     </div>
-    <InspectorTabs
-      v-if="diffMode"
-      v-model:tab="selectedTab"
-      :counts="tabCounts"
-    />
+    <InspectorTabs v-if="diffMode" v-model:tab="selectedTab" :counts="tabCounts" />
     <div class="detail-content">
       <template v-if="diffMode && selectedTab === 'files'">
         <ChangedFileCard
@@ -65,10 +56,7 @@ const importerCountFor = (path) => importerCountsByTarget.value.get(path) ?? 0;
           :section-id="activeSection.id"
           :importer-count="importerCountFor(changeFile.path)"
         />
-        <EmptyState
-          v-if="changedFiles.length === 0"
-          message="no changed files here"
-        />
+        <EmptyState v-if="changedFiles.length === 0" message="no changed files here" />
       </template>
       <template v-else-if="diffMode && selectedTab === 'dependents'">
         <PathRow
@@ -77,10 +65,7 @@ const importerCountFor = (path) => importerCountsByTarget.value.get(path) ?? 0;
           :path="filePath"
           variant="dependents"
         />
-        <EmptyState
-          v-if="dependentFiles.length === 0"
-          message="no downstream files"
-        />
+        <EmptyState v-if="dependentFiles.length === 0" message="no downstream files" />
         <PathRow
           v-if="dependentHiddenCount > 0"
           variant="dependents"
@@ -94,10 +79,7 @@ const importerCountFor = (path) => importerCountsByTarget.value.get(path) ?? 0;
           :path="filePath"
           variant="imports"
         />
-        <EmptyState
-          v-if="importedFiles.length === 0"
-          message="no cross-section imports"
-        />
+        <EmptyState v-if="importedFiles.length === 0" message="no cross-section imports" />
       </template>
       <template v-else>
         <SectionFileRow

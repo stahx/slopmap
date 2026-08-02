@@ -7,13 +7,8 @@ import { usePayload } from './usePayload.js';
 import { useViewState } from './useViewState.js';
 
 const { payload, diffMode } = usePayload();
-const {
-  aggregateFilter,
-  impactOnly,
-  hideIsolated,
-  isAggregatedView,
-  activeAggregate,
-} = useViewState();
+const { aggregateFilter, impactOnly, hideIsolated, isAggregatedView, activeAggregate } =
+  useViewState();
 
 const selectedNode = shallowRef(null);
 const selectedSection = shallowRef(null);
@@ -55,12 +50,7 @@ const clearDisplacement = () => {
 
 const applyDisplacement = (originNode) => {
   const pushRadius = isAggregatedView.value ? AGGREGATE_PUSH_RADIUS : 90;
-  const displacements = computeDisplacement(
-    currentNodes(),
-    originNode,
-    pushRadius,
-    26
-  );
+  const displacements = computeDisplacement(currentNodes(), originNode, pushRadius, 26);
   for (const displacement of displacements) {
     displacedOriginals.set(displacement.node, displacement.original);
     displacement.node.x = displacement.nextX;

@@ -9,16 +9,13 @@ export const buildPayloadIndex = (graph) => {
   const groupColors = new Map(
     graph.groups
       .slice(0, GROUP_COLORS.length)
-      .map((group, slotIndex) => [group.name, GROUP_COLORS[slotIndex]])
+      .map((group, slotIndex) => [group.name, GROUP_COLORS[slotIndex]]),
   );
 
   for (const link of graph.links) {
     const sourceId = endpointId(link.source);
     const targetId = endpointId(link.target);
-    importerCountsByTarget.set(
-      targetId,
-      (importerCountsByTarget.get(targetId) ?? 0) + 1
-    );
+    importerCountsByTarget.set(targetId, (importerCountsByTarget.get(targetId) ?? 0) + 1);
     if (!importedTargetsBySource.has(sourceId)) {
       importedTargetsBySource.set(sourceId, new Set());
     }

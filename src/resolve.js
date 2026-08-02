@@ -1,7 +1,18 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-const RESOLUTION_EXTENSIONS = ['.js', '.ts', '.mjs', '.cjs', '.jsx', '.tsx', '.mts', '.cts', '.vue', '.svelte'];
+const RESOLUTION_EXTENSIONS = [
+  '.js',
+  '.ts',
+  '.mjs',
+  '.cjs',
+  '.jsx',
+  '.tsx',
+  '.mts',
+  '.cts',
+  '.vue',
+  '.svelte',
+];
 
 const ALIAS_PATTERN = /^(?:~~\/|[@~]\/)/;
 

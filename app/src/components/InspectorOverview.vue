@@ -3,11 +3,7 @@ import { computed } from 'vue';
 
 import { usePayload } from '../composables/usePayload.js';
 import { useViewState } from '../composables/useViewState.js';
-import {
-  GROUP_COLORS,
-  MUTED_COLOR,
-  STATUS_COLORS,
-} from '../lib/graphTokens.js';
+import { GROUP_COLORS, MUTED_COLOR, STATUS_COLORS } from '../lib/graphTokens.js';
 
 const emit = defineEmits(['select']);
 
@@ -15,9 +11,7 @@ const { payload, stats, diffMode } = usePayload();
 const { activeAggregate } = useViewState();
 
 const untouchedCount = computed(
-  () =>
-    payload.value?.graph?.nodes?.filter((node) => node.status === 'normal')
-      .length ?? 0
+  () => payload.value?.graph?.nodes?.filter((node) => node.status === 'normal').length ?? 0,
 );
 const legendRows = computed(() => {
   if (diffMode.value) {
@@ -64,8 +58,7 @@ const legendRows = computed(() => {
   return rows;
 });
 const overviewMeta = computed(
-  () =>
-    `${stats.value?.fileCount ?? 0} files · ${stats.value?.linkCount ?? 0} imports`
+  () => `${stats.value?.fileCount ?? 0} files · ${stats.value?.linkCount ?? 0} imports`,
 );
 </script>
 
@@ -80,10 +73,7 @@ const overviewMeta = computed(
       </div>
       <div v-if="diffMode" class="changed-sections-block">
         <div class="changed-sections-label">CHANGED SECTIONS</div>
-        <ChangedSectionsList
-          :active-aggregate="activeAggregate"
-          @select="emit('select', $event)"
-        />
+        <ChangedSectionsList :active-aggregate="activeAggregate" @select="emit('select', $event)" />
       </div>
     </div>
   </div>

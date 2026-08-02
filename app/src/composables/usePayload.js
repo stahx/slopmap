@@ -27,9 +27,7 @@ export const loadPayload = async () => {
   payload.value = markRaw(parsedPayload);
   const { repoName, modeLabel } = parsedPayload;
   if (repoName || modeLabel) {
-    document.title = ['slopmap', repoName, modeLabel]
-      .filter(Boolean)
-      .join(' · ');
+    document.title = ['slopmap', repoName, modeLabel].filter(Boolean).join(' · ');
   }
   return payload.value;
 };

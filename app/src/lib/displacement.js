@@ -1,9 +1,4 @@
-export const computeDisplacement = (
-  nodes,
-  originNode,
-  pushRadius,
-  maxPush
-) => {
+export const computeDisplacement = (nodes, originNode, pushRadius, maxPush) => {
   const displacements = [];
   for (const node of nodes) {
     if (node === originNode) continue;
@@ -25,10 +20,7 @@ export const computeDisplacement = (
       },
       nextX: node.x + (deltaX / distance) * pushDistance,
       nextY: node.y + (deltaY / distance) * pushDistance,
-      nextZ:
-        node.z === undefined
-          ? undefined
-          : node.z + (deltaZ / distance) * pushDistance,
+      nextZ: node.z === undefined ? undefined : node.z + (deltaZ / distance) * pushDistance,
     });
   }
   return displacements;
