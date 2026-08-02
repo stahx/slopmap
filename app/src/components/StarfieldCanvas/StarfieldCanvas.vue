@@ -1,3 +1,12 @@
+<template>
+  <canvas
+    v-show="theme === 'galaxy'"
+    ref="canvasElement"
+    class="starfield-canvas pointer-events-none fixed inset-0 z-0 block size-full"
+    aria-hidden="true"
+  ></canvas>
+</template>
+
 <script setup>
 import { ref } from 'vue';
 
@@ -10,28 +19,3 @@ const canvasElement = ref(null);
 
 useStarfield(canvasElement);
 </script>
-
-<template>
-  <canvas
-    v-show="theme === 'galaxy'"
-    ref="canvasElement"
-    class="starfield-canvas"
-    aria-hidden="true"
-  ></canvas>
-</template>
-
-<style scoped>
-.starfield-canvas {
-  position: fixed;
-  z-index: 0;
-  inset: 0;
-  display: block;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
-
-.starfield-canvas[hidden] {
-  display: none;
-}
-</style>

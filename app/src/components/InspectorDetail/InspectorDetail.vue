@@ -1,61 +1,29 @@
-<script setup>
-import { computed, shallowRef } from 'vue';
-
-import { useInspector } from '../../composables/useInspector.js';
-import { usePayload } from '../../composables/usePayload.js';
-import { useSelection } from '../../composables/useSelection.js';
-import { MUTED_COLOR, STATUS_COLORS } from '../../lib/graphTokens.js';
-
-const { context, diffMode } = usePayload();
-const { deselect } = useSelection();
-const {
-  activeSection,
-  selectedTab,
-  copied,
-  changedFiles,
-  dependentFiles,
-  dependentHiddenCount,
-  importedFiles,
-  sectionFiles,
-  tabCounts,
-  importerCountsByTarget,
-  copyPaths,
-  isolateBlast,
-} = useInspector();
-
-const diffFile = shallowRef(null);
-
-const statusStyle = computed(() => {
-  const statusColor = STATUS_COLORS[activeSection.value?.status] ?? MUTED_COLOR;
-  return {
-    background: statusColor,
-    boxShadow: `0 0 12px 3px ${statusColor}80`,
-  };
-});
-
-const importerCountFor = (path) => importerCountsByTarget.value.get(path) ?? 0;
-const openDiff = (changeFile) => {
-  diffFile.value = changeFile;
-};
-const closeDiff = () => {
-  diffFile.value = null;
-};
-</script>
-
 <template>
-  <div v-if="activeSection" class="inspector-detail">
-    <div class="detail-header-block">
-      <div class="detail-header">
-        <span class="detail-status-dot" :style="statusStyle"></span>
-        <div class="detail-title">{{ activeSection.id }}</div>
-        <button class="detail-close" type="button" aria-label="Deselect section" @click="deselect">
+  <div v-if="activeSection" class="inspector-detail flex min-h-0 flex-[1_1_auto] flex-col">
+    <div class="detail-header-block flex-[0_0_auto] px-5 pt-[18px] pb-4">
+      <div class="detail-header flex items-center gap-2.5">
+        <span
+          class="detail-status-dot size-[11px] flex-[0_0_auto] rounded-full"
+          :style="statusStyle"
+        ></span>
+        <div
+          class="detail-title min-w-0 flex-[1_1_auto] font-mono text-[15.5px] leading-[1.35] font-semibold text-ink [overflow-wrap:anywhere]"
+        >
+          {{ activeSection.id }}
+        </div>
+        <button
+          class="detail-close m-0 size-7 flex-[0_0_auto] cursor-pointer border-0 bg-transparent p-0 text-[18px] leading-none text-ink/40"
+          type="button"
+          aria-label="Deselect section"
+          @click="deselect"
+        >
           ×
         </button>
       </div>
       <DetailStatTiles :section="activeSection" :diff-mode="diffMode" />
     </div>
     <InspectorTabs v-if="diffMode" v-model:tab="selectedTab" :counts="tabCounts" />
-    <div class="detail-content">
+    <div class="detail-content min-h-0 flex-[1_1_auto] overflow-y-auto px-2 py-1.5">
       <template v-if="diffMode && selectedTab === 'files'">
         <ChangedFileCard
           v-for="changeFile in changedFiles"
@@ -109,69 +77,46 @@ const closeDiff = () => {
   <DiffModal v-if="diffFile" :change-file="diffFile" @close="closeDiff" />
 </template>
 
-<style scoped>
-.inspector-detail {
-  display: flex;
-  min-height: 0;
-  flex: 1 1 auto;
-  flex-direction: column;
-}
+<script setup>
+import { computed, shallowRef } from 'vue';
 
-.inspector-detail[hidden] {
-  display: none;
-}
+import { useInspector } from '../../composables/useInspector.js';
+import { usePayload } from '../../composables/usePayload.js';
+import { useSelection } from '../../composables/useSelection.js';
+import { MUTED_COLOR, STATUS_COLORS } from '../../lib/graphTokens.js';
 
-.detail-header-block {
-  flex: 0 0 auto;
-  padding: 18px 20px 16px;
-}
+const { context, diffMode } = usePayload();
+const { deselect } = useSelection();
+const {
+  activeSection,
+  selectedTab,
+  copied,
+  changedFiles,
+  dependentFiles,
+  dependentHiddenCount,
+  importedFiles,
+  sectionFiles,
+  tabCounts,
+  importerCountsByTarget,
+  copyPaths,
+  isolateBlast,
+} = useInspector();
 
-.detail-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
+const diffFile = shallowRef(null);
 
-.detail-header[hidden] {
-  display: none;
-}
+const statusStyle = computed(() => {
+  const statusColor = STATUS_COLORS[activeSection.value?.status] ?? MUTED_COLOR;
+  return {
+    background: statusColor,
+    boxShadow: `0 0 12px 3px ${statusColor}80`,
+  };
+});
 
-.detail-status-dot {
-  width: 11px;
-  height: 11px;
-  flex: 0 0 auto;
-  border-radius: 50%;
-}
-
-.detail-title {
-  min-width: 0;
-  flex: 1 1 auto;
-  color: #e8e6df;
-  font-family: var(--font-mono);
-  font-size: 15.5px;
-  font-weight: 600;
-  line-height: 1.35;
-  overflow-wrap: anywhere;
-}
-
-.detail-close {
-  width: 28px;
-  height: 28px;
-  flex: 0 0 auto;
-  margin: 0;
-  padding: 0;
-  color: rgba(232, 230, 223, 0.4);
-  background: transparent;
-  border: 0;
-  font-size: 18px;
-  line-height: 1;
-  cursor: pointer;
-}
-
-.detail-content {
-  min-height: 0;
-  flex: 1 1 auto;
-  overflow-y: auto;
-  padding: 6px 8px;
-}
-</style>
+const importerCountFor = (path) => importerCountsByTarget.value.get(path) ?? 0;
+const openDiff = (changeFile) => {
+  diffFile.value = changeFile;
+};
+const closeDiff = () => {
+  diffFile.value = null;
+};
+</script>

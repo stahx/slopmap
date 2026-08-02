@@ -1,3 +1,19 @@
+<template>
+  <div
+    class="slopmap-app min-h-screen"
+    :style="layoutStyle"
+    :data-theme="theme"
+    data-test="slopmap-app"
+  >
+    <StarfieldCanvas />
+    <IconRail />
+    <TopHeader />
+    <GraphStage />
+    <ControlsPill />
+    <InspectorPanel @select="handleSectionSelect" />
+  </div>
+</template>
+
 <script setup>
 import { useSelection } from './composables/useSelection.js';
 import { useSettings } from './composables/useSettings.js';
@@ -16,20 +32,3 @@ const handleSectionSelect = (section) => {
   selectSection(section);
 };
 </script>
-
-<template>
-  <div class="slopmap-app" :style="layoutStyle" :data-theme="theme" data-test="slopmap-app">
-    <StarfieldCanvas />
-    <IconRail />
-    <TopHeader />
-    <GraphStage />
-    <ControlsPill />
-    <InspectorPanel @select="handleSectionSelect" />
-  </div>
-</template>
-
-<style scoped>
-.slopmap-app {
-  min-height: 100vh;
-}
-</style>

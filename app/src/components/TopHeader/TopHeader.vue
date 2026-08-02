@@ -1,3 +1,65 @@
+<template>
+  <header
+    class="app-top-header fixed top-0 right-[var(--spacing-inspector)] left-[var(--spacing-rail)] z-[3] flex h-[var(--spacing-header)] items-center gap-3.5 border-b border-white/6 bg-panel/60 px-[22px] backdrop-blur-[8px]"
+  >
+    <div class="header-context flex min-w-0 flex-col gap-1">
+      <div class="header-repository flex min-w-0 items-center gap-[7px] whitespace-nowrap">
+        <span
+          class="repo-name min-w-0 overflow-hidden text-ellipsis font-mono text-[13.5px] font-semibold text-ink"
+          >{{ repoName }}</span
+        >
+        <span class="repo-separator font-mono text-[12px] text-ink/28">/</span>
+        <span
+          class="context-branch min-w-0 overflow-hidden text-ellipsis font-mono text-[12px] font-medium text-accent-yellow"
+          >{{ context?.branch ?? '' }}</span
+        >
+        <span
+          v-if="context?.baseRef"
+          class="context-base-wrap min-w-0 overflow-hidden text-ellipsis font-mono text-[11.5px] text-ink/30"
+        >
+          → <span>{{ context.baseRef }}</span>
+        </span>
+      </div>
+      <div class="header-meta text-[11px] leading-[1.2] text-ink/35">{{ metaText }}</div>
+    </div>
+    <div class="header-flex-spacer flex-[1_1_auto]"></div>
+    <a
+      v-if="pullRequest"
+      class="context-pr flex flex-[0_0_auto] items-center gap-[7px] rounded-[9px] border border-white/12 px-[11px] py-[7px] text-inherit no-underline"
+      :href="pullRequest.url"
+      :title="pullRequest.title"
+      target="_blank"
+      rel="noopener"
+    >
+      <span class="context-pr-number font-mono text-[12px] font-semibold text-ink"
+        >#{{ pullRequest.number }}</span
+      >
+      <span
+        class="context-pr-state rounded-[4px] border border-success-green/40 px-[5px] py-0.5 font-mono text-[9.5px] text-success-green"
+      >
+        {{ String(pullRequest.state ?? '').toUpperCase() }}
+      </span>
+      <span class="context-pr-arrow text-accent">↗</span>
+    </a>
+    <div
+      v-if="totals"
+      class="context-totals flex flex-[0_0_auto] items-center gap-2 rounded-[9px] bg-white/5 px-3 py-[7px]"
+    >
+      <span class="total-additions font-mono text-[12px] font-semibold text-success-green"
+        >+{{ totals.additions }}</span
+      >
+      <span class="total-deletions font-mono text-[12px] font-semibold text-danger-red"
+        >−{{ totals.deletions }}</span
+      >
+      <RatioBar
+        class="totals-ratio w-[70px] !flex-[0_0_auto]"
+        :additions="totals.additions"
+        :deletions="totals.deletions"
+      />
+    </div>
+  </header>
+</template>
+
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 
@@ -33,199 +95,3 @@ const refreshRelativeTime = () => {
     : '';
 };
 </script>
-
-<template>
-  <header class="top-header">
-    <div class="header-context">
-      <div class="header-repository">
-        <span class="repo-name">{{ repoName }}</span>
-        <span class="repo-separator">/</span>
-        <span class="context-branch">{{ context?.branch ?? '' }}</span>
-        <span v-if="context?.baseRef" class="context-base-wrap">
-          → <span>{{ context.baseRef }}</span>
-        </span>
-      </div>
-      <div class="header-meta">{{ metaText }}</div>
-    </div>
-    <div class="header-flex-spacer"></div>
-    <a
-      v-if="pullRequest"
-      class="context-pr"
-      :href="pullRequest.url"
-      :title="pullRequest.title"
-      target="_blank"
-      rel="noopener"
-    >
-      <span class="context-pr-number">#{{ pullRequest.number }}</span>
-      <span class="context-pr-state">
-        {{ String(pullRequest.state ?? '').toUpperCase() }}
-      </span>
-      <span class="context-pr-arrow">↗</span>
-    </a>
-    <div v-if="totals" class="context-totals">
-      <span class="total-additions">+{{ totals.additions }}</span>
-      <span class="total-deletions">−{{ totals.deletions }}</span>
-      <RatioBar class="totals-ratio" :additions="totals.additions" :deletions="totals.deletions" />
-    </div>
-  </header>
-</template>
-
-<style scoped>
-.top-header {
-  position: fixed;
-  top: 0;
-  right: var(--inspector-w);
-  left: var(--rail-w);
-  z-index: 3;
-  display: flex;
-  height: var(--header-h);
-  align-items: center;
-  gap: 14px;
-  padding: 0 22px;
-  background: rgba(14, 16, 32, 0.6);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(8px);
-}
-
-.top-header[hidden] {
-  display: none;
-}
-
-.header-context {
-  display: flex;
-  min-width: 0;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.header-context[hidden] {
-  display: none;
-}
-
-.header-repository {
-  display: flex;
-  min-width: 0;
-  align-items: center;
-  gap: 7px;
-  white-space: nowrap;
-}
-
-.header-repository[hidden] {
-  display: none;
-}
-
-.repo-name {
-  min-width: 0;
-  overflow: hidden;
-  color: #e8e6df;
-  font-family: var(--font-mono);
-  font-size: 13.5px;
-  font-weight: 600;
-  text-overflow: ellipsis;
-}
-
-.repo-separator {
-  color: rgba(232, 230, 223, 0.28);
-  font-family: var(--font-mono);
-  font-size: 12px;
-}
-
-.context-branch {
-  min-width: 0;
-  overflow: hidden;
-  color: #f2b52e;
-  font-family: var(--font-mono);
-  font-size: 12px;
-  font-weight: 500;
-  text-overflow: ellipsis;
-}
-
-.context-base-wrap {
-  min-width: 0;
-  overflow: hidden;
-  color: rgba(232, 230, 223, 0.3);
-  font-family: var(--font-mono);
-  font-size: 11.5px;
-  text-overflow: ellipsis;
-}
-
-.header-meta {
-  color: rgba(232, 230, 223, 0.35);
-  font-size: 11px;
-  line-height: 1.2;
-}
-
-.header-flex-spacer {
-  flex: 1 1 auto;
-}
-
-.context-pr {
-  display: flex;
-  flex: 0 0 auto;
-  align-items: center;
-  gap: 7px;
-  padding: 7px 11px;
-  color: inherit;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 9px;
-  text-decoration: none;
-}
-
-.context-pr[hidden] {
-  display: none;
-}
-
-.context-pr-number {
-  color: #e8e6df;
-  font-family: var(--font-mono);
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.context-pr-state {
-  padding: 2px 5px;
-  color: #6fbf8b;
-  border: 1px solid rgba(111, 191, 139, 0.4);
-  border-radius: 4px;
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-}
-
-.context-pr-arrow {
-  color: #f08a4b;
-}
-
-.context-totals {
-  display: flex;
-  flex: 0 0 auto;
-  align-items: center;
-  gap: 8px;
-  padding: 7px 12px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 9px;
-}
-
-.context-totals[hidden] {
-  display: none;
-}
-
-.total-additions,
-.total-deletions {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.total-additions {
-  color: #6fbf8b;
-}
-
-.total-deletions {
-  color: #e8564a;
-}
-
-.totals-ratio {
-  width: 70px;
-  flex: 0 0 auto;
-}
-</style>

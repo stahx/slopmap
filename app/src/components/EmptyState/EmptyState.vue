@@ -1,3 +1,7 @@
+<template>
+  <div class="detail-empty px-3 py-[11px] text-[12px] text-ink/35">{{ message }}</div>
+</template>
+
 <script setup>
 defineProps({
   message: {
@@ -6,15 +10,3 @@ defineProps({
   },
 });
 </script>
-
-<template>
-  <div class="detail-empty">{{ message }}</div>
-</template>
-
-<style scoped>
-.detail-empty {
-  padding: 11px 12px;
-  color: rgba(232, 230, 223, 0.35);
-  font-size: 12px;
-}
-</style>

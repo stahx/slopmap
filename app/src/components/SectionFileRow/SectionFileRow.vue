@@ -1,3 +1,17 @@
+<template>
+  <div
+    class="section-file-row flex min-w-0 items-center gap-2.5 rounded-[9px] px-3 py-[11px] font-mono text-[12.5px] leading-[1.35] text-ink first:bg-white/5 hover:bg-white/5"
+  >
+    <span
+      class="section-file-name min-w-0 flex-[1_1_auto] overflow-hidden text-ellipsis whitespace-nowrap text-ink"
+      >{{ node.id }}</span
+    >
+    <span class="section-file-loc flex-[0_0_auto] font-mono text-[11px] font-medium text-ink/30"
+      >{{ node.loc }} loc</span
+    >
+  </div>
+</template>
+
 <script setup>
 defineProps({
   node: {
@@ -6,51 +20,3 @@ defineProps({
   },
 });
 </script>
-
-<template>
-  <div class="section-file-row">
-    <span class="section-file-name">{{ node.id }}</span>
-    <span class="section-file-loc">{{ node.loc }} loc</span>
-  </div>
-</template>
-
-<style scoped>
-.section-file-row {
-  display: flex;
-  min-width: 0;
-  align-items: center;
-  gap: 10px;
-  padding: 11px 12px;
-  color: #e8e6df;
-  border-radius: 9px;
-  font-family: var(--font-mono);
-  font-size: 12.5px;
-  line-height: 1.35;
-}
-
-.section-file-row[hidden] {
-  display: none;
-}
-
-.section-file-row:first-child,
-.section-file-row:hover {
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.section-file-name {
-  min-width: 0;
-  flex: 1 1 auto;
-  overflow: hidden;
-  color: #e8e6df;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.section-file-loc {
-  flex: 0 0 auto;
-  color: rgba(232, 230, 223, 0.3);
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 500;
-}
-</style>

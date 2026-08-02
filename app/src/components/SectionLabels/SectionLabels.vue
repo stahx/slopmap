@@ -1,3 +1,24 @@
+<template>
+  <div
+    class="section-labels pointer-events-none absolute inset-0 z-[2] overflow-hidden"
+    aria-hidden="true"
+  >
+    <div
+      v-for="section in sections"
+      :key="section.id"
+      :ref="(labelElement) => registerLabel(section.id, labelElement)"
+      class="section-label absolute top-0 left-0 whitespace-nowrap [text-shadow:0_1px_3px_rgba(0,0,0,0.9)] [will-change:transform]"
+      :class="
+        isHub(section)
+          ? 'section-label-hub font-label text-[13px] font-semibold text-white'
+          : 'section-label-subsection font-label text-[12px] font-medium text-white/72'
+      "
+    >
+      {{ labelText(section) }}
+    </div>
+  </div>
+</template>
+
 <script setup>
 import { computed } from 'vue';
 
@@ -15,61 +36,3 @@ const isHub = (section) => compactnessLevel.value !== 3 || section.id === sectio
 
 const labelText = (section) => (isHub(section) ? section.id : section.id.split('/').at(-1));
 </script>
-
-<template>
-  <div class="section-labels" aria-hidden="true">
-    <div
-      v-for="section in sections"
-      :key="section.id"
-      :ref="(labelElement) => registerLabel(section.id, labelElement)"
-      class="section-label"
-      :class="{
-        'section-label-hub': isHub(section),
-        'section-label-subsection': !isHub(section),
-      }"
-    >
-      {{ labelText(section) }}
-    </div>
-  </div>
-</template>
-
-<style scoped>
-.section-labels {
-  position: absolute;
-  z-index: 2;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-}
-
-.section-label {
-  position: absolute;
-  top: 0;
-  left: 0;
-  white-space: nowrap;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
-  will-change: transform;
-}
-
-.section-label-hub {
-  color: #ffffff;
-  font-family:
-    'Inter',
-    system-ui,
-    -apple-system,
-    sans-serif;
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.section-label-subsection {
-  color: rgba(255, 255, 255, 0.72);
-  font-family:
-    'Inter',
-    system-ui,
-    -apple-system,
-    sans-serif;
-  font-size: 12px;
-  font-weight: 500;
-}
-</style>
