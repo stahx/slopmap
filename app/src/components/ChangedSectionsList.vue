@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 
 import { MUTED_COLOR, STATUS_COLORS } from '../lib/graphTokens.js';
+import { sortChangedSections } from '../lib/sections.js';
 
 const props = defineProps({
   activeAggregate: {
@@ -13,13 +14,7 @@ const props = defineProps({
 const emit = defineEmits(['select']);
 
 const changedSections = computed(() =>
-  (props.activeAggregate?.sections ?? [])
-    .filter((section) => section.changedCount > 0)
-    .sort(
-      (firstSection, secondSection) =>
-        secondSection.changedCount - firstSection.changedCount ||
-        firstSection.id.localeCompare(secondSection.id)
-    )
+  sortChangedSections(props.activeAggregate?.sections ?? [])
 );
 
 const statusColor = (status) => STATUS_COLORS[status] ?? MUTED_COLOR;
