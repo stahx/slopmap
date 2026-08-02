@@ -1,5 +1,7 @@
+export const wrapPosition = (value, size) => ((value % size) + size) % size;
+
 export const wrapCoordinate = (value, size) =>
-  Math.round(((value % size) + size) % size);
+  Math.round(wrapPosition(value, size));
 
 export const azimuthDelta = (previous, next) => {
   let delta = next - previous;
