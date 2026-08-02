@@ -1,9 +1,6 @@
 :root {
   --font-sans: "Inter Tight", "Inter", system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
-  --rail-w: 60px;
-  --header-h: 64px;
-  --inspector-w: 452px;
   color-scheme: dark;
 }
 
