@@ -2,6 +2,13 @@
 
 slopmap turns any JavaScript or TypeScript repository into a 3D architecture map. Its default Compact view rolls files up into groups shown as planets, while diff views reveal a pull request's blast radius. The flight-deck shell keeps view and dimension controls on a left icon rail, repository and pull-request context in the top header, map settings in a bottom controls pill, and details in a permanent tabbed inspector. The name is a joke, and unfortunately an accurate one.
 
+## Requirements
+
+- Node.js 18 or newer
+- [pnpm](https://pnpm.io) for development; the published CLI runs on any package manager
+- Git, since every map is built from `git ls-files` and `git diff`
+- [GitHub CLI](https://cli.github.com) (`gh`), only for `--pr`
+
 ## Install
 
 ```sh
@@ -71,7 +78,20 @@ Open the development URL with `?fixture=diff` to load the diff fixture instead o
 
 Build the committed viewer artifact with `pnpm build`. Run `pnpm check:dist` to rebuild it and verify that `dist/index.html` is already in sync with the viewer source.
 
-The pre-commit hook runs lint-staged, which fixes ESLint issues and formats staged source files without rebuilding the viewer. If a merge conflict affects `dist/index.html`, resolve it from source and regenerate the artifact:
+Everyday commands:
+
+```sh
+pnpm test         # full suite, both projects
+pnpm test:watch   # watch mode
+pnpm lint         # eslint across the repo
+pnpm format       # prettier check
+```
+
+Tests are split into two Vitest projects: `cli` covers `src/` in a Node environment, `viewer` covers `app/` in jsdom.
+
+Two Git hooks guard the repository. The pre-commit hook runs lint-staged, which fixes ESLint issues, formats staged source files, and runs the specs related to them without rebuilding the viewer. The pre-push hook runs the full suite. Both are installed by `pnpm install` through the `prepare` script; run `pnpm exec husky` if `.husky/_` is ever missing, because a missing runtime directory makes Git skip the hooks silently. Pass `--no-verify` to bypass either one.
+
+If a merge conflict affects `dist/index.html`, resolve it from source and regenerate the artifact:
 
 ```sh
 pnpm build && git add dist
@@ -84,3 +104,7 @@ pnpm build && git add dist
 - `tsconfig` `paths` aliases.
 - A `--max-nodes` performance guard.
 - GitHub CLI extension packaging.
+
+## License
+
+MIT — see [LICENSE](LICENSE).

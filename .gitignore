@@ -1,1 +1,20 @@
 node_modules/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Test and log output
+coverage/
+*.log
+
+# Editor and OS cruft
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# Local agent state (.claude/rules is tracked on purpose)
+.claude/settings.local.json
