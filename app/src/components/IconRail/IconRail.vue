@@ -24,54 +24,33 @@
       </svg>
     </div>
     <div class="rail-top-spacer h-2.5 flex-[0_0_auto]"></div>
-    <button
-      class="rail-button inline-flex size-[34px] flex-[0_0_auto] cursor-pointer items-center justify-center rounded-[9px] border-0 p-0 font-mono text-[13px] font-medium hover:bg-white/10 hover:text-ink"
-      :class="
-        currentView === 'compact' ? 'active bg-white/10 text-ink' : 'bg-transparent text-ink/45'
-      "
-      type="button"
-      aria-label="Compact view"
-      @click="showView('compact')"
-    >
-      ◉
-    </button>
-    <button
-      class="rail-button inline-flex size-[34px] flex-[0_0_auto] cursor-pointer items-center justify-center rounded-[9px] border-0 p-0 font-mono text-[13px] font-medium hover:bg-white/10 hover:text-ink"
-      :class="
-        currentView === 'files' ? 'active bg-white/10 text-ink' : 'bg-transparent text-ink/45'
-      "
-      type="button"
-      aria-label="Files view"
-      @click="showView('files')"
-    >
-      ≡
-    </button>
-    <button
-      class="rail-button inline-flex size-[34px] flex-[0_0_auto] cursor-pointer items-center justify-center rounded-[9px] border-0 p-0 font-mono text-[13px] font-medium hover:bg-white/10 hover:text-ink"
-      :class="dimension === '2d' ? 'active bg-white/10 text-ink' : 'bg-transparent text-ink/45'"
-      type="button"
-      title="2D / 3D"
-      aria-label="2D / 3D"
-      @click="toggleDimension"
-    >
-      ⌥
-    </button>
+
+    <RailButton
+      v-for="railButton in railButtons"
+      :key="railButton.key"
+      :glyph="railButton.glyph"
+      :label="railButton.label"
+      :hint="railButton.hint"
+      :active="railButton.active"
+      @activate="railButton.activate()"
+    />
+
     <div class="rail-flex-spacer flex-[1_1_auto]"></div>
     <HelpPopover v-if="helpVisible" @dismiss="dismissHelp" />
-    <button
-      class="rail-button inline-flex size-[34px] flex-[0_0_auto] cursor-pointer items-center justify-center rounded-[9px] border-0 bg-transparent p-0 font-mono text-[13px] font-medium text-ink/45 hover:bg-white/10 hover:text-ink"
-      type="button"
-      aria-label="Help"
+
+    <RailButton
+      glyph="?"
+      label="Help"
+      hint="Keyboard shortcuts and legend"
+      :active="helpVisible"
       :aria-expanded="helpVisible"
-      @click="toggleHelp"
-    >
-      ?
-    </button>
+      @activate="toggleHelp"
+    />
   </nav>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 
 import { useSettings } from '../../composables/useSettings.js';
 import { useViewState } from '../../composables/useViewState.js';
@@ -80,6 +59,33 @@ const { dimension } = useSettings();
 const { currentView, showView } = useViewState();
 
 const helpVisible = ref(false);
+
+const railButtons = computed(() => [
+  {
+    key: 'compact',
+    glyph: '◉',
+    label: 'Compact',
+    hint: 'Roll files up into groups',
+    active: currentView.value === 'compact',
+    activate: () => showView('compact'),
+  },
+  {
+    key: 'files',
+    glyph: '≡',
+    label: 'Files',
+    hint: 'Show every file in the graph',
+    active: currentView.value === 'files',
+    activate: () => showView('files'),
+  },
+  {
+    key: 'dimension',
+    glyph: '⌥',
+    label: dimension.value === '2d' ? '2D canvas' : '3D orbit',
+    hint: 'Switch between a 3D orbit and a flat 2D canvas',
+    active: dimension.value === '2d',
+    activate: () => toggleDimension(),
+  },
+]);
 
 const toggleDimension = () => {
   dimension.value = dimension.value === '2d' ? '3d' : '2d';

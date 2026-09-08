@@ -81,6 +81,8 @@ const labelLoopVersion = ref(0);
 const BLAST_LABEL_CLASSES =
   'pointer-events-none absolute top-0 left-0 z-[3] whitespace-nowrap font-mono text-[10.5px] font-medium tracking-[0.06em] text-accent/60 [text-shadow:0_1px_3px_rgba(0,0,0,0.9)] [will-change:transform]';
 const BLAST_RING_SEGMENTS = 128;
+const FIT_DURATION = 600;
+const FIT_PADDING = 60;
 
 export const parallaxSource = {
   get pan3dX() {
@@ -358,31 +360,46 @@ const consumePendingSectionClickAfterStop = (stoppedDimension) => {
   if (section !== undefined && Number.isFinite(section.x)) handleNodeClick(section);
 };
 
-const pin3dNodes = () => {
-  if (graph3dInstance === null || dimension.value !== '3d') return;
-  for (const node of graph3dInstance.graphData().nodes) {
+const pinNodes = (graph, withDepth) => {
+  for (const node of graph.graphData().nodes) {
+    if (!Number.isFinite(node.x) || !Number.isFinite(node.y)) continue;
     node.fx = node.x;
     node.fy = node.y;
-    node.fz = node.z;
+    if (withDepth && Number.isFinite(node.z)) node.fz = node.z;
   }
+};
+
+const lockLayoutOnDrag = (draggedNode) => {
+  const graph = activeGraph();
+  if (graph === null) return;
+  for (const node of graph.graphData().nodes) {
+    if (node === draggedNode) continue;
+    if (Number.isFinite(node.fx)) continue;
+    if (!Number.isFinite(node.x) || !Number.isFinite(node.y)) continue;
+    node.fx = node.x;
+    node.fy = node.y;
+    if (dimension.value === '3d' && Number.isFinite(node.z)) node.fz = node.z;
+  }
+};
+
+const pin3dNodes = () => {
+  if (graph3dInstance === null || dimension.value !== '3d') return;
+  pinNodes(graph3dInstance, true);
   refreshCameraBounds();
   if (pendingFitAfterStop && dimension.value === '3d') {
     pendingFitAfterStop = false;
-    graph3dInstance.zoomToFit(600);
+    graph3dInstance.zoomToFit(FIT_DURATION, FIT_PADDING);
   }
   consumePendingSectionClickAfterStop('3d');
 };
 
 const pin2dNodes = () => {
   if (graph2dInstance === null || dimension.value !== '2d') return;
-  for (const node of graph2dInstance.graphData().nodes) {
-    node.fx = node.x;
-    node.fy = node.y;
-  }
+  pinNodes(graph2dInstance, false);
   refreshCameraBounds();
   if (pendingFitAfterStop && dimension.value === '2d') {
     pendingFitAfterStop = false;
-    graph2dInstance.zoomToFit(600);
+    graph2dInstance.zoomToFit(FIT_DURATION, FIT_PADDING);
   }
   consumePendingSectionClickAfterStop('2d');
 };
@@ -529,7 +546,7 @@ const clamp3dTarget = (controls) => {
   controls.target.z = clampToBounds(controls.target.z, cameraBounds.minZ, cameraBounds.maxZ);
 };
 
-const handle2dZoomEnd = ({ k: zoomScale, x: transformX, y: transformY }) => {
+const handle2dZoomEnd = ({ x: centerGraphX, y: centerGraphY }) => {
   if (snappingBack) {
     snappingBack = false;
     if (snapBackTimeoutId !== null) {
@@ -541,14 +558,11 @@ const handle2dZoomEnd = ({ k: zoomScale, x: transformX, y: transformY }) => {
   if (
     cameraBounds === null ||
     graph2dInstance === null ||
-    zoomScale <= 0 ||
-    mapWidth.value <= 0 ||
-    mapHeight.value <= 0
+    !Number.isFinite(centerGraphX) ||
+    !Number.isFinite(centerGraphY)
   ) {
     return;
   }
-  const centerGraphX = (mapWidth.value / 2 - transformX) / zoomScale;
-  const centerGraphY = (mapHeight.value / 2 - transformY) / zoomScale;
   const clampedX = clampToBounds(centerGraphX, cameraBounds.minX, cameraBounds.maxX);
   const clampedY = clampToBounds(centerGraphY, cameraBounds.minY, cameraBounds.maxY);
   if (clampedX === centerGraphX && clampedY === centerGraphY) return;
@@ -607,7 +621,7 @@ const applyView = () => {
   clearIdleGraph();
   relaxCameraLimits();
   restartLabelLoop();
-  if (isFullyPositioned(graph.graphData().nodes)) graph.zoomToFit(600);
+  if (isFullyPositioned(graph.graphData().nodes)) graph.zoomToFit(FIT_DURATION, FIT_PADDING);
   refreshCameraBounds();
   pendingFitAfterStop = true;
   if (requestedSectionClickId === null) return;
@@ -651,6 +665,7 @@ const createGraphInstances = (host3dElement, host2dElement) => {
     .linkOpacity(0.35)
     .linkDirectionalParticles(particleCountFor)
     .linkDirectionalParticleWidth(1.4)
+    .onNodeDrag(lockLayoutOnDrag)
     .onNodeClick(handleNodeClick)
     .onBackgroundClick(handleBackgroundClick)
     .onEngineStop(pin3dNodes);
@@ -670,10 +685,11 @@ const createGraphInstances = (host3dElement, host2dElement) => {
     .nodeCanvasObject(render2dNodeLabel)
     .onNodeClick(handleNodeClick)
     .onBackgroundClick(handleBackgroundClick)
+    .onNodeDrag(lockLayoutOnDrag)
     .onEngineStop(pin2dNodes)
-    .onZoom(({ x: transformX, y: transformY }) => {
-      pan2dX = transformX;
-      pan2dY = transformY;
+    .onZoom(({ x: centerGraphX, y: centerGraphY }) => {
+      pan2dX = centerGraphX;
+      pan2dY = centerGraphY;
     })
     .onZoomEnd(handle2dZoomEnd);
   setGraphHooks({ recolor, repaint });
