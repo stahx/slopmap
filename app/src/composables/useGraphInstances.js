@@ -13,7 +13,13 @@ import {
 } from 'three';
 import { isProxy, onBeforeUnmount, ref, watch } from 'vue';
 
-import { clampToBounds, computeBounds, computeMinZoom, expandBounds } from '../lib/cameraBounds.js';
+import {
+  clampToBounds,
+  computeBounds,
+  computeMinZoom,
+  expandBounds,
+  isFullyPositioned,
+} from '../lib/cameraBounds.js';
 import { filterGraph } from '../lib/filterGraph.js';
 import {
   linkColorFor,
@@ -255,7 +261,7 @@ const refreshCameraBounds = () => {
     return;
   }
   const nodes = graph.graphData().nodes;
-  if (nodes.length === 0 || nodes.some((node) => !Number.isFinite(node.x))) return;
+  if (!isFullyPositioned(nodes)) return;
   const bounds = computeBounds(nodes);
   cameraBounds = bounds === null ? null : expandBounds(bounds, 0.25, 150);
   if (cameraBounds === null) return;
@@ -601,8 +607,7 @@ const applyView = () => {
   clearIdleGraph();
   relaxCameraLimits();
   restartLabelLoop();
-  const hasSettledCoordinates = graph.graphData().nodes.some((node) => Number.isFinite(node.x));
-  if (hasSettledCoordinates) graph.zoomToFit(600);
+  if (isFullyPositioned(graph.graphData().nodes)) graph.zoomToFit(600);
   refreshCameraBounds();
   pendingFitAfterStop = true;
   if (requestedSectionClickId === null) return;

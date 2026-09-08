@@ -1,6 +1,12 @@
 import { describe, expect, test } from 'vitest';
 
-import { clampToBounds, computeBounds, computeMinZoom, expandBounds } from './cameraBounds.js';
+import {
+  clampToBounds,
+  computeBounds,
+  computeMinZoom,
+  expandBounds,
+  isFullyPositioned,
+} from './cameraBounds.js';
 
 describe('app/src/lib/cameraBounds', () => {
   test('computeBounds', () => {
@@ -36,6 +42,13 @@ describe('app/src/lib/cameraBounds', () => {
       centerZ: 0,
       radius: 250,
     });
+  });
+
+  test('isFullyPositioned', () => {
+    expect(isFullyPositioned([])).toBe(false);
+    expect(isFullyPositioned([{ x: 1, y: 2 }])).toBe(true);
+    expect(isFullyPositioned([{ x: 1, y: 2 }, { id: 'fresh' }])).toBe(false);
+    expect(isFullyPositioned([{ x: 1, y: 2, z: Number.NaN }])).toBe(false);
   });
 
   test('computeMinZoom', () => {
