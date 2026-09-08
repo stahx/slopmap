@@ -529,7 +529,7 @@ const clamp3dTarget = (controls) => {
   controls.target.z = clampToBounds(controls.target.z, cameraBounds.minZ, cameraBounds.maxZ);
 };
 
-const handle2dZoomEnd = ({ k: zoomScale, x: transformX, y: transformY }) => {
+const handle2dZoomEnd = ({ x: centerGraphX, y: centerGraphY }) => {
   if (snappingBack) {
     snappingBack = false;
     if (snapBackTimeoutId !== null) {
@@ -541,14 +541,11 @@ const handle2dZoomEnd = ({ k: zoomScale, x: transformX, y: transformY }) => {
   if (
     cameraBounds === null ||
     graph2dInstance === null ||
-    zoomScale <= 0 ||
-    mapWidth.value <= 0 ||
-    mapHeight.value <= 0
+    !Number.isFinite(centerGraphX) ||
+    !Number.isFinite(centerGraphY)
   ) {
     return;
   }
-  const centerGraphX = (mapWidth.value / 2 - transformX) / zoomScale;
-  const centerGraphY = (mapHeight.value / 2 - transformY) / zoomScale;
   const clampedX = clampToBounds(centerGraphX, cameraBounds.minX, cameraBounds.maxX);
   const clampedY = clampToBounds(centerGraphY, cameraBounds.minY, cameraBounds.maxY);
   if (clampedX === centerGraphX && clampedY === centerGraphY) return;
@@ -671,9 +668,9 @@ const createGraphInstances = (host3dElement, host2dElement) => {
     .onNodeClick(handleNodeClick)
     .onBackgroundClick(handleBackgroundClick)
     .onEngineStop(pin2dNodes)
-    .onZoom(({ x: transformX, y: transformY }) => {
-      pan2dX = transformX;
-      pan2dY = transformY;
+    .onZoom(({ x: centerGraphX, y: centerGraphY }) => {
+      pan2dX = centerGraphX;
+      pan2dY = centerGraphY;
     })
     .onZoomEnd(handle2dZoomEnd);
   setGraphHooks({ recolor, repaint });
