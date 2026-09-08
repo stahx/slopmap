@@ -4,10 +4,24 @@
     aria-label="Map controls"
   >
     <div
-      class="logo-tile flex size-[30px] flex-[0_0_auto] items-center justify-center rounded-[9px] bg-accent font-mono text-[13px] font-bold text-on-accent"
+      class="logo-tile flex size-[30px] flex-[0_0_auto] items-center justify-center"
       aria-label="slopmap"
     >
-      s
+      <svg class="size-[30px]" viewBox="0 0 120 120" aria-hidden="true">
+        <rect width="120" height="120" rx="26" fill="var(--color-panel-raised)" />
+        <circle
+          cx="60"
+          cy="60"
+          r="46"
+          fill="none"
+          stroke="var(--color-accent)"
+          stroke-opacity="0.25"
+          stroke-width="4"
+        />
+        <circle cx="60" cy="60" r="15" fill="var(--color-danger-red)" />
+        <circle cx="92" cy="60" r="8" fill="var(--color-accent)" />
+        <circle cx="38" cy="36" r="6" fill="var(--color-accent-yellow)" />
+      </svg>
     </div>
     <div class="rail-top-spacer h-2.5 flex-[0_0_auto]"></div>
     <button
