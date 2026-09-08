@@ -81,6 +81,8 @@ const labelLoopVersion = ref(0);
 const BLAST_LABEL_CLASSES =
   'pointer-events-none absolute top-0 left-0 z-[3] whitespace-nowrap font-mono text-[10.5px] font-medium tracking-[0.06em] text-accent/60 [text-shadow:0_1px_3px_rgba(0,0,0,0.9)] [will-change:transform]';
 const BLAST_RING_SEGMENTS = 128;
+const FIT_DURATION = 600;
+const FIT_PADDING = 60;
 
 export const parallaxSource = {
   get pan3dX() {
@@ -368,7 +370,7 @@ const pin3dNodes = () => {
   refreshCameraBounds();
   if (pendingFitAfterStop && dimension.value === '3d') {
     pendingFitAfterStop = false;
-    graph3dInstance.zoomToFit(600);
+    graph3dInstance.zoomToFit(FIT_DURATION, FIT_PADDING);
   }
   consumePendingSectionClickAfterStop('3d');
 };
@@ -382,7 +384,7 @@ const pin2dNodes = () => {
   refreshCameraBounds();
   if (pendingFitAfterStop && dimension.value === '2d') {
     pendingFitAfterStop = false;
-    graph2dInstance.zoomToFit(600);
+    graph2dInstance.zoomToFit(FIT_DURATION, FIT_PADDING);
   }
   consumePendingSectionClickAfterStop('2d');
 };
@@ -604,7 +606,7 @@ const applyView = () => {
   clearIdleGraph();
   relaxCameraLimits();
   restartLabelLoop();
-  if (isFullyPositioned(graph.graphData().nodes)) graph.zoomToFit(600);
+  if (isFullyPositioned(graph.graphData().nodes)) graph.zoomToFit(FIT_DURATION, FIT_PADDING);
   refreshCameraBounds();
   pendingFitAfterStop = true;
   if (requestedSectionClickId === null) return;
