@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/icon.svg" width="128" height="128" alt="" />
+</p>
+
 # slopmap
 
 slopmap turns any JavaScript or TypeScript repository into a 3D architecture map. Its default Compact view rolls files up into groups shown as planets, while diff views reveal a pull request's blast radius. The flight-deck shell keeps view and dimension controls on a left icon rail, repository and pull-request context in the top header, map settings in a bottom controls pill, and details in a permanent tabbed inspector. The name is a joke, and unfortunately an accurate one.
