@@ -12,7 +12,7 @@ slopmap turns any JavaScript or TypeScript repository into a 3D architecture map
 ## Install
 
 ```sh
-git clone <repository-url>
+git clone https://github.com/stahx/slopmap.git
 cd slopmap
 pnpm install
 pnpm link --global
