@@ -4,7 +4,11 @@
 
 # slopmap
 
-slopmap turns any JavaScript or TypeScript repository into a 3D architecture map. Its default Compact view rolls files up into groups shown as planets, while diff views reveal a pull request's blast radius. The flight-deck shell keeps view and dimension controls on a left icon rail, repository and pull-request context in the top header, map settings in a bottom controls pill, and details in a permanent tabbed inspector. The name is a joke, and unfortunately an accurate one.
+**A 3D architecture map of any JavaScript or TypeScript repository — and of the blast radius of any change to it.**
+
+Point it at a repository and every file becomes a node, every import an edge. Point it at a branch or a pull request and it colours what changed, what depends on the change, and what the change depends on, so the reach of a diff is visible before anyone reads it. The default Compact view rolls files up into groups shown as planets; the files view shows the whole graph.
+
+The output is a single self-contained HTML file. The name is a joke, and unfortunately an accurate one.
 
 ## Requirements
 
@@ -40,12 +44,6 @@ slopmap --pr 123
 - `slopmap --base <ref>` renders changes against a Git ref and their blast radius.
 - `slopmap --pr <number>` renders the files changed by a GitHub pull request and their blast radius.
 
-When GitHub PR metadata is available, the header shows its state and change totals. The inspector also provides a direct review action.
-
-Every map has two views on the rail: Compact rolls files up with a compactness slider (`roots` → `groups` → `dirs`), and the files view shows the full graph. Import lines show how items at the active Compact level connect. The inspector overview shows the graph distribution and changed sections; selecting a Compact ball opens Files, Dependents, and Imports tabs with change ratios, importer counts, paths, and blast-radius details, and clicking a changed-file card opens its embedded unified diff. `Copy paths` copies the selected section's paths, while `Isolate blast` jumps to the matching filtered files graph with impact-only enabled. Search, impact-only, isolated-file, theme, and compactness controls live in the floating bottom pill.
-
-Use the rail's dimension button for a 3D orbit or flat 2D canvas; the choice is remembered between visits. In 2D, a selected changed section also shows its blast-radius ring.
-
 | Option          | Description                                                |
 | --------------- | ---------------------------------------------------------- |
 | `--base <ref>`  | Git ref to diff against, such as `master` or `origin/main` |
@@ -53,6 +51,20 @@ Use the rail's dimension button for a 3D orbit or flat 2D canvas; the choice is 
 | `--out <file>`  | Output HTML path; defaults to a temporary file             |
 | `--no-open`     | Do not open the result in a browser                        |
 | `--help`        | Show command help                                          |
+
+When GitHub PR metadata is available, the header shows the pull request's state and change totals, and the inspector offers a direct review action.
+
+## Reading the map
+
+The shell keeps view and dimension controls on a left icon rail, repository and pull-request context in the top header, map settings in a floating bottom pill, and details in a permanent tabbed inspector.
+
+**Views.** The rail carries two. Compact rolls files up behind a compactness slider (`roots` → `groups` → `dirs`); the files view shows the full graph. Import lines show how items at the active Compact level connect.
+
+**Inspector.** The overview shows the graph distribution and the changed sections. Selecting a Compact ball opens Files, Dependents, and Imports tabs carrying change ratios, importer counts, paths, and blast-radius details. Clicking a changed-file card opens its embedded unified diff.
+
+**Actions.** `Copy paths` copies the selected section's paths. `Isolate blast` jumps to the matching filtered files graph with impact-only enabled.
+
+**Controls.** Search, impact-only, isolated-file, theme, and compactness live in the bottom pill. The rail's dimension button switches between a 3D orbit and a flat 2D canvas, and the choice is remembered between visits. In 2D, a selected changed section also draws its blast-radius ring.
 
 ## How it works
 
@@ -100,14 +112,6 @@ If a merge conflict affects `dist/index.html`, resolve it from source and regene
 ```sh
 pnpm build && git add dist
 ```
-
-## Roadmap
-
-- `--ai` annotations through `claude -p`, including cluster labels and a PR impact summary.
-- Polyglot regex packs for Python, Go, Ruby, and PHP.
-- `tsconfig` `paths` aliases.
-- A `--max-nodes` performance guard.
-- GitHub CLI extension packaging.
 
 ## License
 
