@@ -1,13 +1,15 @@
 <template>
   <nav
-    class="icon-rail fixed top-0 bottom-0 left-0 z-[4] flex w-[var(--spacing-rail)] flex-col items-center gap-2 border-r border-white/7 bg-panel/95 py-3.5"
+    class="icon-rail fixed top-0 bottom-0 left-0 z-[4] flex flex-col items-start gap-2 border-r border-white/7 bg-panel/95 py-3.5 transition-[width] duration-150"
+    :class="
+      expanded
+        ? 'w-[188px] px-[13px] shadow-[8px_0_24px_rgba(0,0,0,0.45)]'
+        : 'w-[var(--spacing-rail)] px-[13px]'
+    "
     aria-label="Map controls"
   >
-    <div
-      class="logo-tile flex size-[30px] flex-[0_0_auto] items-center justify-center"
-      aria-label="slopmap"
-    >
-      <svg class="size-[30px]" viewBox="0 0 120 120" aria-hidden="true">
+    <div class="logo-tile flex h-[30px] flex-[0_0_auto] items-center gap-2.5" aria-label="slopmap">
+      <svg class="size-[30px] flex-[0_0_auto]" viewBox="0 0 120 120" aria-hidden="true">
         <rect width="120" height="120" rx="26" fill="var(--color-panel-raised)" />
         <circle
           cx="60"
@@ -22,56 +24,50 @@
         <circle cx="92" cy="60" r="8" fill="var(--color-accent)" />
         <circle cx="38" cy="36" r="6" fill="var(--color-accent-yellow)" />
       </svg>
+      <span
+        v-if="expanded"
+        class="rail-wordmark font-mono text-[13px] font-semibold whitespace-nowrap text-ink"
+        >slopmap</span
+      >
     </div>
     <div class="rail-top-spacer h-2.5 flex-[0_0_auto]"></div>
-    <button
-      class="rail-button inline-flex size-[34px] flex-[0_0_auto] cursor-pointer items-center justify-center rounded-[9px] border-0 p-0 font-mono text-[13px] font-medium hover:bg-white/10 hover:text-ink"
-      :class="
-        currentView === 'compact' ? 'active bg-white/10 text-ink' : 'bg-transparent text-ink/45'
-      "
-      type="button"
-      aria-label="Compact view"
-      @click="showView('compact')"
-    >
-      ◉
-    </button>
-    <button
-      class="rail-button inline-flex size-[34px] flex-[0_0_auto] cursor-pointer items-center justify-center rounded-[9px] border-0 p-0 font-mono text-[13px] font-medium hover:bg-white/10 hover:text-ink"
-      :class="
-        currentView === 'files' ? 'active bg-white/10 text-ink' : 'bg-transparent text-ink/45'
-      "
-      type="button"
-      aria-label="Files view"
-      @click="showView('files')"
-    >
-      ≡
-    </button>
-    <button
-      class="rail-button inline-flex size-[34px] flex-[0_0_auto] cursor-pointer items-center justify-center rounded-[9px] border-0 p-0 font-mono text-[13px] font-medium hover:bg-white/10 hover:text-ink"
-      :class="dimension === '2d' ? 'active bg-white/10 text-ink' : 'bg-transparent text-ink/45'"
-      type="button"
-      title="2D / 3D"
-      aria-label="2D / 3D"
-      @click="toggleDimension"
-    >
-      ⌥
-    </button>
+
+    <RailButton
+      v-for="railButton in railButtons"
+      :key="railButton.key"
+      :glyph="railButton.glyph"
+      :label="railButton.label"
+      :hint="railButton.hint"
+      :active="railButton.active"
+      :expanded="expanded"
+      @activate="railButton.activate()"
+    />
+
     <div class="rail-flex-spacer flex-[1_1_auto]"></div>
     <HelpPopover v-if="helpVisible" @dismiss="dismissHelp" />
-    <button
-      class="rail-button inline-flex size-[34px] flex-[0_0_auto] cursor-pointer items-center justify-center rounded-[9px] border-0 bg-transparent p-0 font-mono text-[13px] font-medium text-ink/45 hover:bg-white/10 hover:text-ink"
-      type="button"
-      aria-label="Help"
+
+    <RailButton
+      glyph="?"
+      label="Help"
+      hint="Keyboard shortcuts and legend"
+      :active="helpVisible"
+      :expanded="expanded"
       :aria-expanded="helpVisible"
-      @click="toggleHelp"
-    >
-      ?
-    </button>
+      @activate="toggleHelp"
+    />
+    <RailButton
+      :glyph="expanded ? '«' : '»'"
+      :label="expanded ? 'Collapse' : 'Expand'"
+      :hint="expanded ? 'Collapse the rail' : 'Expand the rail'"
+      :active="false"
+      :expanded="expanded"
+      @activate="toggleExpanded"
+    />
   </nav>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 
 import { useSettings } from '../../composables/useSettings.js';
 import { useViewState } from '../../composables/useViewState.js';
@@ -80,9 +76,41 @@ const { dimension } = useSettings();
 const { currentView, showView } = useViewState();
 
 const helpVisible = ref(false);
+const expanded = ref(false);
+
+const railButtons = computed(() => [
+  {
+    key: 'compact',
+    glyph: '◉',
+    label: 'Compact',
+    hint: 'Roll files up into groups',
+    active: currentView.value === 'compact',
+    activate: () => showView('compact'),
+  },
+  {
+    key: 'files',
+    glyph: '≡',
+    label: 'Files',
+    hint: 'Show every file in the graph',
+    active: currentView.value === 'files',
+    activate: () => showView('files'),
+  },
+  {
+    key: 'dimension',
+    glyph: '⌥',
+    label: dimension.value === '2d' ? '2D canvas' : '3D orbit',
+    hint: 'Switch between a 3D orbit and a flat 2D canvas',
+    active: dimension.value === '2d',
+    activate: () => toggleDimension(),
+  },
+]);
 
 const toggleDimension = () => {
   dimension.value = dimension.value === '2d' ? '3d' : '2d';
+};
+
+const toggleExpanded = () => {
+  expanded.value = !expanded.value;
 };
 
 const toggleHelp = () => {
