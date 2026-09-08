@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import { clampToBounds, computeBounds, expandBounds } from './cameraBounds.js';
+import { clampToBounds, computeBounds, computeMinZoom, expandBounds } from './cameraBounds.js';
 
 describe('app/src/lib/cameraBounds', () => {
   test('computeBounds', () => {
@@ -36,6 +36,12 @@ describe('app/src/lib/cameraBounds', () => {
       centerZ: 0,
       radius: 250,
     });
+  });
+
+  test('computeMinZoom', () => {
+    expect(computeMinZoom({ minX: 0, maxX: 2400, minY: 0, maxY: 1600 }, 1200, 800)).toBe(0.25);
+    expect(computeMinZoom({ minX: 0, maxX: 375, minY: 0, maxY: 375 }, 1200, 800)).toBe(1);
+    expect(computeMinZoom({ minX: 0, maxX: 0, minY: 0, maxY: 0 }, 1200, 800)).toBe(0.01);
   });
 
   test('clampToBounds', () => {

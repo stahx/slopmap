@@ -32,6 +32,14 @@ export const computeBounds = (nodes) => {
 export const clampToBounds = (value, minimum, maximum) =>
   Math.min(Math.max(value, minimum), maximum);
 
+export const computeMinZoom = (bounds, width, height) => {
+  const boundsWidth = bounds.maxX - bounds.minX;
+  const boundsHeight = bounds.maxY - bounds.minY;
+  if (boundsWidth <= 0 || boundsHeight <= 0) return 0.01;
+  const fitZoom = Math.min(width / boundsWidth, height / boundsHeight);
+  return Math.min(fitZoom * 0.5, 1);
+};
+
 export const expandBounds = (bounds, marginRatio, marginAbsolute) => {
   const marginX = (bounds.maxX - bounds.minX) * marginRatio + marginAbsolute;
   const marginY = (bounds.maxY - bounds.minY) * marginRatio + marginAbsolute;
