@@ -13,22 +13,22 @@ describe('app/src/components/IconRail/subcomponents/RailButton', () => {
   test('render', () => {
     const wrapper = shallowMount(RailButton, { props: BASE_PROPS });
 
-    expect(wrapper.find('.rail-glyph').text()).toBe('◉');
+    expect(wrapper.find('button').text()).toBe('◉');
     expect(wrapper.find('button').attributes('aria-label')).toBe('Compact');
   });
 
-  test('shows the tooltip markup only while collapsed', () => {
-    const collapsed = shallowMount(RailButton, { props: BASE_PROPS });
+  test('renders the tooltip label and hint', () => {
+    const wrapper = shallowMount(RailButton, { props: BASE_PROPS });
 
-    expect(collapsed.find('.rail-tooltip').exists()).toBe(true);
-    expect(collapsed.find('.rail-tooltip-label').text()).toBe('Compact');
-    expect(collapsed.find('.rail-tooltip-hint').text()).toBe('Roll files up into groups');
-    expect(collapsed.find('.rail-label').exists()).toBe(false);
+    expect(wrapper.find('.rail-tooltip-label').text()).toBe('Compact');
+    expect(wrapper.find('.rail-tooltip-hint').text()).toBe('Roll files up into groups');
+  });
 
-    const expanded = shallowMount(RailButton, { props: { ...BASE_PROPS, expanded: true } });
+  test('omits the hint line when no hint is given', () => {
+    const wrapper = shallowMount(RailButton, { props: { glyph: '?', label: 'Help' } });
 
-    expect(expanded.find('.rail-tooltip').exists()).toBe(false);
-    expect(expanded.find('.rail-label').text()).toBe('Compact');
+    expect(wrapper.find('.rail-tooltip-label').text()).toBe('Help');
+    expect(wrapper.find('.rail-tooltip-hint').exists()).toBe(false);
   });
 
   test('emits activate on click', async () => {

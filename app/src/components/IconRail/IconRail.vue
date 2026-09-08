@@ -1,15 +1,13 @@
 <template>
   <nav
-    class="icon-rail fixed top-0 bottom-0 left-0 z-[4] flex flex-col items-start gap-2 border-r border-white/7 bg-panel/95 py-3.5 transition-[width] duration-150"
-    :class="
-      expanded
-        ? 'w-[188px] px-[13px] shadow-[8px_0_24px_rgba(0,0,0,0.45)]'
-        : 'w-[var(--spacing-rail)] px-[13px]'
-    "
+    class="icon-rail fixed top-0 bottom-0 left-0 z-[4] flex w-[var(--spacing-rail)] flex-col items-center gap-2 border-r border-white/7 bg-panel/95 py-3.5"
     aria-label="Map controls"
   >
-    <div class="logo-tile flex h-[30px] flex-[0_0_auto] items-center gap-2.5" aria-label="slopmap">
-      <svg class="size-[30px] flex-[0_0_auto]" viewBox="0 0 120 120" aria-hidden="true">
+    <div
+      class="logo-tile flex size-[30px] flex-[0_0_auto] items-center justify-center"
+      aria-label="slopmap"
+    >
+      <svg class="size-[30px]" viewBox="0 0 120 120" aria-hidden="true">
         <rect width="120" height="120" rx="26" fill="var(--color-panel-raised)" />
         <circle
           cx="60"
@@ -24,11 +22,6 @@
         <circle cx="92" cy="60" r="8" fill="var(--color-accent)" />
         <circle cx="38" cy="36" r="6" fill="var(--color-accent-yellow)" />
       </svg>
-      <span
-        v-if="expanded"
-        class="rail-wordmark font-mono text-[13px] font-semibold whitespace-nowrap text-ink"
-        >slopmap</span
-      >
     </div>
     <div class="rail-top-spacer h-2.5 flex-[0_0_auto]"></div>
 
@@ -39,7 +32,6 @@
       :label="railButton.label"
       :hint="railButton.hint"
       :active="railButton.active"
-      :expanded="expanded"
       @activate="railButton.activate()"
     />
 
@@ -51,17 +43,8 @@
       label="Help"
       hint="Keyboard shortcuts and legend"
       :active="helpVisible"
-      :expanded="expanded"
       :aria-expanded="helpVisible"
       @activate="toggleHelp"
-    />
-    <RailButton
-      :glyph="expanded ? '«' : '»'"
-      :label="expanded ? 'Collapse' : 'Expand'"
-      :hint="expanded ? 'Collapse the rail' : 'Expand the rail'"
-      :active="false"
-      :expanded="expanded"
-      @activate="toggleExpanded"
     />
   </nav>
 </template>
@@ -76,7 +59,6 @@ const { dimension } = useSettings();
 const { currentView, showView } = useViewState();
 
 const helpVisible = ref(false);
-const expanded = ref(false);
 
 const railButtons = computed(() => [
   {
@@ -107,10 +89,6 @@ const railButtons = computed(() => [
 
 const toggleDimension = () => {
   dimension.value = dimension.value === '2d' ? '3d' : '2d';
-};
-
-const toggleExpanded = () => {
-  expanded.value = !expanded.value;
 };
 
 const toggleHelp = () => {
