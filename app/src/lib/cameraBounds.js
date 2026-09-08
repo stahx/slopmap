@@ -1,7 +1,10 @@
+export const isPositioned = (node) =>
+  Number.isFinite(node.x) && Number.isFinite(node.y) && Number.isFinite(node.z ?? 0);
+
+export const isFullyPositioned = (nodes) => nodes.length > 0 && nodes.every(isPositioned);
+
 export const computeBounds = (nodes) => {
-  const positionedNodes = nodes.filter(
-    (node) => Number.isFinite(node.x) && Number.isFinite(node.y) && Number.isFinite(node.z ?? 0),
-  );
+  const positionedNodes = nodes.filter(isPositioned);
   if (positionedNodes.length === 0) return null;
 
   let minX = Infinity;
