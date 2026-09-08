@@ -26,7 +26,7 @@ export default defineConfig({
     }),
     AutoImport({
       imports: ['vue'],
-      dts: 'app/src/auto-imports.d.ts',
+      dts: false,
       eslintrc: {
         enabled: true,
         filepath: 'app/.eslintrc-auto-import.json',
@@ -34,7 +34,7 @@ export default defineConfig({
     }),
     Components({
       dirs: ['src/components'],
-      dts: 'app/src/components.d.ts',
+      dts: false,
     }),
     viteSingleFile({ removeViteModuleLoader: true }),
     assertSingleFile(),
