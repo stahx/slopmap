@@ -308,6 +308,12 @@ const feedGraph = (graph, graphData) => {
   graph.graphData(graphData);
 };
 
+const clearIdleGraph = () => {
+  const idleGraph = dimension.value === '2d' ? graph3dInstance : graph2dInstance;
+  if (idleGraph === null || idleGraph.graphData().nodes.length === 0) return;
+  idleGraph.graphData({ nodes: [], links: [] });
+};
+
 const filteredFilesGraph = () => {
   if (payload.value === null) return { nodes: [], links: [] };
   return filterGraph({
@@ -348,7 +354,7 @@ const consumePendingSectionClickAfterStop = (stoppedDimension) => {
 };
 
 const pin3dNodes = () => {
-  if (graph3dInstance === null) return;
+  if (graph3dInstance === null || dimension.value !== '3d') return;
   for (const node of graph3dInstance.graphData().nodes) {
     node.fx = node.x;
     node.fy = node.y;
@@ -363,7 +369,7 @@ const pin3dNodes = () => {
 };
 
 const pin2dNodes = () => {
-  if (graph2dInstance === null) return;
+  if (graph2dInstance === null || dimension.value !== '2d') return;
   for (const node of graph2dInstance.graphData().nodes) {
     node.fx = node.x;
     node.fy = node.y;
@@ -557,8 +563,11 @@ const resizeGraphs = (width, height) => {
 
 const refreshFilesGraph = () => {
   if (currentView.value !== 'files') return;
-  feedGraph(activeGraph(), filteredFilesGraph());
+  const graph = activeGraph();
+  feedGraph(graph, filteredFilesGraph());
   relaxCameraLimits();
+  if (graph === null) return;
+  if (graph.graphData().nodes.some((node) => Number.isFinite(node.x))) refreshCameraBounds();
 };
 
 const applyView = () => {
@@ -591,10 +600,14 @@ const applyView = () => {
     graph.d3Force('charge').strength(-45);
     graph.d3Force('link').distance(35);
   }
+  clearIdleGraph();
   relaxCameraLimits();
   restartLabelLoop();
   const hasSettledCoordinates = graph.graphData().nodes.some((node) => Number.isFinite(node.x));
-  if (hasSettledCoordinates) graph.zoomToFit(600);
+  if (hasSettledCoordinates) {
+    graph.zoomToFit(600);
+    refreshCameraBounds();
+  }
   pendingFitAfterStop = true;
   if (requestedSectionClickId === null) return;
   const section = activeAggregate.value?.sections.find(

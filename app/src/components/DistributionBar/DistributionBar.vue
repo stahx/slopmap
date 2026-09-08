@@ -1,5 +1,6 @@
 <template>
   <div
+    v-if="segments.length > 0"
     class="distribution-bar flex h-[7px] gap-0.5 overflow-hidden rounded-[4px]"
     aria-hidden="true"
   >
@@ -54,6 +55,6 @@ const segments = computed(() => {
       color: MUTED_COLOR,
       count: untouchedCount,
     },
-  ];
+  ].filter((segment) => segment.count > 0);
 });
 </script>
