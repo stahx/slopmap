@@ -13,7 +13,7 @@ import {
 } from 'three';
 import { isProxy, onBeforeUnmount, ref, watch } from 'vue';
 
-import { clampToBounds, computeBounds, expandBounds } from '../lib/cameraBounds.js';
+import { clampToBounds, computeBounds, computeMinZoom, expandBounds } from '../lib/cameraBounds.js';
 import { filterGraph } from '../lib/filterGraph.js';
 import {
   linkColorFor,
@@ -254,7 +254,9 @@ const refreshCameraBounds = () => {
     cameraBounds = null;
     return;
   }
-  const bounds = computeBounds(graph.graphData().nodes);
+  const nodes = graph.graphData().nodes;
+  if (nodes.length === 0 || nodes.some((node) => !Number.isFinite(node.x))) return;
+  const bounds = computeBounds(nodes);
   cameraBounds = bounds === null ? null : expandBounds(bounds, 0.25, 150);
   if (cameraBounds === null) return;
   if (dimension.value === '3d') {
@@ -268,10 +270,7 @@ const refreshCameraBounds = () => {
   const width = mapWidth.value;
   const height = mapHeight.value;
   if (width <= 0 || height <= 0) return;
-  const boundsWidth = cameraBounds.maxX - cameraBounds.minX;
-  const boundsHeight = cameraBounds.maxY - cameraBounds.minY;
-  const fitZoom = Math.min(width / boundsWidth, height / boundsHeight);
-  graph2dInstance.minZoom(fitZoom * 0.5);
+  graph2dInstance.minZoom(computeMinZoom(cameraBounds, width, height));
 };
 
 const relaxCameraLimits = () => {
@@ -566,8 +565,7 @@ const refreshFilesGraph = () => {
   const graph = activeGraph();
   feedGraph(graph, filteredFilesGraph());
   relaxCameraLimits();
-  if (graph === null) return;
-  if (graph.graphData().nodes.some((node) => Number.isFinite(node.x))) refreshCameraBounds();
+  refreshCameraBounds();
 };
 
 const applyView = () => {
@@ -604,10 +602,8 @@ const applyView = () => {
   relaxCameraLimits();
   restartLabelLoop();
   const hasSettledCoordinates = graph.graphData().nodes.some((node) => Number.isFinite(node.x));
-  if (hasSettledCoordinates) {
-    graph.zoomToFit(600);
-    refreshCameraBounds();
-  }
+  if (hasSettledCoordinates) graph.zoomToFit(600);
+  refreshCameraBounds();
   pendingFitAfterStop = true;
   if (requestedSectionClickId === null) return;
   const section = activeAggregate.value?.sections.find(
