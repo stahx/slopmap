@@ -89,7 +89,7 @@ pnpm format       # prettier check
 
 Tests are split into two Vitest projects: `cli` covers `src/` in a Node environment, `viewer` covers `app/` in jsdom.
 
-Two Git hooks guard the repository. The pre-commit hook runs lint-staged, which fixes ESLint issues, formats staged source files, and runs the specs related to them without rebuilding the viewer. The pre-push hook runs the full suite. Both are installed by `pnpm install` through the `prepare` script; run `pnpm exec husky` if `.husky/_` is ever missing, because a missing runtime directory makes Git skip the hooks silently. Pass `--no-verify` to bypass either one.
+Two Git hooks guard the repository. The pre-commit hook runs lint-staged, which fixes ESLint issues, formats staged source files, and runs the specs related to them without rebuilding the viewer. The pre-push hook runs the full suite and then `pnpm check:dist`, so a stale `dist/index.html` blocks the push; note that `check:dist` rebuilds the artifact in your working tree as a side effect. Both are installed by `pnpm install` through the `prepare` script; run `pnpm exec husky` if `.husky/_` is ever missing, because a missing runtime directory makes Git skip the hooks silently. Pass `--no-verify` to bypass either one.
 
 If a merge conflict affects `dist/index.html`, resolve it from source and regenerate the artifact:
 
