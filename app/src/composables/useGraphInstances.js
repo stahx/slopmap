@@ -360,13 +360,31 @@ const consumePendingSectionClickAfterStop = (stoppedDimension) => {
   if (section !== undefined && Number.isFinite(section.x)) handleNodeClick(section);
 };
 
-const pin3dNodes = () => {
-  if (graph3dInstance === null || dimension.value !== '3d') return;
-  for (const node of graph3dInstance.graphData().nodes) {
+const pinNodes = (graph, withDepth) => {
+  for (const node of graph.graphData().nodes) {
+    if (!Number.isFinite(node.x) || !Number.isFinite(node.y)) continue;
     node.fx = node.x;
     node.fy = node.y;
-    node.fz = node.z;
+    if (withDepth && Number.isFinite(node.z)) node.fz = node.z;
   }
+};
+
+const lockLayoutOnDrag = (draggedNode) => {
+  const graph = activeGraph();
+  if (graph === null) return;
+  for (const node of graph.graphData().nodes) {
+    if (node === draggedNode) continue;
+    if (Number.isFinite(node.fx)) continue;
+    if (!Number.isFinite(node.x) || !Number.isFinite(node.y)) continue;
+    node.fx = node.x;
+    node.fy = node.y;
+    if (dimension.value === '3d' && Number.isFinite(node.z)) node.fz = node.z;
+  }
+};
+
+const pin3dNodes = () => {
+  if (graph3dInstance === null || dimension.value !== '3d') return;
+  pinNodes(graph3dInstance, true);
   refreshCameraBounds();
   if (pendingFitAfterStop && dimension.value === '3d') {
     pendingFitAfterStop = false;
@@ -377,10 +395,7 @@ const pin3dNodes = () => {
 
 const pin2dNodes = () => {
   if (graph2dInstance === null || dimension.value !== '2d') return;
-  for (const node of graph2dInstance.graphData().nodes) {
-    node.fx = node.x;
-    node.fy = node.y;
-  }
+  pinNodes(graph2dInstance, false);
   refreshCameraBounds();
   if (pendingFitAfterStop && dimension.value === '2d') {
     pendingFitAfterStop = false;
@@ -650,6 +665,7 @@ const createGraphInstances = (host3dElement, host2dElement) => {
     .linkOpacity(0.35)
     .linkDirectionalParticles(particleCountFor)
     .linkDirectionalParticleWidth(1.4)
+    .onNodeDrag(lockLayoutOnDrag)
     .onNodeClick(handleNodeClick)
     .onBackgroundClick(handleBackgroundClick)
     .onEngineStop(pin3dNodes);
@@ -669,6 +685,7 @@ const createGraphInstances = (host3dElement, host2dElement) => {
     .nodeCanvasObject(render2dNodeLabel)
     .onNodeClick(handleNodeClick)
     .onBackgroundClick(handleBackgroundClick)
+    .onNodeDrag(lockLayoutOnDrag)
     .onEngineStop(pin2dNodes)
     .onZoom(({ x: centerGraphX, y: centerGraphY }) => {
       pan2dX = centerGraphX;
