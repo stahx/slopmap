@@ -72,7 +72,7 @@ const legendRows = computed(() => {
         selectable: false,
         dimmed: true,
       },
-    ];
+    ].filter((row) => row.count > 0);
   }
 
   const groups = payload.value?.graph?.groups ?? [];
