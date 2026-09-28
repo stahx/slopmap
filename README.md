@@ -52,7 +52,26 @@ Use the rail's dimension button for a 3D orbit or flat 2D canvas; the choice is 
 | `--pr <number>` | GitHub PR number; uses `gh` to fetch changed files         |
 | `--out <file>`  | Output HTML path; defaults to a temporary file             |
 | `--no-open`     | Do not open the result in a browser                        |
+| `--json`        | Print a query command's result as JSON                     |
+| `--limit <n>`   | Rows per list in query output; defaults to 30              |
 | `--help`        | Show command help                                          |
+
+## Querying the graph
+
+The import graph behind the map can also be read in the terminal, with no HTML and no browser. Nothing is cached: every call rebuilds the graph from the working tree, which takes about 350 ms on a 5,000-file repository, so an answer is never stale.
+
+```sh
+slopmap query onboarding step   # find source files by path
+slopmap context src/graph.js    # what a file imports and what imports it
+slopmap impact src/graph.js     # everything that depends on a file, by depth
+slopmap changes                 # working-tree changes and their blast radius
+slopmap changes --base master   # or --pr 123
+slopmap overview                # sections with file counts and import flows
+```
+
+A file argument can be a repository-relative path, a path relative to the current directory, or any unique suffix such as `graph.js`; an ambiguous name lists its candidates. Output is plain text sized for coding agents as much as for people, and `--json` returns the same result as structured data.
+
+The graph is file-level: it knows which files import which, not which functions call which.
 
 ## How it works
 

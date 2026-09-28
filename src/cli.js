@@ -7,6 +7,23 @@ import { collectRepoFiles, scanSources } from './scan.js';
 import { createResolver } from './resolve.js';
 import { buildGraph } from './graph.js';
 import { renderHtml, writeOutput } from './render.js';
+import {
+  DEFAULT_LIMIT,
+  changeImpact,
+  createIndex,
+  fileContext,
+  findFiles,
+  impactOf,
+  resolveFilePath,
+  sectionOverview,
+} from './query.js';
+import {
+  formatChanges,
+  formatContext,
+  formatImpact,
+  formatOverview,
+  formatQuery,
+} from './queryFormat.js';
 
 const PATCH_BUFFER_LIMIT = 64 * 1024 * 1024;
 const PATCH_LINE_LIMIT = 500;
@@ -19,15 +36,34 @@ Usage:
   slopmap --base <ref>        diff map: changes vs <ref> + blast radius
   slopmap --pr <number>       diff map for a GitHub PR (via gh CLI)
 
+Query the import graph in the terminal (no map, no browser):
+  slopmap query <term>        find source files by path
+  slopmap context <file>      what a file imports and what imports it
+  slopmap impact <file>       everything that depends on a file, by depth
+  slopmap changes             working-tree changes and their blast radius
+  slopmap changes --base <ref> | --pr <number>
+  slopmap overview            sections with file counts and import flows
+
 Options:
   --base <ref>       git ref to diff against (e.g. master, origin/main)
   --pr <number>      GitHub PR number; uses gh to fetch changed files
   --out <file>       output HTML path (default: temp file)
   --no-open          do not open the result in a browser
+  --json             print a query command's result as JSON
+  --limit <n>        max rows per list in query output (default ${DEFAULT_LIMIT})
   --help             show this help
 `;
 
+const QUERY_COMMANDS = new Set(['query', 'context', 'impact', 'changes', 'overview']);
+
 const git = (cwd, args) => execFileSync('git', args, { cwd, encoding: 'utf8' }).trimEnd();
+
+const toPosix = (filePath) => filePath.split(path.sep).join('/');
+
+const exitWith = (message) => {
+  process.stderr.write(`slopmap: ${message}\n`);
+  process.exit(1);
+};
 
 const outputLines = (output) => output.split('\n').filter(Boolean);
 
@@ -208,13 +244,26 @@ const detectPullRequest = (repoRoot, prNumber) => {
 };
 
 const parseArgs = (argv) => {
-  const options = { base: null, pr: null, out: null, open: true, help: false };
+  const options = {
+    base: null,
+    pr: null,
+    out: null,
+    open: true,
+    help: false,
+    json: false,
+    limit: null,
+    command: null,
+    commandArgs: [],
+  };
+  const positionals = [];
   for (let argIndex = 0; argIndex < argv.length; argIndex += 1) {
     const arg = argv[argIndex];
     if (arg === '--help' || arg === '-h') {
       options.help = true;
     } else if (arg === '--no-open') {
       options.open = false;
+    } else if (arg === '--json') {
+      options.json = true;
     } else if (arg === '--base') {
       argIndex += 1;
       options.base = argv[argIndex];
@@ -224,17 +273,36 @@ const parseArgs = (argv) => {
     } else if (arg === '--out') {
       argIndex += 1;
       options.out = argv[argIndex];
+    } else if (arg === '--limit') {
+      argIndex += 1;
+      options.limit = argv[argIndex];
+    } else if (!arg.startsWith('-')) {
+      positionals.push(arg);
     } else {
       process.stderr.write(`slopmap: unknown option "${arg}"\n\n${HELP_TEXT}`);
       process.exit(1);
     }
   }
-  const hasMissingValue = [options.base, options.pr, options.out].some(
+  const hasMissingValue = [options.base, options.pr, options.out, options.limit].some(
     (value) => value === undefined || (value !== null && value.startsWith('--')),
   );
   if (hasMissingValue) {
     process.stderr.write(`slopmap: missing value for option\n\n${HELP_TEXT}`);
     process.exit(1);
+  }
+  if (positionals.length > 0) {
+    const [command, ...commandArgs] = positionals;
+    if (!QUERY_COMMANDS.has(command)) {
+      process.stderr.write(`slopmap: unknown command "${command}"\n\n${HELP_TEXT}`);
+      process.exit(1);
+    }
+    options.command = command;
+    options.commandArgs = commandArgs;
+  }
+  if (options.limit !== null) {
+    const limit = Number(options.limit);
+    if (!Number.isInteger(limit) || limit < 1) exitWith('--limit needs a positive whole number');
+    options.limit = limit;
   }
   return options;
 };
@@ -396,6 +464,78 @@ export const resolveChangedFiles = (repoRoot, options) => {
   return { modeLabel: 'full map', files: new Set() };
 };
 
+const buildRepoGraph = (repoRoot, changedFiles, changes) => {
+  const repoFiles = collectRepoFiles(repoRoot);
+  const sources = scanSources(repoRoot, repoFiles.sourceFiles);
+  const resolver = createResolver(repoRoot, repoFiles);
+  return buildGraph({ sources, resolver, changedFiles, changes });
+};
+
+const resolveFileArgument = (repoRoot, index, input) => {
+  const absolute = path.isAbsolute(input);
+  const resolved = resolveFilePath(
+    index,
+    absolute ? toPosix(path.relative(repoRoot, input)) : input,
+    absolute ? '' : toPosix(path.relative(repoRoot, process.cwd())),
+  );
+  if (resolved.match !== null) return resolved.match;
+  if (resolved.candidates.length === 0) {
+    exitWith(
+      `"${input}" is not a source file in the import graph (try: slopmap query ${path.posix.basename(input)})`,
+    );
+  }
+  const shown = resolved.candidates.slice(0, DEFAULT_LIMIT);
+  const hidden = resolved.candidates.length - shown.length;
+  exitWith(
+    `"${input}" matches ${resolved.candidates.length} files, pass a longer path:\n` +
+      shown.map((candidate) => `  ${candidate}`).join('\n') +
+      (hidden > 0 ? `\n  ... ${hidden} more` : ''),
+  );
+};
+
+const runQueryCommand = (repoRoot, options) => {
+  const { command, commandArgs } = options;
+  const limit = options.limit ?? DEFAULT_LIMIT;
+  if (command !== 'changes' && (options.base || options.pr)) {
+    exitWith(`--base and --pr only apply to "changes", not "${command}"`);
+  }
+  let result;
+  let text;
+  if (command === 'changes') {
+    const target = options.base || options.pr ? options : { ...options, base: 'HEAD' };
+    const changed = resolveChangedFiles(repoRoot, target);
+    const changes = collectChanges(
+      repoRoot,
+      { ...target, pullRequestData: changed.pullRequestData },
+      changed.files,
+    );
+    const index = createIndex(buildRepoGraph(repoRoot, changed.files, changes));
+    const mode = options.pr
+      ? `in ${changed.modeLabel}`
+      : options.base
+        ? changed.modeLabel
+        : 'in working tree';
+    result = { mode, ...changeImpact(index, changes) };
+    text = formatChanges(result, limit);
+  } else {
+    const index = createIndex(buildRepoGraph(repoRoot));
+    if (command === 'overview') {
+      result = sectionOverview(index);
+      text = formatOverview(result);
+    } else if (command === 'query') {
+      if (commandArgs.length === 0) exitWith('query needs a search term');
+      result = findFiles(index, commandArgs.join(' '), limit);
+      text = formatQuery(result);
+    } else {
+      if (commandArgs.length !== 1) exitWith(`${command} needs exactly one file path`);
+      const filePath = resolveFileArgument(repoRoot, index, commandArgs[0]);
+      result = command === 'context' ? fileContext(index, filePath) : impactOf(index, [filePath]);
+      text = command === 'context' ? formatContext(result, limit) : formatImpact(result, limit);
+    }
+  }
+  process.stdout.write(options.json ? `${JSON.stringify(result, null, 2)}\n` : `${text}\n`);
+};
+
 export const runCli = async (argv) => {
   const options = parseArgs(argv);
   if (options.help) {
@@ -404,6 +544,10 @@ export const runCli = async (argv) => {
   }
 
   const repoRoot = git(process.cwd(), ['rev-parse', '--show-toplevel']);
+  if (options.command) {
+    runQueryCommand(repoRoot, options);
+    return;
+  }
   const repoName = path.basename(repoRoot);
 
   const changed = resolveChangedFiles(repoRoot, options);
@@ -424,10 +568,7 @@ export const runCli = async (argv) => {
     pullRequest,
     generatedAt: new Date().toISOString(),
   };
-  const repoFiles = collectRepoFiles(repoRoot);
-  const sources = scanSources(repoRoot, repoFiles.sourceFiles);
-  const resolver = createResolver(repoRoot, repoFiles);
-  const graph = buildGraph({ sources, resolver, changedFiles: changed.files, changes });
+  const graph = buildRepoGraph(repoRoot, changed.files, changes);
 
   const html = renderHtml({ graph, repoName, modeLabel: changed.modeLabel, context });
   const outPath = options.out
